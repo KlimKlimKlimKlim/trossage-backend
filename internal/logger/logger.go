@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/config"
 )
@@ -13,14 +14,23 @@ func New(cfg config.Logger) (*zap.Logger, error) {
 	switch cfg.Env {
 	case "prod":
 		gin.SetMode(gin.ReleaseMode)
-		return zap.NewProduction()
+		zapCfg := zap.NewProductionConfig()
+		zapCfg.DisableStacktrace = true
+		zapCfg.DisableCaller = true
+		return zapCfg.Build()
+
 	case "dev":
-		gin.SetMode(gin.DebugMode)
-		return zap.NewDevelopment()
+		gin.SetMode(gin.ReleaseMode)
+		zapCfg := zap.NewDevelopmentConfig()
+		zapCfg.DisableStacktrace = true
+		zapCfg.DisableCaller = true
+		zapCfg.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
+		return zapCfg.Build()
+
 	case "test":
 		gin.SetMode(gin.TestMode)
 		return zap.NewExample(), nil
-	default:
-		return nil, errors.New("unknown logger environment")
 	}
+
+	return nil, errors.New("unknown logger environment")
 }

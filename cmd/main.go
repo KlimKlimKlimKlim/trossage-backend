@@ -28,7 +28,7 @@ func run() int {
 
 	ctx := context.Background()
 
-	if err = app.Init(); err != nil {
+	if err = app.Init(ctx); err != nil {
 		log.Println("Failed to init app:", err)
 		return 1
 	}

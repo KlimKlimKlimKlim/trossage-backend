@@ -1,0 +1,28 @@
+package api
+
+import (
+	"github.com/gin-gonic/gin"
+
+	"github.com/KlimKlimKlimKlim/trossage-backend/internal/dto"
+	derrors "github.com/KlimKlimKlimKlim/trossage-backend/internal/errors"
+	"github.com/KlimKlimKlimKlim/trossage-backend/internal/http/response"
+)
+
+func (s *state) registerUser(ctx *gin.Context) {
+	var req dto.RegisterUserRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		response.HandleError(ctx, derrors.ErrInvalidBody)
+		return
+	}
+
+	user, accessToken, refreshToken, err := s.controller.CreateUser(ctx, req.Login, req.Password, req.DisplayName)
+	if err != nil {
+		response.HandleError(ctx, err)
+		return
+	}
+
+	var resp dto.CreateUserResponse
+	resp.Fill(user, accessToken, refreshToken)
+
+	response.Created(ctx, resp)
+}

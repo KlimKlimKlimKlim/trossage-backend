@@ -9,13 +9,17 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/jackc/pgx/v5/pgxpool"
 	"go.uber.org/zap"
 	"golang.org/x/sync/errgroup"
 
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/config"
+	"github.com/KlimKlimKlimKlim/trossage-backend/internal/controller"
+	"github.com/KlimKlimKlimKlim/trossage-backend/internal/http/servers/api"
+	"github.com/KlimKlimKlimKlim/trossage-backend/internal/http/servers/system"
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/logger"
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/server/api"
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/server/system"
+	"github.com/KlimKlimKlimKlim/trossage-backend/internal/postgres"
+	"github.com/KlimKlimKlimKlim/trossage-backend/internal/postgres/repository"
 )
 
 type App struct {
@@ -24,6 +28,10 @@ type App struct {
 
 	errorGroup    *errgroup.Group
 	errorGroupCtx context.Context
+
+	pool *pgxpool.Pool
+
+	controller *controller.Controller
 
 	systemServer *http.Server
 	apiServer    *http.Server
@@ -38,15 +46,27 @@ func New(cfg *config.Config) (*App, error) {
 	app := App{
 		log:    log,
 		config: cfg,
-
-		systemServer: system.New(log, &cfg.Server.System),
-		apiServer:    api.New(log, &cfg.Server.API),
 	}
 
 	return &app, nil
 }
 
-func (a *App) Init() error {
+func (a *App) Init(ctx context.Context) error {
+	pool, err := postgres.New(ctx, &a.config.Postgres)
+	if err != nil {
+		return fmt.Errorf("failed to connect to postgres: %w", err)
+	}
+
+	a.log.Info("Database connected")
+
+	a.pool = pool
+
+	repoManager := postgres.NewManager(pool, repository.NewRepository(pool))
+	a.controller = controller.New(a.config, repoManager)
+
+	a.systemServer = system.New(&a.config.Server.System)
+	a.apiServer = api.New(a.log, &a.config.Server.API, a.controller)
+
 	return nil
 }
 
@@ -54,21 +74,21 @@ func (a *App) Start(ctx context.Context) error {
 	a.errorGroup, a.errorGroupCtx = errgroup.WithContext(ctx)
 
 	a.errorGroup.Go(func() error {
+		a.log.Info("System HTTP server starting", zap.String("address", a.systemServer.Addr))
+
 		if err := a.systemServer.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			return fmt.Errorf("system HTTP server: %w", err)
 		}
-
-		a.log.Info("System HTTP server started", zap.String("address", a.systemServer.Addr))
 
 		return nil
 	})
 
 	a.errorGroup.Go(func() error {
+		a.log.Info("API HTTP server starting", zap.String("address", a.apiServer.Addr))
+
 		if err := a.apiServer.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			return fmt.Errorf("api HTTP server: %w", err)
 		}
-
-		a.log.Info("API HTTP server started", zap.String("address", a.apiServer.Addr))
 
 		return nil
 	})
@@ -117,6 +137,11 @@ func (a *App) Stop() error {
 		} else {
 			a.log.Info("API HTTP server stopped")
 		}
+	}
+
+	if a.pool != nil {
+		a.pool.Close()
+		a.log.Info("Database disconnected")
 	}
 
 	_ = a.log.Sync()

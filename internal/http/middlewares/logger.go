@@ -1,4 +1,4 @@
-package api
+package middlewares
 
 import (
 	"time"
@@ -12,7 +12,7 @@ const (
 	RequestIDHeader = "X-Request-ID"
 )
 
-func loggingMiddleware(logger *zap.Logger) gin.HandlerFunc {
+func Logging(logger *zap.Logger) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		start := time.Now()
 
@@ -27,28 +27,22 @@ func loggingMiddleware(logger *zap.Logger) gin.HandlerFunc {
 			zap.String("request_id", requestID),
 			zap.String("method", c.Request.Method),
 			zap.String("path", c.Request.URL.Path),
-			zap.String("query", c.Request.URL.RawQuery),
 			zap.Int("status", c.Writer.Status()),
 			zap.Duration("duration", time.Since(start)),
 			zap.String("user_agent", c.Request.UserAgent()),
 		}
 
-		switch {
-		case c.Writer.Status() >= 500:
-			logger.Error("API HTTP request", fields...)
-		case c.Writer.Status() >= 400:
-			logger.Warn("API HTTP request", fields...)
-		default:
-			logger.Info("API HTTP request", fields...)
+		if len(c.Errors) > 0 {
+			fields = append(fields, zap.Error(c.Errors[0].Err))
 		}
 
-		if len(c.Errors) > 0 {
-			for _, err := range c.Errors {
-				logger.Error("Request error",
-					zap.String("request_id", requestID),
-					zap.Error(err),
-				)
-			}
+		switch {
+		case c.Writer.Status() >= 500:
+			logger.Error("HTTP request", fields...)
+		case c.Writer.Status() >= 400:
+			logger.Warn("HTTP request", fields...)
+		default:
+			logger.Info("HTTP request", fields...)
 		}
 	}
 }

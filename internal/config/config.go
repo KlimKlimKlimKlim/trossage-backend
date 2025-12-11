@@ -9,8 +9,11 @@ import (
 )
 
 type Config struct {
-	Server Server `envPrefix:"SERVER_"`
-	Logger Logger `envPrefix:"LOGGER_"`
+	Server   Server   `envPrefix:"SERVER_"`
+	Logger   Logger   `envPrefix:"LOGGER_"`
+	Postgres Postgres `envPrefix:"POSTGRES_"`
+	Hasher   Hasher   `envPrefix:"HASHER_"`
+	JWT      JWT      `envPrefix:"JWT_"`
 }
 
 type Server struct {
@@ -35,6 +38,37 @@ type APIServer struct {
 	IdleTimeout       time.Duration `env:"IDLE_TIMEOUT" envDefault:"120s"`
 	ReadHeaderTimeout time.Duration `env:"READ_HEADER_TIMEOUT" envDefault:"3s"`
 	MaxHeaderBytes    int           `env:"MAX_HEADER_BYTES" envDefault:"1048576"` // 1 MB
+}
+
+type Postgres struct {
+	Host              string        `env:"HOST,required"`
+	Port              string        `env:"PORT,required"`
+	User              string        `env:"USER,required"`
+	Password          string        `env:"PASSWORD,required"`
+	DBName            string        `env:"DB,required"`
+	SSLMode           string        `env:"SSL_MODE,required"`
+	MaxConns          int32         `env:"MAX_CONNS" envDefault:"25"`
+	MinConns          int32         `env:"MIN_CONNS" envDefault:"5"`
+	MaxConnLifetime   time.Duration `env:"MAX_CONN_LIFETIME" envDefault:"5m"`
+	MaxConnIdleTime   time.Duration `env:"MAX_CONN_IDLE_TIME" envDefault:"1m"`
+	HealthCheckPeriod time.Duration `env:"HEALTH_CHECK_PERIOD" envDefault:"15s"`
+}
+
+type Hasher struct {
+	Memory     uint32 `env:"MEMORY" envDefault:"65536"`
+	Iterations uint32 `env:"ITERATIONS" envDefault:"3"`
+	SaltLength uint32 `env:"SALT_LENGTH" envDefault:"16"`
+	KeyLength  uint32 `env:"KEY_LENGTH" envDefault:"32"`
+}
+
+type JWT struct {
+	Access  JWTSetting `envPrefix:"ACCESS_"`
+	Refresh JWTSetting `envPrefix:"REFRESH_"`
+}
+
+type JWTSetting struct {
+	Secret   string        `env:"SECRET,required"`
+	Lifetime time.Duration `env:"LIFETIME,required"`
 }
 
 type Logger struct {
