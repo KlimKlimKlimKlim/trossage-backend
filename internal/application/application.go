@@ -20,6 +20,7 @@ import (
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/logger"
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/postgres"
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/postgres/repository"
+	"github.com/KlimKlimKlimKlim/trossage-backend/migrations"
 )
 
 type App struct {
@@ -56,10 +57,14 @@ func (a *App) Init(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("failed to connect to postgres: %w", err)
 	}
-
+	a.pool = pool
 	a.log.Info("Database connected")
 
-	a.pool = pool
+	if err = migrations.RunMigrations(&a.config.Postgres); err != nil {
+		return fmt.Errorf("failed to run migrations: %w", err)
+	}
+
+	a.log.Info("Migrations run")
 
 	repoManager := postgres.NewManager(pool, repository.NewRepository(pool))
 	a.controller = controller.New(a.config, repoManager)

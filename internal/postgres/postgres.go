@@ -10,15 +10,12 @@ import (
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/config"
 )
 
-func buildDSN(cfg *config.Postgres) string {
-	return fmt.Sprintf(
+func New(ctx context.Context, cfg *config.Postgres) (*pgxpool.Pool, error) {
+	dsn := fmt.Sprintf(
 		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
 		cfg.Host, cfg.Port, cfg.User, cfg.Password, cfg.DBName, cfg.SSLMode,
 	)
-}
 
-func New(ctx context.Context, cfg *config.Postgres) (*pgxpool.Pool, error) {
-	dsn := buildDSN(cfg)
 	poolConfig, err := pgxpool.ParseConfig(dsn)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse DSN: %w", err)

@@ -6,14 +6,12 @@ services:
     env_file:
       - .env
     ports:
-      - "80:8080"
+      - "8080:8080"
     networks:
       - chat-net
     depends_on:
       postgres:
         condition: service_healthy
-      migrate:
-        condition: service_completed_successfully
 
   postgres:
     image: postgres:16-alpine
@@ -33,24 +31,6 @@ services:
       timeout: 5s
       retries: 5
       start_period: 10s
-
-  migrate:
-    image: migrate/migrate
-    container_name: chat-migrate
-    env_file:
-      - .env
-    networks:
-      - chat-net
-    volumes:
-      - ./migrations:/migrations
-    depends_on:
-      postgres:
-        condition: service_healthy
-    entrypoint: sh
-    command:
-        - -c
-        - 'migrate -path=/migrations -database="postgresql://$$POSTGRES_USER:$$POSTGRES_PASSWORD@$$POSTGRES_HOST:$$POSTGRES_PORT/$$POSTGRES_DB?sslmode=$$POSTGRES_SSL_MODE" up'
-    restart: on-failure
 
 volumes:
   pgdata:
