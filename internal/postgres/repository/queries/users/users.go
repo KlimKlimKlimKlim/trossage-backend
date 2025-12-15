@@ -15,3 +15,6 @@ var SelectUserByIDQuery string
 
 //go:embed update_user.sql
 var UpdateUserQuery string
+
+//go:embed delete_user.sql
+var DeleteUserQuery string

@@ -1,5 +1,14 @@
 basePath: /api
 definitions:
+  dto.DeleteUserRequest:
+    properties:
+      password:
+        example: currentPassword123
+        minLength: 8
+        type: string
+    required:
+    - password
+    type: object
   dto.EmptyData:
     type: object
   dto.ErrorResponse:
@@ -284,6 +293,38 @@ paths:
       tags:
       - auth
   /users/me:
+    delete:
+      description: Permanently deletes authenticated user account and all associated
+        data. Requires password confirmation.
+      parameters:
+      - description: Password confirmation
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.DeleteUserRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SuccessEmptyResponse'
+        "400":
+          description: Invalid request body
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized or invalid password
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete current user
+      tags:
+      - users
     get:
       description: Returns authenticated user profile information
       responses:

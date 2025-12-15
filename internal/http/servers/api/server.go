@@ -42,6 +42,7 @@ func New(log *zap.Logger, cfg *config.APIServer, c *controller.Controller) *http
 		{
 			usersRouter.GET("/me", s.getCurrentUser)
 			usersRouter.PATCH("/me", s.updateCurrentUser)
+			usersRouter.DELETE("/me", s.deleteCurrentUser)
 		}
 	}
 

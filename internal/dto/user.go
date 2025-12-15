@@ -74,3 +74,8 @@ func (dto *UpdateUserResponse) Fill(user models.User, tokensRevoked bool, tokens
 	dto.TokensRevoked = tokensRevoked
 	dto.TokensRevokedReason = tokensRevokedReason
 }
+
+// DeleteUserRequest contains password confirmation for account deletion
+type DeleteUserRequest struct {
+	Password string `json:"password" binding:"required,min=8" example:"currentPassword123"`
+}

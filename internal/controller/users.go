@@ -149,3 +149,29 @@ func (c *Controller) UpdateUser(ctx context.Context, userID int64, displayName, 
 
 	return updatedUser, tokensRevoked, tokensRevokedReason, nil
 }
+
+func (c *Controller) DeleteUser(ctx context.Context, userID int64, password string) error {
+	err := c.RepoManager.InTx(ctx, func(tx postgres.IRepository) error {
+		user, err := tx.SelectUserByID(ctx, userID)
+		if err != nil {
+			return fmt.Errorf("failed to get user: %w", err)
+		}
+
+		ok, err := c.hasher.VerifyPassword(password, user.PasswordHash)
+		if err != nil {
+			return fmt.Errorf("failed to verify password: %w", err)
+		}
+
+		if !ok {
+			return derrors.ErrUnauthorized
+		}
+
+		if err = tx.DeleteUser(ctx, userID); err != nil {
+			return fmt.Errorf("failed to delete user: %w", err)
+		}
+
+		return nil
+	})
+
+	return err
+}

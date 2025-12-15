@@ -101,3 +101,16 @@ func (r *Repository) UpdateUser(ctx context.Context, user models.User) (models.U
 
 	return user, nil
 }
+
+func (r *Repository) DeleteUser(ctx context.Context, userID int64) error {
+	result, err := r.db.Exec(ctx, users.DeleteUserQuery, userID)
+	if err != nil {
+		return err
+	}
+
+	if result.RowsAffected() == 0 {
+		return derrors.ErrUserNotFound
+	}
+
+	return nil
+}

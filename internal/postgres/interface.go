@@ -12,6 +12,7 @@ type IRepository interface {
 	SelectUserByLogin(ctx context.Context, login string) (models.User, error)
 	SelectUserByID(ctx context.Context, userID int64) (models.User, error)
 	UpdateUser(ctx context.Context, user models.User) (models.User, error)
+	DeleteUser(ctx context.Context, userID int64) error
 
 	InsertRefreshToken(ctx context.Context, token models.Token) (models.Token, error)
 	SelectRefreshToken(ctx context.Context, userID int64, tokenHash string) (models.Token, error)
