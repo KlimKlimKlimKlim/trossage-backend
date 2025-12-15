@@ -82,3 +82,22 @@ func (r *Repository) SelectUserByID(ctx context.Context, userID int64) (models.U
 
 	return user, nil
 }
+
+func (r *Repository) UpdateUser(ctx context.Context, user models.User) (models.User, error) {
+	err := r.db.QueryRow(ctx, users.UpdateUserQuery,
+		user.ID,
+		user.DisplayName,
+		user.PasswordHash,
+	).Scan(
+		&user.UpdatedAt,
+	)
+
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return models.User{}, derrors.ErrUserNotFound
+		}
+		return models.User{}, err
+	}
+
+	return user, nil
+}

@@ -7,6 +7,7 @@ import (
 
 var (
 	ErrInvalidBody = New("invalid body", http.StatusBadRequest)
+	ErrEmptyBody   = New("empty body", http.StatusUnprocessableEntity)
 
 	ErrUnauthorized = New("unauthorized", http.StatusUnauthorized)
 
@@ -14,6 +15,8 @@ var (
 	ErrUserAlreadyExists = New("user already exists", http.StatusConflict)
 
 	ErrTokenNotFound = New("token not found", http.StatusNotFound)
+
+	ErrSamePassword = New("new password must be different from current", http.StatusUnprocessableEntity)
 )
 
 var (

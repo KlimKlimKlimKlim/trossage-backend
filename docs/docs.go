@@ -239,6 +239,55 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Updates authenticated user display name and/or password. Password change revokes all refresh tokens.",
+                "tags": [
+                    "users"
+                ],
+                "summary": "Update current user",
+                "parameters": [
+                    {
+                        "description": "Fields to update",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UpdateUserRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SuccessUpdateUserResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request data or same password",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
             }
         }
     },
@@ -338,6 +387,22 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.SuccessUpdateUserResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/dto.UpdateUserResponse"
+                },
+                "error": {
+                    "type": "string",
+                    "example": ""
+                },
+                "is_success": {
+                    "type": "boolean",
+                    "example": true
+                }
+            }
+        },
         "dto.SuccessUserAndTokenResponse": {
             "type": "object",
             "properties": {
@@ -380,6 +445,39 @@ const docTemplate = `{
                 "refresh_token": {
                     "type": "string",
                     "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                }
+            }
+        },
+        "dto.UpdateUserRequest": {
+            "type": "object",
+            "properties": {
+                "display_name": {
+                    "type": "string",
+                    "maxLength": 20,
+                    "minLength": 1,
+                    "example": "John Doe Updated"
+                },
+                "password": {
+                    "type": "string",
+                    "maxLength": 63,
+                    "minLength": 8,
+                    "example": "newSecurePass123"
+                }
+            }
+        },
+        "dto.UpdateUserResponse": {
+            "type": "object",
+            "properties": {
+                "tokens_revoked": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "tokens_revoked_reason": {
+                    "type": "string",
+                    "example": "password changed"
+                },
+                "user": {
+                    "$ref": "#/definitions/dto.UserResponse"
                 }
             }
         },

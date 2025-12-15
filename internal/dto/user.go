@@ -55,3 +55,22 @@ func (dto *UserAndTokenResponse) Fill(user models.User, accessToken, refreshToke
 	dto.User.Fill(user)
 	dto.Token.Fill(accessToken, refreshToken)
 }
+
+// UpdateUserRequest contains fields that can be updated
+type UpdateUserRequest struct {
+	DisplayName *string `json:"display_name,omitempty" binding:"omitempty,min=1,max=20" example:"John Doe Updated"`
+	Password    *string `json:"password,omitempty" binding:"omitempty,min=8,max=63" example:"newSecurePass123"`
+}
+
+// UpdateUserResponse represents update response data
+type UpdateUserResponse struct {
+	User                UserResponse `json:"user"`
+	TokensRevoked       bool         `json:"tokens_revoked" example:"true"`
+	TokensRevokedReason string       `json:"tokens_revoked_reason,omitempty" example:"password changed"`
+}
+
+func (dto *UpdateUserResponse) Fill(user models.User, tokensRevoked bool, tokensRevokedReason string) {
+	dto.User.Fill(user)
+	dto.TokensRevoked = tokensRevoked
+	dto.TokensRevokedReason = tokensRevokedReason
+}

@@ -22,4 +22,5 @@ type (
 	SuccessTokenResponse        = SuccessResponse[TokenResponse]
 	SuccessEmptyResponse        = SuccessResponse[EmptyData]
 	SuccessUserResponse         = SuccessResponse[UserResponse]
+	SuccessUpdateUserResponse   = SuccessResponse[UpdateUserResponse]
 )

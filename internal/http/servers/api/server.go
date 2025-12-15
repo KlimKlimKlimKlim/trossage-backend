@@ -41,6 +41,7 @@ func New(log *zap.Logger, cfg *config.APIServer, c *controller.Controller) *http
 		usersRouter := apiRouter.Group("/users")
 		{
 			usersRouter.GET("/me", s.getCurrentUser)
+			usersRouter.PATCH("/me", s.updateCurrentUser)
 		}
 	}
 

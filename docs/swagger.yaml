@@ -68,6 +68,17 @@ definitions:
         example: true
         type: boolean
     type: object
+  dto.SuccessUpdateUserResponse:
+    properties:
+      data:
+        $ref: '#/definitions/dto.UpdateUserResponse'
+      error:
+        example: ""
+        type: string
+      is_success:
+        example: true
+        type: boolean
+    type: object
   dto.SuccessUserAndTokenResponse:
     properties:
       data:
@@ -98,6 +109,30 @@ definitions:
       refresh_token:
         example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
         type: string
+    type: object
+  dto.UpdateUserRequest:
+    properties:
+      display_name:
+        example: John Doe Updated
+        maxLength: 20
+        minLength: 1
+        type: string
+      password:
+        example: newSecurePass123
+        maxLength: 63
+        minLength: 8
+        type: string
+    type: object
+  dto.UpdateUserResponse:
+    properties:
+      tokens_revoked:
+        example: true
+        type: boolean
+      tokens_revoked_reason:
+        example: password changed
+        type: string
+      user:
+        $ref: '#/definitions/dto.UserResponse'
     type: object
   dto.UserAndTokenResponse:
     properties:
@@ -267,6 +302,38 @@ paths:
       security:
       - BearerAuth: []
       summary: Get current user
+      tags:
+      - users
+    patch:
+      description: Updates authenticated user display name and/or password. Password
+        change revokes all refresh tokens.
+      parameters:
+      - description: Fields to update
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateUserRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SuccessUpdateUserResponse'
+        "400":
+          description: Invalid request data or same password
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update current user
       tags:
       - users
 securityDefinitions:
