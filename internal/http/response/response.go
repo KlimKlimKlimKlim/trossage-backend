@@ -15,6 +15,10 @@ type Response struct {
 	Data      any    `json:"data"`
 }
 
+func OK(c *gin.Context, data any) {
+	c.JSON(http.StatusOK, Response{IsSuccess: true, Data: data})
+}
+
 func Created(c *gin.Context, data any) {
 	c.JSON(http.StatusCreated, Response{IsSuccess: true, Data: data})
 }

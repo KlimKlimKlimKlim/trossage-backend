@@ -8,6 +8,15 @@ import (
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/http/response"
 )
 
+// loginUser authenticates existing user
+// @Summary      Login user
+// @Tags         auth
+// @Param        request body dto.LoginUserRequest true "Login credentials"
+// @Success      200 {object} dto.LoginUserResponse
+// @Failure      400 {object} dto.ErrorResponse "Invalid request data"
+// @Failure      401 {object} dto.ErrorResponse "Invalid credentials"
+// @Failure      500 {object} dto.ErrorResponse "Internal server error"
+// @Router       /auth/login [post]
 func (s *state) loginUser(ctx *gin.Context) {
 	var req dto.LoginUserRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -24,5 +33,5 @@ func (s *state) loginUser(ctx *gin.Context) {
 	var resp dto.TokenResponse
 	resp.Fill(accessToken, refreshToken)
 
-	response.Created(ctx, resp)
+	response.OK(ctx, resp)
 }

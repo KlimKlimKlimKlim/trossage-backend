@@ -8,6 +8,15 @@ import (
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/http/response"
 )
 
+// registerUser registers a new user
+// @Summary      Register user
+// @Tags         auth
+// @Param        request body dto.RegisterUserRequest true "Registration data"
+// @Success      201 {object} dto.RegisterUserResponse
+// @Failure      400 {object} dto.ErrorResponse "Invalid request data"
+// @Failure      409 {object} dto.ErrorResponse "User already exists"
+// @Failure      500 {object} dto.ErrorResponse "Internal server error"
+// @Router       /auth/register [post]
 func (s *state) registerUser(ctx *gin.Context) {
 	var req dto.RegisterUserRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {

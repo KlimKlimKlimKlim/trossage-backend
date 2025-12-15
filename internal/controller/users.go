@@ -53,7 +53,7 @@ func (c *Controller) LoginUser(ctx context.Context, login, password string) (str
 		user, err := tx.SelectUserByLogin(ctx, login)
 		if err != nil {
 			if errors.Is(err, derrors.ErrUserNotFound) {
-				return fmt.Errorf("user not found: %w", derrors.ErrWrongLoginOrPassword)
+				return fmt.Errorf("user not found: %w", derrors.ErrInvalidCredentials)
 			}
 
 			return fmt.Errorf("failed to select user: %w", err)
@@ -65,7 +65,7 @@ func (c *Controller) LoginUser(ctx context.Context, login, password string) (str
 		}
 
 		if !ok {
-			return fmt.Errorf("password is wrong: %w", derrors.ErrWrongLoginOrPassword)
+			return fmt.Errorf("password is wrong: %w", derrors.ErrInvalidCredentials)
 		}
 
 		accessString, refreshString, err = c.createTokens(ctx, tx, user.ID)

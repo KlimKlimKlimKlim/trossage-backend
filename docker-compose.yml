@@ -1,7 +1,7 @@
 services:
   app:
     build: .
-    container_name: chat-app
+    container_name: trossage-app
     restart: unless-stopped
     env_file:
       - .env
@@ -15,7 +15,7 @@ services:
 
   postgres:
     image: postgres:16-alpine
-    container_name: chat-postgres
+    container_name: trossage-postgres
     restart: unless-stopped
     env_file:
       - .env

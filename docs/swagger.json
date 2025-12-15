@@ -1,0 +1,243 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "Trossage API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "basePath": "/api",
+    "paths": {
+        "/auth/login": {
+            "post": {
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Login user",
+                "parameters": [
+                    {
+                        "description": "Login credentials",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.LoginUserRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.LoginUserResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request data",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid credentials",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/register": {
+            "post": {
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Register user",
+                "parameters": [
+                    {
+                        "description": "Registration data",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.RegisterUserRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.RegisterUserResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request data",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "User already exists",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "dto.CreateUserResponse": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "$ref": "#/definitions/dto.TokenResponse"
+                },
+                "user": {
+                    "$ref": "#/definitions/dto.UserResponse"
+                }
+            }
+        },
+        "dto.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "object"
+                },
+                "error": {
+                    "type": "string",
+                    "example": "some error message"
+                },
+                "is_success": {
+                    "type": "boolean",
+                    "example": false
+                }
+            }
+        },
+        "dto.LoginUserRequest": {
+            "type": "object",
+            "required": [
+                "login",
+                "password"
+            ],
+            "properties": {
+                "login": {
+                    "type": "string",
+                    "example": "john_doe"
+                },
+                "password": {
+                    "type": "string",
+                    "example": "securePass123"
+                }
+            }
+        },
+        "dto.LoginUserResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/dto.TokenResponse"
+                },
+                "error": {
+                    "type": "string",
+                    "example": ""
+                },
+                "is_success": {
+                    "type": "boolean",
+                    "example": true
+                }
+            }
+        },
+        "dto.RegisterUserRequest": {
+            "type": "object",
+            "required": [
+                "display_name",
+                "login",
+                "password"
+            ],
+            "properties": {
+                "display_name": {
+                    "type": "string",
+                    "maxLength": 20,
+                    "example": "John Doe"
+                },
+                "login": {
+                    "type": "string",
+                    "maxLength": 20,
+                    "minLength": 3,
+                    "example": "john_doe"
+                },
+                "password": {
+                    "type": "string",
+                    "maxLength": 63,
+                    "minLength": 8,
+                    "example": "securePass123"
+                }
+            }
+        },
+        "dto.RegisterUserResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/dto.CreateUserResponse"
+                },
+                "error": {
+                    "type": "string",
+                    "example": ""
+                },
+                "is_success": {
+                    "type": "boolean",
+                    "example": true
+                }
+            }
+        },
+        "dto.TokenResponse": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string",
+                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                },
+                "refresh_token": {
+                    "type": "string",
+                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                }
+            }
+        },
+        "dto.UserResponse": {
+            "type": "object",
+            "properties": {
+                "display_name": {
+                    "type": "string",
+                    "example": "John Doe"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 12345
+                },
+                "login": {
+                    "type": "string",
+                    "example": "john_doe"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    }
+}

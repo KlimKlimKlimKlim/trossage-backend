@@ -1,0 +1,165 @@
+basePath: /api
+definitions:
+  dto.CreateUserResponse:
+    properties:
+      token:
+        $ref: '#/definitions/dto.TokenResponse'
+      user:
+        $ref: '#/definitions/dto.UserResponse'
+    type: object
+  dto.ErrorResponse:
+    properties:
+      data:
+        type: object
+      error:
+        example: some error message
+        type: string
+      is_success:
+        example: false
+        type: boolean
+    type: object
+  dto.LoginUserRequest:
+    properties:
+      login:
+        example: john_doe
+        type: string
+      password:
+        example: securePass123
+        type: string
+    required:
+    - login
+    - password
+    type: object
+  dto.LoginUserResponse:
+    properties:
+      data:
+        $ref: '#/definitions/dto.TokenResponse'
+      error:
+        example: ""
+        type: string
+      is_success:
+        example: true
+        type: boolean
+    type: object
+  dto.RegisterUserRequest:
+    properties:
+      display_name:
+        example: John Doe
+        maxLength: 20
+        type: string
+      login:
+        example: john_doe
+        maxLength: 20
+        minLength: 3
+        type: string
+      password:
+        example: securePass123
+        maxLength: 63
+        minLength: 8
+        type: string
+    required:
+    - display_name
+    - login
+    - password
+    type: object
+  dto.RegisterUserResponse:
+    properties:
+      data:
+        $ref: '#/definitions/dto.CreateUserResponse'
+      error:
+        example: ""
+        type: string
+      is_success:
+        example: true
+        type: boolean
+    type: object
+  dto.TokenResponse:
+    properties:
+      access_token:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        type: string
+      refresh_token:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        type: string
+    type: object
+  dto.UserResponse:
+    properties:
+      display_name:
+        example: John Doe
+        type: string
+      id:
+        example: 12345
+        type: integer
+      login:
+        example: john_doe
+        type: string
+    type: object
+info:
+  contact: {}
+  title: Trossage API
+  version: "1.0"
+paths:
+  /auth/login:
+    post:
+      parameters:
+      - description: Login credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.LoginUserRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.LoginUserResponse'
+        "400":
+          description: Invalid request data
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Invalid credentials
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Login user
+      tags:
+      - auth
+  /auth/register:
+    post:
+      parameters:
+      - description: Registration data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RegisterUserRequest'
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.RegisterUserResponse'
+        "400":
+          description: Invalid request data
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "409":
+          description: User already exists
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Register user
+      tags:
+      - auth
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

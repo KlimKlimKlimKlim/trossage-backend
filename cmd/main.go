@@ -1,10 +1,17 @@
 package main
 
+// @title           Trossage API
+// @version         1.0
+// @BasePath        /api
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
 import (
 	"context"
 	"log"
 	"os"
 
+	_ "github.com/KlimKlimKlimKlim/trossage-backend/docs"
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/application"
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/config"
 )
