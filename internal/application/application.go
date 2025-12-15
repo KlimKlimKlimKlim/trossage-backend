@@ -20,6 +20,7 @@ import (
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/logger"
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/postgres"
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/postgres/repository"
+	"github.com/KlimKlimKlimKlim/trossage-backend/internal/workers/token_cleanup"
 	"github.com/KlimKlimKlimKlim/trossage-backend/migrations"
 )
 
@@ -33,6 +34,8 @@ type App struct {
 	pool *pgxpool.Pool
 
 	controller *controller.Controller
+
+	tokenCleanupWorker *token_cleanup.Worker
 
 	systemServer *http.Server
 	apiServer    *http.Server
@@ -69,6 +72,8 @@ func (a *App) Init(ctx context.Context) error {
 	repoManager := postgres.NewManager(pool, repository.NewRepository(pool))
 	a.controller = controller.New(a.config, repoManager)
 
+	a.tokenCleanupWorker = token_cleanup.New(a.log, repoManager, &a.config.Worker.TokenCleanup)
+
 	a.systemServer = system.New(&a.config.Server.System)
 	a.apiServer = api.New(a.log, &a.config.Server.API, a.controller)
 
@@ -95,6 +100,13 @@ func (a *App) Start(ctx context.Context) error {
 			return fmt.Errorf("api HTTP server: %w", err)
 		}
 
+		return nil
+	})
+
+	a.errorGroup.Go(func() error {
+		if err := a.tokenCleanupWorker.Run(a.errorGroupCtx); err != nil {
+			return fmt.Errorf("token cleanup worker: %w", err)
+		}
 		return nil
 	})
 

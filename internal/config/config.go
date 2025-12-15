@@ -9,11 +9,12 @@ import (
 )
 
 type Config struct {
-	Server   Server   `envPrefix:"SERVER_"`
-	Logger   Logger   `envPrefix:"LOGGER_"`
-	Postgres Postgres `envPrefix:"POSTGRES_"`
-	Hasher   Hasher   `envPrefix:"HASHER_"`
-	JWT      JWT      `envPrefix:"JWT_"`
+	Server   Server       `envPrefix:"SERVER_"`
+	Logger   Logger       `envPrefix:"LOGGER_"`
+	Postgres Postgres     `envPrefix:"POSTGRES_"`
+	Hasher   Hasher       `envPrefix:"HASHER_"`
+	JWT      JWT          `envPrefix:"JWT_"`
+	Worker   WorkerConfig `envPrefix:"WORKER_"`
 }
 
 type Server struct {
@@ -73,6 +74,16 @@ type JWTSetting struct {
 
 type Logger struct {
 	Env string `env:"ENV,required"`
+}
+
+type WorkerConfig struct {
+	TokenCleanup TokenCleanupConfig `envPrefix:"TOKEN_CLEANUP_"`
+}
+
+type TokenCleanupConfig struct {
+	Interval         time.Duration `env:"INTERVAL" envDefault:"15m"`
+	ExpiredRetention time.Duration `env:"EXPIRED_RETENTION" envDefault:"1h"`
+	RevokedRetention time.Duration `env:"REVOKED_RETENTION" envDefault:"1h"`
 }
 
 func New() (*Config, error) {

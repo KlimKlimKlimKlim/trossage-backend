@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"errors"
+	"time"
 
 	"github.com/jackc/pgx/v5"
 
@@ -67,4 +68,22 @@ func (r *Repository) RevokeRefreshTokensByUserID(ctx context.Context, userID int
 	}
 
 	return nil
+}
+
+func (r *Repository) DeleteExpiredTokens(ctx context.Context, olderThan time.Time) (int64, error) {
+	result, err := r.db.Exec(ctx, tokens.DeleteExpiredTokensQuery, olderThan)
+	if err != nil {
+		return 0, err
+	}
+
+	return result.RowsAffected(), nil
+}
+
+func (r *Repository) DeleteRevokedTokens(ctx context.Context, olderThan time.Time) (int64, error) {
+	result, err := r.db.Exec(ctx, tokens.DeleteRevokedTokensQuery, olderThan)
+	if err != nil {
+		return 0, err
+	}
+
+	return result.RowsAffected(), nil
 }

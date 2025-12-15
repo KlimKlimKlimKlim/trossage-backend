@@ -15,3 +15,9 @@ var RevokeTokenByIDQuery string
 
 //go:embed revoke_tokens_by_user_id.sql
 var RevokeTokensByUserID string
+
+//go:embed delete_expired_tokens.sql
+var DeleteExpiredTokensQuery string
+
+//go:embed delete_revoked_tokens.sql
+var DeleteRevokedTokensQuery string

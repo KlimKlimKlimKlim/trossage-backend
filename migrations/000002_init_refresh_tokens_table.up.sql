@@ -13,4 +13,11 @@ CREATE INDEX idx_refresh_tokens_user_active ON refresh_tokens (user_id)
 WHERE
     revoked_at IS NULL;
 
--- CREATE INDEX idx_refresh_tokens_cleanup ON refresh_tokens (expires_at, revoked_at);
+CREATE INDEX idx_refresh_tokens_expired ON refresh_tokens (expires_at)
+WHERE
+    revoked_at IS NULL;
+
+CREATE INDEX idx_refresh_tokens_revoked ON refresh_tokens (revoked_at)
+WHERE
+    revoked_at IS NOT NULL;
+
