@@ -9,17 +9,17 @@ import (
 type Controller struct {
 	hasher *hasher.Hasher
 
-	accessJWTController  *jwt.Controller
-	refreshJWTController *jwt.Controller
+	AccessJWTController  *jwt.Controller
+	RefreshJWTController *jwt.Controller
 
-	repoManager IRepoManager
+	RepoManager IRepoManager
 }
 
 func New(cfg *config.Config, repoManager IRepoManager) *Controller {
 	return &Controller{
 		hasher:               hasher.New(&cfg.Hasher),
-		accessJWTController:  jwt.New(&cfg.JWT.Access, jwt.AccessType),
-		refreshJWTController: jwt.New(&cfg.JWT.Refresh, jwt.RefreshType),
-		repoManager:          repoManager,
+		AccessJWTController:  jwt.New(&cfg.JWT.Access, jwt.AccessType),
+		RefreshJWTController: jwt.New(&cfg.JWT.Refresh, jwt.RefreshType),
+		RepoManager:          repoManager,
 	}
 }

@@ -41,6 +41,26 @@ definitions:
         example: true
         type: boolean
     type: object
+  dto.LogoutResponse:
+    properties:
+      error:
+        example: ""
+        type: string
+      is_success:
+        example: true
+        type: boolean
+    type: object
+  dto.RefreshTokenResponse:
+    properties:
+      data:
+        $ref: '#/definitions/dto.TokenResponse'
+      error:
+        example: ""
+        type: string
+      is_success:
+        example: true
+        type: boolean
+    type: object
   dto.RegisterUserRequest:
     properties:
       display_name:
@@ -96,6 +116,7 @@ definitions:
     type: object
 info:
   contact: {}
+  description: Simple chat backend API
   title: Trossage API
   version: "1.0"
 paths:
@@ -126,6 +147,48 @@ paths:
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
       summary: Login user
+      tags:
+      - auth
+  /auth/logout:
+    post:
+      description: Revokes current refresh token and ends session on this device
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.LogoutResponse'
+        "401":
+          description: Invalid or expired refresh token
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Logout
+      tags:
+      - auth
+  /auth/refresh:
+    post:
+      description: Generates new access and refresh tokens using valid refresh token
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.RefreshTokenResponse'
+        "401":
+          description: Invalid or expired refresh token
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Refresh tokens
       tags:
       - auth
   /auth/register:
@@ -159,6 +222,7 @@ paths:
       - auth
 securityDefinitions:
   BearerAuth:
+    description: Type "Bearer" followed by a space and JWT token
     in: header
     name: Authorization
     type: apiKey

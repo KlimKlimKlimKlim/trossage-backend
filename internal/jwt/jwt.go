@@ -50,25 +50,25 @@ func (jc *Controller) signToken(token *jwt.Token) (string, error) {
 }
 
 func (jc *Controller) GenerateSignedToken(userID int64) (string, error) {
-	refreshToken := jc.generateToken(userID)
+	token := jc.generateToken(userID)
 
-	return jc.signToken(refreshToken)
+	return jc.signToken(token)
 }
 
 func (jc *Controller) GenerateSignedTokenAndModel(userID int64) (string, models.Token, error) {
-	refreshToken := jc.generateToken(userID)
+	token := jc.generateToken(userID)
 
-	expiredAt, err := refreshToken.Claims.GetExpirationTime()
+	expiredAt, err := token.Claims.GetExpirationTime()
 	if err != nil {
 		return "", models.Token{}, fmt.Errorf("failed to get expiration time: %w", err)
 	}
 
-	refreshString, err := jc.signToken(refreshToken)
+	tokenString, err := jc.signToken(token)
 	if err != nil {
-		return "", models.Token{}, fmt.Errorf("failed to sign refresh token: %w", err)
+		return "", models.Token{}, fmt.Errorf("failed to sign token: %w", err)
 	}
 
-	hash := sha256.Sum256([]byte(refreshString))
+	hash := sha256.Sum256([]byte(tokenString))
 	tokenHash := hex.EncodeToString(hash[:])
 
 	modelToken := models.Token{
@@ -77,7 +77,7 @@ func (jc *Controller) GenerateSignedTokenAndModel(userID int64) (string, models.
 		ExpiresAt: expiredAt.Time,
 	}
 
-	return refreshString, modelToken, nil
+	return tokenString, modelToken, nil
 }
 
 func (jc *Controller) ProcessToken(tokenString string) (int64, error) {
@@ -87,7 +87,7 @@ func (jc *Controller) ProcessToken(tokenString string) (int64, error) {
 	})
 
 	if err != nil || !token.Valid || c.UserID == 0 || c.Type != jc.tokenType {
-		return 0, derrors.ErrInvalidToken
+		return 0, derrors.ErrUnauthorized
 	}
 
 	return c.UserID, nil

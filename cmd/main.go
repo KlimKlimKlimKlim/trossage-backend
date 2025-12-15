@@ -2,10 +2,14 @@ package main
 
 // @title           Trossage API
 // @version         1.0
-// @BasePath        /api
+// @description     Simple chat backend API
+
+// @BasePath /api
+
 // @securityDefinitions.apikey BearerAuth
 // @in header
 // @name Authorization
+// @description Type "Bearer" followed by a space and JWT token
 import (
 	"context"
 	"log"

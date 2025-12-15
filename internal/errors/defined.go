@@ -7,9 +7,10 @@ import (
 var (
 	ErrInvalidBody = New("invalid body", http.StatusBadRequest)
 
-	ErrInvalidToken       = New("invalid token", http.StatusForbidden)
-	ErrInvalidCredentials = New("invalid credentials", http.StatusUnauthorized)
+	ErrUnauthorized = New("unauthorized", http.StatusUnauthorized)
 
 	ErrUserNotFound      = New("user not found", http.StatusNotFound)
 	ErrUserAlreadyExists = New("user already exists", http.StatusConflict)
+
+	ErrTokenNotFound = New("token not found", http.StatusNotFound)
 )

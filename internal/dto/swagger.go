@@ -7,6 +7,13 @@ type SuccessResponse[T any] struct {
 	Data      T      `json:"data"`
 }
 
+// SimpleSuccessResponse represents success response without data
+type SimpleSuccessResponse struct {
+	IsSuccess bool   `json:"is_success" example:"true"`
+	Error     string `json:"error" example:""`
+	Data      any    `json:"data" swaggertype:"object" swaggerignore:"true"`
+}
+
 // ErrorResponse wraps error API responses
 type ErrorResponse struct {
 	IsSuccess bool   `json:"is_success" example:"false"`
@@ -18,4 +25,6 @@ type ErrorResponse struct {
 type (
 	RegisterUserResponse = SuccessResponse[CreateUserResponse]
 	LoginUserResponse    = SuccessResponse[TokenResponse]
+	RefreshTokenResponse = SuccessResponse[TokenResponse]
+	LogoutResponse       = SimpleSuccessResponse
 )

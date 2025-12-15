@@ -26,7 +26,7 @@ func (c *Controller) CreateUser(ctx context.Context, login, password, displayNam
 		}
 	)
 
-	err = c.repoManager.InTx(ctx, func(tx postgres.IRepository) error {
+	err = c.RepoManager.InTx(ctx, func(tx postgres.IRepository) error {
 		user, err = tx.InsertUser(ctx, user)
 		if err != nil {
 			return fmt.Errorf("failed to insert user: %w", err)
@@ -49,11 +49,11 @@ func (c *Controller) CreateUser(ctx context.Context, login, password, displayNam
 func (c *Controller) LoginUser(ctx context.Context, login, password string) (string, string, error) {
 	var accessString, refreshString string
 
-	err := c.repoManager.InTx(ctx, func(tx postgres.IRepository) error {
+	err := c.RepoManager.InTx(ctx, func(tx postgres.IRepository) error {
 		user, err := tx.SelectUserByLogin(ctx, login)
 		if err != nil {
 			if errors.Is(err, derrors.ErrUserNotFound) {
-				return fmt.Errorf("user not found: %w", derrors.ErrInvalidCredentials)
+				return fmt.Errorf("user not found: %w", derrors.ErrUnauthorized)
 			}
 
 			return fmt.Errorf("failed to select user: %w", err)
@@ -65,7 +65,7 @@ func (c *Controller) LoginUser(ctx context.Context, login, password string) (str
 		}
 
 		if !ok {
-			return fmt.Errorf("password is wrong: %w", derrors.ErrInvalidCredentials)
+			return fmt.Errorf("password is wrong: %w", derrors.ErrUnauthorized)
 		}
 
 		accessString, refreshString, err = c.createTokens(ctx, tx, user.ID)

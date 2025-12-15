@@ -48,4 +48,5 @@ func HandleError(c *gin.Context, err error) {
 	}
 
 	c.JSON(code, resp)
+	c.Abort()
 }

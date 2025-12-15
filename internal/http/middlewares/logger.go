@@ -8,15 +8,11 @@ import (
 	"go.uber.org/zap"
 )
 
-const (
-	RequestIDHeader = "X-Request-ID"
-)
-
 func Logging(logger *zap.Logger) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		start := time.Now()
 
-		requestID := c.GetHeader(RequestIDHeader)
+		requestID := c.GetHeader(requestIDHeader)
 		if requestID == "" {
 			requestID = uuid.New().String()
 		}

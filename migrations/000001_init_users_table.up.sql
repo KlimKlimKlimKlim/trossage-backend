@@ -24,12 +24,3 @@ CREATE TRIGGER set_updated_at_users
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_users ();
 
-CREATE TABLE refresh_tokens (
-    id bigserial PRIMARY KEY,
-    user_id bigint NOT NULL REFERENCES users (id) ON DELETE CASCADE,
-    token_hash varchar(64) NOT NULL UNIQUE,
-    expires_at timestamptz NOT NULL,
-    revoked_at timestamptz DEFAULT NULL,
-    created_at timestamptz NOT NULL DEFAULT NOW()
-);
-
