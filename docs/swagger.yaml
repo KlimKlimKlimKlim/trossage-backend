@@ -25,50 +25,6 @@ definitions:
     - login
     - password
     type: object
-  dto.LoginUserResponse:
-    properties:
-      data:
-        $ref: '#/definitions/dto.UserAndTokenResponse'
-      error:
-        example: ""
-        type: string
-      is_success:
-        example: true
-        type: boolean
-    type: object
-  dto.LogoutAllResponse:
-    properties:
-      data:
-        $ref: '#/definitions/dto.EmptyData'
-      error:
-        example: ""
-        type: string
-      is_success:
-        example: true
-        type: boolean
-    type: object
-  dto.LogoutResponse:
-    properties:
-      data:
-        $ref: '#/definitions/dto.EmptyData'
-      error:
-        example: ""
-        type: string
-      is_success:
-        example: true
-        type: boolean
-    type: object
-  dto.RefreshTokenResponse:
-    properties:
-      data:
-        $ref: '#/definitions/dto.TokenResponse'
-      error:
-        example: ""
-        type: string
-      is_success:
-        example: true
-        type: boolean
-    type: object
   dto.RegisterUserRequest:
     properties:
       display_name:
@@ -90,10 +46,43 @@ definitions:
     - login
     - password
     type: object
-  dto.RegisterUserResponse:
+  dto.SuccessEmptyResponse:
+    properties:
+      data:
+        $ref: '#/definitions/dto.EmptyData'
+      error:
+        example: ""
+        type: string
+      is_success:
+        example: true
+        type: boolean
+    type: object
+  dto.SuccessTokenResponse:
+    properties:
+      data:
+        $ref: '#/definitions/dto.TokenResponse'
+      error:
+        example: ""
+        type: string
+      is_success:
+        example: true
+        type: boolean
+    type: object
+  dto.SuccessUserAndTokenResponse:
     properties:
       data:
         $ref: '#/definitions/dto.UserAndTokenResponse'
+      error:
+        example: ""
+        type: string
+      is_success:
+        example: true
+        type: boolean
+    type: object
+  dto.SuccessUserResponse:
+    properties:
+      data:
+        $ref: '#/definitions/dto.UserResponse'
       error:
         example: ""
         type: string
@@ -119,6 +108,9 @@ definitions:
     type: object
   dto.UserResponse:
     properties:
+      created_at:
+        example: "2025-12-15T09:00:00Z"
+        type: string
       display_name:
         example: John Doe
         type: string
@@ -148,7 +140,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dto.LoginUserResponse'
+            $ref: '#/definitions/dto.SuccessUserAndTokenResponse'
         "400":
           description: Invalid request data
           schema:
@@ -171,7 +163,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dto.LogoutResponse'
+            $ref: '#/definitions/dto.SuccessEmptyResponse'
         "401":
           description: Invalid or expired refresh token
           schema:
@@ -192,7 +184,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dto.LogoutAllResponse'
+            $ref: '#/definitions/dto.SuccessEmptyResponse'
         "401":
           description: Unauthorized
           schema:
@@ -213,7 +205,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dto.RefreshTokenResponse'
+            $ref: '#/definitions/dto.SuccessTokenResponse'
         "401":
           description: Invalid or expired refresh token
           schema:
@@ -240,7 +232,7 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/dto.RegisterUserResponse'
+            $ref: '#/definitions/dto.SuccessUserAndTokenResponse'
         "400":
           description: Invalid request data
           schema:
@@ -256,6 +248,27 @@ paths:
       summary: Register user
       tags:
       - auth
+  /users/me:
+    get:
+      description: Returns authenticated user profile information
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SuccessUserResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get current user
+      tags:
+      - users
 securityDefinitions:
   BearerAuth:
     description: Type "Bearer" followed by a space and JWT token

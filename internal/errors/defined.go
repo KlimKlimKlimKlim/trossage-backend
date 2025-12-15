@@ -1,6 +1,7 @@
 package errors
 
 import (
+	"errors"
 	"net/http"
 )
 
@@ -13,4 +14,9 @@ var (
 	ErrUserAlreadyExists = New("user already exists", http.StatusConflict)
 
 	ErrTokenNotFound = New("token not found", http.StatusNotFound)
+)
+
+var (
+	ErrUserIDIsEmpty  = errors.New("user_id is empty")
+	ErrTokenIDIsEmpty = errors.New("token_id is empty")
 )

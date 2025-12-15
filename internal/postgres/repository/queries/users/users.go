@@ -9,3 +9,6 @@ var InsertUserQuery string
 
 //go:embed select_user_by_login.sql
 var SelectUserByLoginQuery string
+
+//go:embed select_user_by_id.sql
+var SelectUserByIDQuery string

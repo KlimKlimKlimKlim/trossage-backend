@@ -18,9 +18,8 @@ type ErrorResponse struct {
 
 // Endpoint response types
 type (
-	RegisterUserResponse = SuccessResponse[UserAndTokenResponse]
-	LoginUserResponse    = SuccessResponse[UserAndTokenResponse]
-	RefreshTokenResponse = SuccessResponse[TokenResponse]
-	LogoutResponse       = SuccessResponse[EmptyData]
-	LogoutAllResponse    = SuccessResponse[EmptyData]
+	SuccessUserAndTokenResponse = SuccessResponse[UserAndTokenResponse]
+	SuccessTokenResponse        = SuccessResponse[TokenResponse]
+	SuccessEmptyResponse        = SuccessResponse[EmptyData]
+	SuccessUserResponse         = SuccessResponse[UserResponse]
 )

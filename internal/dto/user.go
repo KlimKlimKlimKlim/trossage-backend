@@ -1,6 +1,8 @@
 package dto
 
 import (
+	"time"
+
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/models"
 )
 
@@ -19,15 +21,17 @@ type LoginUserRequest struct {
 
 // UserResponse contains user information
 type UserResponse struct {
-	ID          int64  `json:"id" example:"12345"`
-	Login       string `json:"login" example:"john_doe"`
-	DisplayName string `json:"display_name" example:"John Doe"`
+	ID          int64     `json:"id" example:"12345"`
+	Login       string    `json:"login" example:"john_doe"`
+	DisplayName string    `json:"display_name" example:"John Doe"`
+	CreatedAt   time.Time `json:"created_at" example:"2025-12-15T09:00:00Z"`
 }
 
 func (dto *UserResponse) Fill(user models.User) {
 	dto.ID = user.ID
 	dto.Login = user.Login
 	dto.DisplayName = user.DisplayName
+	dto.CreatedAt = user.CreatedAt
 }
 
 // TokenResponse contains access token pair

@@ -85,3 +85,12 @@ func (c *Controller) LoginUser(ctx context.Context, login, password string) (mod
 
 	return user, accessString, refreshString, nil
 }
+
+func (c *Controller) GetUserByID(ctx context.Context, userID int64) (models.User, error) {
+	user, err := c.RepoManager.Repo().SelectUserByID(ctx, userID)
+	if err != nil {
+		return models.User{}, fmt.Errorf("failed to get user: %w", err)
+	}
+
+	return user, nil
+}

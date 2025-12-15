@@ -38,6 +38,10 @@ func New(log *zap.Logger, cfg *config.APIServer, c *controller.Controller) *http
 		}
 
 		apiRouter.Use(authMiddleware)
+		usersRouter := apiRouter.Group("/users")
+		{
+			usersRouter.GET("/me", s.getCurrentUser)
+		}
 	}
 
 	return &http.Server{

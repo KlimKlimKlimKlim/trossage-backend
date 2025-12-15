@@ -36,7 +36,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.LoginUserResponse"
+                            "$ref": "#/definitions/dto.SuccessUserAndTokenResponse"
                         }
                     },
                     "400": {
@@ -76,7 +76,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.LogoutResponse"
+                            "$ref": "#/definitions/dto.SuccessEmptyResponse"
                         }
                     },
                     "401": {
@@ -110,7 +110,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.LogoutAllResponse"
+                            "$ref": "#/definitions/dto.SuccessEmptyResponse"
                         }
                     },
                     "401": {
@@ -144,7 +144,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.RefreshTokenResponse"
+                            "$ref": "#/definitions/dto.SuccessTokenResponse"
                         }
                     },
                     "401": {
@@ -183,7 +183,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/dto.RegisterUserResponse"
+                            "$ref": "#/definitions/dto.SuccessUserAndTokenResponse"
                         }
                     },
                     "400": {
@@ -194,6 +194,40 @@ const docTemplate = `{
                     },
                     "409": {
                         "description": "User already exists",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/me": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns authenticated user profile information",
+                "tags": [
+                    "users"
+                ],
+                "summary": "Get current user",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SuccessUserResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
                         "schema": {
                             "$ref": "#/definitions/dto.ErrorResponse"
                         }
@@ -245,70 +279,6 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.LoginUserResponse": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "$ref": "#/definitions/dto.UserAndTokenResponse"
-                },
-                "error": {
-                    "type": "string",
-                    "example": ""
-                },
-                "is_success": {
-                    "type": "boolean",
-                    "example": true
-                }
-            }
-        },
-        "dto.LogoutAllResponse": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "$ref": "#/definitions/dto.EmptyData"
-                },
-                "error": {
-                    "type": "string",
-                    "example": ""
-                },
-                "is_success": {
-                    "type": "boolean",
-                    "example": true
-                }
-            }
-        },
-        "dto.LogoutResponse": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "$ref": "#/definitions/dto.EmptyData"
-                },
-                "error": {
-                    "type": "string",
-                    "example": ""
-                },
-                "is_success": {
-                    "type": "boolean",
-                    "example": true
-                }
-            }
-        },
-        "dto.RefreshTokenResponse": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "$ref": "#/definitions/dto.TokenResponse"
-                },
-                "error": {
-                    "type": "string",
-                    "example": ""
-                },
-                "is_success": {
-                    "type": "boolean",
-                    "example": true
-                }
-            }
-        },
         "dto.RegisterUserRequest": {
             "type": "object",
             "required": [
@@ -336,11 +306,59 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.RegisterUserResponse": {
+        "dto.SuccessEmptyResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/dto.EmptyData"
+                },
+                "error": {
+                    "type": "string",
+                    "example": ""
+                },
+                "is_success": {
+                    "type": "boolean",
+                    "example": true
+                }
+            }
+        },
+        "dto.SuccessTokenResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/dto.TokenResponse"
+                },
+                "error": {
+                    "type": "string",
+                    "example": ""
+                },
+                "is_success": {
+                    "type": "boolean",
+                    "example": true
+                }
+            }
+        },
+        "dto.SuccessUserAndTokenResponse": {
             "type": "object",
             "properties": {
                 "data": {
                     "$ref": "#/definitions/dto.UserAndTokenResponse"
+                },
+                "error": {
+                    "type": "string",
+                    "example": ""
+                },
+                "is_success": {
+                    "type": "boolean",
+                    "example": true
+                }
+            }
+        },
+        "dto.SuccessUserResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/dto.UserResponse"
                 },
                 "error": {
                     "type": "string",
@@ -379,6 +397,10 @@ const docTemplate = `{
         "dto.UserResponse": {
             "type": "object",
             "properties": {
+                "created_at": {
+                    "type": "string",
+                    "example": "2025-12-15T09:00:00Z"
+                },
                 "display_name": {
                     "type": "string",
                     "example": "John Doe"

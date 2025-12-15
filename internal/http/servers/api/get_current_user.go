@@ -3,31 +3,36 @@ package api
 import (
 	"github.com/gin-gonic/gin"
 
+	"github.com/KlimKlimKlimKlim/trossage-backend/internal/dto"
 	derrors "github.com/KlimKlimKlimKlim/trossage-backend/internal/errors"
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/http/middlewares"
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/http/response"
 )
 
-// logoutUserAll revokes all user's refresh tokens (all sessions)
-// @Summary      Logout from all devices
-// @Description  Revokes all refresh tokens and ends all user sessions
-// @Tags         auth
+// getCurrentUser returns current authenticated user data
+// @Summary      Get current user
+// @Description  Returns authenticated user profile information
+// @Tags         users
 // @Security     BearerAuth
-// @Success      200 {object} dto.SuccessEmptyResponse
+// @Success      200 {object} dto.SuccessUserResponse
 // @Failure      401 {object} dto.ErrorResponse "Unauthorized"
 // @Failure      500 {object} dto.ErrorResponse "Internal server error"
-// @Router       /auth/logout-all [post]
-func (s *state) logoutUserAll(ctx *gin.Context) {
+// @Router       /users/me [get]
+func (s *state) getCurrentUser(ctx *gin.Context) {
 	userID, ok := middlewares.GetUserID(ctx)
 	if !ok {
 		response.HandleError(ctx, derrors.ErrUserIDIsEmpty)
 		return
 	}
 
-	if err := s.controller.LogoutAll(ctx, userID); err != nil {
+	user, err := s.controller.GetUserByID(ctx, userID)
+	if err != nil {
 		response.HandleError(ctx, err)
 		return
 	}
 
-	response.OK(ctx, nil)
+	var resp dto.UserResponse
+	resp.Fill(user)
+
+	response.OK(ctx, resp)
 }

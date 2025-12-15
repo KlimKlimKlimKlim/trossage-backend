@@ -60,3 +60,25 @@ func (r *Repository) SelectUserByLogin(ctx context.Context, login string) (model
 
 	return user, nil
 }
+
+func (r *Repository) SelectUserByID(ctx context.Context, userID int64) (models.User, error) {
+	var user models.User
+
+	err := r.db.QueryRow(ctx, users.SelectUserByIDQuery, userID).Scan(
+		&user.ID,
+		&user.Login,
+		&user.PasswordHash,
+		&user.DisplayName,
+		&user.CreatedAt,
+		&user.UpdatedAt,
+	)
+
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return models.User{}, derrors.ErrUserNotFound
+		}
+		return models.User{}, err
+	}
+
+	return user, nil
+}

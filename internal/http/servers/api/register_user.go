@@ -12,7 +12,7 @@ import (
 // @Summary      Register user
 // @Tags         auth
 // @Param        request body dto.RegisterUserRequest true "Registration data"
-// @Success      201 {object} dto.RegisterUserResponse
+// @Success      201 {object} dto.SuccessUserAndTokenResponse
 // @Failure      400 {object} dto.ErrorResponse "Invalid request data"
 // @Failure      409 {object} dto.ErrorResponse "User already exists"
 // @Failure      500 {object} dto.ErrorResponse "Internal server error"
