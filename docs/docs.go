@@ -209,17 +209,6 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "dto.CreateUserResponse": {
-            "type": "object",
-            "properties": {
-                "token": {
-                    "$ref": "#/definitions/dto.TokenResponse"
-                },
-                "user": {
-                    "$ref": "#/definitions/dto.UserResponse"
-                }
-            }
-        },
         "dto.EmptyData": {
             "type": "object"
         },
@@ -260,7 +249,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "data": {
-                    "$ref": "#/definitions/dto.TokenResponse"
+                    "$ref": "#/definitions/dto.UserAndTokenResponse"
                 },
                 "error": {
                     "type": "string",
@@ -351,7 +340,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "data": {
-                    "$ref": "#/definitions/dto.CreateUserResponse"
+                    "$ref": "#/definitions/dto.UserAndTokenResponse"
                 },
                 "error": {
                     "type": "string",
@@ -373,6 +362,17 @@ const docTemplate = `{
                 "refresh_token": {
                     "type": "string",
                     "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                }
+            }
+        },
+        "dto.UserAndTokenResponse": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "$ref": "#/definitions/dto.TokenResponse"
+                },
+                "user": {
+                    "$ref": "#/definitions/dto.UserResponse"
                 }
             }
         },

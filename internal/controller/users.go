@@ -46,11 +46,15 @@ func (c *Controller) CreateUser(ctx context.Context, login, password, displayNam
 	return user, accessString, refreshString, nil
 }
 
-func (c *Controller) LoginUser(ctx context.Context, login, password string) (string, string, error) {
-	var accessString, refreshString string
+func (c *Controller) LoginUser(ctx context.Context, login, password string) (models.User, string, string, error) {
+	var (
+		user                        models.User
+		accessString, refreshString string
+	)
 
 	err := c.RepoManager.InTx(ctx, func(tx postgres.IRepository) error {
-		user, err := tx.SelectUserByLogin(ctx, login)
+		var err error
+		user, err = tx.SelectUserByLogin(ctx, login)
 		if err != nil {
 			if errors.Is(err, derrors.ErrUserNotFound) {
 				return fmt.Errorf("user not found: %w", derrors.ErrUnauthorized)
@@ -76,8 +80,8 @@ func (c *Controller) LoginUser(ctx context.Context, login, password string) (str
 		return nil
 	})
 	if err != nil {
-		return "", "", err
+		return models.User{}, "", "", err
 	}
 
-	return accessString, refreshString, nil
+	return user, accessString, refreshString, nil
 }

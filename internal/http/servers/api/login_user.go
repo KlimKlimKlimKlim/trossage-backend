@@ -24,14 +24,14 @@ func (s *state) loginUser(ctx *gin.Context) {
 		return
 	}
 
-	accessToken, refreshToken, err := s.controller.LoginUser(ctx, req.Login, req.Password)
+	user, accessToken, refreshToken, err := s.controller.LoginUser(ctx, req.Login, req.Password)
 	if err != nil {
 		response.HandleError(ctx, err)
 		return
 	}
 
-	var resp dto.TokenResponse
-	resp.Fill(accessToken, refreshToken)
+	var resp dto.UserAndTokenResponse
+	resp.Fill(user, accessToken, refreshToken)
 
 	response.OK(ctx, resp)
 }

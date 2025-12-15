@@ -41,13 +41,13 @@ func (dto *TokenResponse) Fill(accessToken, refreshToken string) {
 	dto.RefreshToken = refreshToken
 }
 
-// CreateUserResponse contains created user data with tokens
-type CreateUserResponse struct {
+// UserAndTokenResponse contains user data with tokens
+type UserAndTokenResponse struct {
 	User  UserResponse  `json:"user"`
 	Token TokenResponse `json:"token"`
 }
 
-func (dto *CreateUserResponse) Fill(user models.User, accessToken, refreshToken string) {
+func (dto *UserAndTokenResponse) Fill(user models.User, accessToken, refreshToken string) {
 	dto.User.Fill(user)
 	dto.Token.Fill(accessToken, refreshToken)
 }

@@ -1,12 +1,5 @@
 basePath: /api
 definitions:
-  dto.CreateUserResponse:
-    properties:
-      token:
-        $ref: '#/definitions/dto.TokenResponse'
-      user:
-        $ref: '#/definitions/dto.UserResponse'
-    type: object
   dto.EmptyData:
     type: object
   dto.ErrorResponse:
@@ -35,7 +28,7 @@ definitions:
   dto.LoginUserResponse:
     properties:
       data:
-        $ref: '#/definitions/dto.TokenResponse'
+        $ref: '#/definitions/dto.UserAndTokenResponse'
       error:
         example: ""
         type: string
@@ -100,7 +93,7 @@ definitions:
   dto.RegisterUserResponse:
     properties:
       data:
-        $ref: '#/definitions/dto.CreateUserResponse'
+        $ref: '#/definitions/dto.UserAndTokenResponse'
       error:
         example: ""
         type: string
@@ -116,6 +109,13 @@ definitions:
       refresh_token:
         example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
         type: string
+    type: object
+  dto.UserAndTokenResponse:
+    properties:
+      token:
+        $ref: '#/definitions/dto.TokenResponse'
+      user:
+        $ref: '#/definitions/dto.UserResponse'
     type: object
   dto.UserResponse:
     properties:

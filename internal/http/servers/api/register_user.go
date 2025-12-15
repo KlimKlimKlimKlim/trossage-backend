@@ -30,7 +30,7 @@ func (s *state) registerUser(ctx *gin.Context) {
 		return
 	}
 
-	var resp dto.CreateUserResponse
+	var resp dto.UserAndTokenResponse
 	resp.Fill(user, accessToken, refreshToken)
 
 	response.Created(ctx, resp)
