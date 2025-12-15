@@ -7,6 +7,8 @@ definitions:
       user:
         $ref: '#/definitions/dto.UserResponse'
     type: object
+  dto.EmptyData:
+    type: object
   dto.ErrorResponse:
     properties:
       data:
@@ -41,8 +43,21 @@ definitions:
         example: true
         type: boolean
     type: object
+  dto.LogoutAllResponse:
+    properties:
+      data:
+        $ref: '#/definitions/dto.EmptyData'
+      error:
+        example: ""
+        type: string
+      is_success:
+        example: true
+        type: boolean
+    type: object
   dto.LogoutResponse:
     properties:
+      data:
+        $ref: '#/definitions/dto.EmptyData'
       error:
         example: ""
         type: string
@@ -168,6 +183,27 @@ paths:
       security:
       - BearerAuth: []
       summary: Logout
+      tags:
+      - auth
+  /auth/logout-all:
+    post:
+      description: Revokes all refresh tokens and ends all user sessions
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.LogoutAllResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Logout from all devices
       tags:
       - auth
   /auth/refresh:

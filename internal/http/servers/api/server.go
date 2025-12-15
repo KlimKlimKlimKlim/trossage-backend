@@ -22,19 +22,22 @@ func New(log *zap.Logger, cfg *config.APIServer, c *controller.Controller) *http
 	router.Use(gin.Recovery())
 	router.Use(middlewares.Logging(log))
 
+	authMiddleware := middlewares.Auth(c.AccessJWTController)
+
 	apiRouter := router.Group("/api")
 	{
 		authRouter := apiRouter.Group("/auth")
 		{
 			authRouter.POST("/register", s.registerUser)
 			authRouter.POST("/login", s.loginUser)
+			authRouter.POST("/logout-all", authMiddleware, s.logoutUserAll)
 
 			authRouter.Use(middlewares.RefreshAuth(c.RefreshJWTController, c.RepoManager))
 			authRouter.POST("/refresh", s.refreshToken)
 			authRouter.POST("/logout", s.logoutUser)
 		}
 
-		apiRouter.Use(middlewares.Auth(c.AccessJWTController))
+		apiRouter.Use(authMiddleware)
 	}
 
 	return &http.Server{

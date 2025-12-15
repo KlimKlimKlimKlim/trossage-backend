@@ -13,4 +13,5 @@ type IRepository interface {
 	InsertRefreshToken(ctx context.Context, token models.Token) (models.Token, error)
 	SelectRefreshToken(ctx context.Context, userID int64, tokenHash string) (models.Token, error)
 	RevokeRefreshTokenByID(ctx context.Context, tokenID int64) error
+	RevokeRefreshTokensByUserID(ctx context.Context, userID int64) error
 }

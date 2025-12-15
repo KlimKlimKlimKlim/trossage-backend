@@ -59,3 +59,12 @@ func (r *Repository) RevokeRefreshTokenByID(ctx context.Context, tokenID int64) 
 
 	return nil
 }
+
+func (r *Repository) RevokeRefreshTokensByUserID(ctx context.Context, userID int64) error {
+	_, err := r.db.Exec(ctx, tokens.RevokeTokensByUserID, userID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

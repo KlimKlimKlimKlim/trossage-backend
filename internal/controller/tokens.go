@@ -61,3 +61,11 @@ func (c *Controller) Logout(ctx context.Context, tokenID int64) error {
 
 	return nil
 }
+
+func (c *Controller) LogoutAll(ctx context.Context, userID int64) error {
+	if err := c.RepoManager.Repo().RevokeRefreshTokensByUserID(ctx, userID); err != nil {
+		return fmt.Errorf("failed to revoke tokens: %w", err)
+	}
+
+	return nil
+}

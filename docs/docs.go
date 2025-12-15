@@ -94,6 +94,40 @@ const docTemplate = `{
                 }
             }
         },
+        "/auth/logout-all": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Revokes all refresh tokens and ends all user sessions",
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Logout from all devices",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.LogoutAllResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/auth/refresh": {
             "post": {
                 "security": [
@@ -186,6 +220,9 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.EmptyData": {
+            "type": "object"
+        },
         "dto.ErrorResponse": {
             "type": "object",
             "properties": {
@@ -235,9 +272,28 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.LogoutAllResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/dto.EmptyData"
+                },
+                "error": {
+                    "type": "string",
+                    "example": ""
+                },
+                "is_success": {
+                    "type": "boolean",
+                    "example": true
+                }
+            }
+        },
         "dto.LogoutResponse": {
             "type": "object",
             "properties": {
+                "data": {
+                    "$ref": "#/definitions/dto.EmptyData"
+                },
                 "error": {
                     "type": "string",
                     "example": ""
