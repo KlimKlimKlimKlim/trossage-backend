@@ -3,8 +3,8 @@ package api
 import (
 	"github.com/gin-gonic/gin"
 
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/dto"
 	derrors "github.com/KlimKlimKlimKlim/trossage-backend/internal/errors"
+	"github.com/KlimKlimKlimKlim/trossage-backend/internal/http/dto"
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/http/response"
 )
 
