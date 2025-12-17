@@ -18,3 +18,9 @@ var UpdateUserQuery string
 
 //go:embed delete_user.sql
 var DeleteUserQuery string
+
+//go:embed select_users_by_login_prefix.sql
+var SelectUsersByLoginPrefixQuery string
+
+//go:embed count_users_by_login_prefix.sql
+var CountUsersByLoginPrefixQuery string

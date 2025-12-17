@@ -23,4 +23,5 @@ type (
 	SuccessEmptyResponse        = SuccessResponse[EmptyData]
 	SuccessUserResponse         = SuccessResponse[UserResponse]
 	SuccessUpdateUserResponse   = SuccessResponse[UpdateUserResponse]
+	SuccessUsersSearchResponse  = SuccessResponse[UsersSearchResponse]
 )

@@ -80,3 +80,20 @@ func (dto *UpdateUserResponse) Fill(user models.User, tokensRevoked bool, tokens
 type DeleteUserRequest struct {
 	Password string `json:"password" binding:"required" example:"currentPassword123"`
 }
+
+type UsersSearchResponse struct {
+	Users  []UserResponse `json:"users"`
+	Total  int            `json:"total" example:"42"`
+	Limit  int            `json:"limit" example:"20"`
+	Offset int            `json:"offset" example:"0"`
+}
+
+func (dto *UsersSearchResponse) Fill(users []models.User, total, limit, offset int) {
+	dto.Users = make([]UserResponse, len(users))
+	for i, user := range users {
+		dto.Users[i].Fill(user)
+	}
+	dto.Total = total
+	dto.Limit = limit
+	dto.Offset = offset
+}

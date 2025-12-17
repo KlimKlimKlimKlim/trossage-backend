@@ -215,3 +215,17 @@ func (c *Controller) DeleteUser(ctx context.Context, userID int64, password stri
 
 	return err
 }
+
+func (c *Controller) SearchUsersByLogin(ctx context.Context, query string, limit, offset int) ([]models.User, int, error) {
+	users, err := c.RepoManager.Repo().SelectUsersByLoginPrefix(ctx, query, limit, offset)
+	if err != nil {
+		return nil, 0, fmt.Errorf("failed to search users: %w", err)
+	}
+
+	total, err := c.RepoManager.Repo().CountUsersByLoginPrefix(ctx, query)
+	if err != nil {
+		return nil, 0, fmt.Errorf("failed to count users: %w", err)
+	}
+
+	return users, total, nil
+}
