@@ -58,8 +58,9 @@ func (dto *UserAndTokenResponse) Fill(user models.User, accessToken, refreshToke
 
 // UpdateUserRequest contains fields that can be updated
 type UpdateUserRequest struct {
-	DisplayName *string `json:"display_name,omitempty" binding:"omitempty,min=1,max=20" example:"John Doe Updated"`
-	Password    *string `json:"password,omitempty" binding:"omitempty,min=8,max=63" example:"newSecurePass123"`
+	DisplayName string `json:"display_name,omitempty" binding:"omitempty,min=1,max=20" example:"John Doe Updated"`
+	OldPassword string `json:"old_password,omitempty" binding:"omitempty" example:"currentPassword123"`
+	NewPassword string `json:"new_password,omitempty" binding:"omitempty,min=8,max=63" example:"newSecurePass123"`
 }
 
 // UpdateUserResponse represents update response data
@@ -77,5 +78,5 @@ func (dto *UpdateUserResponse) Fill(user models.User, tokensRevoked bool, tokens
 
 // DeleteUserRequest contains password confirmation for account deletion
 type DeleteUserRequest struct {
-	Password string `json:"password" binding:"required,min=8" example:"currentPassword123"`
+	Password string `json:"password" binding:"required" example:"currentPassword123"`
 }

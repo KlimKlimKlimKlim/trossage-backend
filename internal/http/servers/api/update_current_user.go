@@ -33,12 +33,17 @@ func (s *state) updateCurrentUser(ctx *gin.Context) {
 		return
 	}
 
-	if req.DisplayName == nil && req.Password == nil {
+	if req.DisplayName == "" && req.NewPassword == "" {
 		response.HandleError(ctx, derrors.ErrEmptyBody)
 		return
 	}
 
-	user, tokensRevoked, tokensRevokedReason, err := s.controller.UpdateUser(ctx, userID, req.DisplayName, req.Password)
+	if req.NewPassword != "" && req.OldPassword == "" {
+		response.HandleError(ctx, derrors.ErrUnauthorized)
+		return
+	}
+
+	user, tokensRevoked, tokensRevokedReason, err := s.controller.UpdateUser(ctx, userID, req.DisplayName, req.OldPassword, req.NewPassword)
 	if err != nil {
 		response.HandleError(ctx, err)
 		return

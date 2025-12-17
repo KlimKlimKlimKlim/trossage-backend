@@ -95,7 +95,7 @@ func (c *Controller) GetUserByID(ctx context.Context, userID int64) (models.User
 	return user, nil
 }
 
-func (c *Controller) UpdateUser(ctx context.Context, userID int64, displayName, password *string) (models.User, bool, string, error) {
+func (c *Controller) UpdateUser(ctx context.Context, userID int64, displayName, oldPassword, newPassword string) (models.User, bool, string, error) {
 	var (
 		updatedUser         models.User
 		tokensRevoked       bool
@@ -108,8 +108,17 @@ func (c *Controller) UpdateUser(ctx context.Context, userID int64, displayName, 
 			return fmt.Errorf("failed to get user: %w", err)
 		}
 
-		if password != nil {
-			isSame, err := c.hasher.VerifyPassword(*password, user.PasswordHash)
+		if newPassword != "" {
+			ok, err := c.hasher.VerifyPassword(oldPassword, user.PasswordHash)
+			if err != nil {
+				return fmt.Errorf("failed to verify password: %w", err)
+			}
+
+			if !ok {
+				return derrors.ErrUnauthorized
+			}
+
+			isSame, err := c.hasher.VerifyPassword(newPassword, user.PasswordHash)
 			if err != nil {
 				return fmt.Errorf("failed to verify password: %w", err)
 			}
@@ -118,7 +127,7 @@ func (c *Controller) UpdateUser(ctx context.Context, userID int64, displayName, 
 				return derrors.ErrSamePassword
 			}
 
-			newHash, err := c.hasher.HashPassword(*password)
+			newHash, err := c.hasher.HashPassword(newPassword)
 			if err != nil {
 				return fmt.Errorf("failed to hash password: %w", err)
 			}
@@ -132,8 +141,8 @@ func (c *Controller) UpdateUser(ctx context.Context, userID int64, displayName, 
 			}
 		}
 
-		if displayName != nil {
-			user.DisplayName = *displayName
+		if displayName != "" {
+			user.DisplayName = displayName
 		}
 
 		updatedUser, err = tx.UpdateUser(ctx, user)
