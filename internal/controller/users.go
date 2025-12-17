@@ -4,13 +4,28 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 
+	"github.com/KlimKlimKlimKlim/trossage-backend/internal/controller/validate"
 	derrors "github.com/KlimKlimKlimKlim/trossage-backend/internal/errors"
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/models"
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/postgres"
 )
 
 func (c *Controller) CreateUser(ctx context.Context, login, password, displayName string) (models.User, string, string, error) {
+	login = strings.ToLower(login)
+	if !validate.Login(login) {
+		return models.User{}, "", "", derrors.ErrInvalidLogin
+	}
+
+	if !validate.Password(password) {
+		return models.User{}, "", "", derrors.ErrInvalidPassword
+	}
+
+	if !validate.DisplayName(displayName) {
+		return models.User{}, "", "", derrors.ErrInvalidDisplayName
+	}
+
 	ph, err := c.hasher.HashPassword(password)
 	if err != nil {
 		return models.User{}, "", "", fmt.Errorf("failed to hash password: %w", err)
@@ -96,6 +111,14 @@ func (c *Controller) GetUserByID(ctx context.Context, userID int64) (models.User
 }
 
 func (c *Controller) UpdateUser(ctx context.Context, userID int64, displayName, oldPassword, newPassword string) (models.User, bool, string, error) {
+	if !validate.Password(newPassword) {
+		return models.User{}, false, "", derrors.ErrInvalidPassword
+	}
+
+	if !validate.DisplayName(displayName) {
+		return models.User{}, false, "", derrors.ErrInvalidDisplayName
+	}
+
 	var (
 		updatedUser         models.User
 		tokensRevoked       bool

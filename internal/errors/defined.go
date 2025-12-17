@@ -6,8 +6,11 @@ import (
 )
 
 var (
-	ErrInvalidBody = New("invalid body", http.StatusBadRequest)
-	ErrEmptyBody   = New("empty body", http.StatusUnprocessableEntity)
+	ErrInvalidBody        = New("invalid body", http.StatusBadRequest)
+	ErrEmptyBody          = New("empty body", http.StatusUnprocessableEntity)
+	ErrInvalidLogin       = New("login must be 3-20 characters long and contain only lowercase letters, digits, and underscores", http.StatusUnprocessableEntity)
+	ErrInvalidPassword    = New("password must be 8-63 characters long, contain at least one letter and one digit, and use only allowed characters", http.StatusUnprocessableEntity)
+	ErrInvalidDisplayName = New("display name must be 1-20 characters long and contain only letters, digits, spaces, dots, underscores, and hyphens", http.StatusUnprocessableEntity)
 
 	ErrUnauthorized = New("unauthorized", http.StatusUnauthorized)
 
