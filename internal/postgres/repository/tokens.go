@@ -38,7 +38,7 @@ func (r *Repository) SelectRefreshToken(ctx context.Context, userID int64, token
 	)
 
 	if err != nil {
-		if errors.As(err, &pgx.ErrNoRows) {
+		if errors.Is(err, pgx.ErrNoRows) {
 			return models.Token{}, derrors.ErrTokenNotFound
 		}
 

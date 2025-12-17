@@ -51,7 +51,7 @@ func (r *Repository) SelectUserByLogin(ctx context.Context, login string) (model
 	)
 
 	if err != nil {
-		if errors.As(err, &pgx.ErrNoRows) {
+		if errors.Is(err, pgx.ErrNoRows) {
 			return models.User{}, derrors.ErrUserNotFound
 		}
 

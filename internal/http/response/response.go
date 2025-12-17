@@ -36,8 +36,8 @@ func HandleError(c *gin.Context, err error) {
 		code = derr.Code
 		message = derr.Message
 	default:
-		code = http.StatusInternalServerError
-		message = "internal error"
+		code = derrors.ErrInternalServerError.Code
+		message = derrors.ErrInternalServerError.Message
 	}
 
 	_ = c.Error(err)
