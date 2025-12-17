@@ -71,6 +71,7 @@ func (r *Repository) SelectUserByID(ctx context.Context, userID int64) (models.U
 		&user.DisplayName,
 		&user.CreatedAt,
 		&user.UpdatedAt,
+		&user.DeletedAt,
 	)
 
 	if err != nil {

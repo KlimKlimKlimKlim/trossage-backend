@@ -4,7 +4,8 @@ SELECT
     password_hash,
     display_name,
     created_at,
-    updated_at
+    updated_at,
+    deleted_at
 FROM
     users
 WHERE

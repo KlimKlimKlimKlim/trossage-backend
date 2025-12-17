@@ -31,6 +31,17 @@ func (c *Controller) RefreshToken(ctx context.Context, userID, oldTokenID int64)
 	var accessString, refreshString string
 
 	err := c.RepoManager.InTx(ctx, func(tx postgres.IRepository) error {
+		if user, err := tx.SelectUserByID(ctx, userID); err != nil {
+			switch {
+			case errors.Is(err, derrors.ErrUserNotFound):
+				return fmt.Errorf("user not found: %w", derrors.ErrUnauthorized)
+			case user.IsDeleted():
+				return fmt.Errorf("user is deleted: %w", derrors.ErrUnauthorized)
+			}
+
+			return fmt.Errorf("failed to select user: %w", err)
+		}
+
 		if err := tx.RevokeRefreshTokenByID(ctx, oldTokenID); err != nil {
 			if errors.Is(err, derrors.ErrTokenNotFound) {
 				return fmt.Errorf("token not found: %w", derrors.ErrUnauthorized)

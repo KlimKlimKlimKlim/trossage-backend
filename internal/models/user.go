@@ -11,4 +11,9 @@ type User struct {
 	DisplayName  string
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
+	DeletedAt    time.Time
+}
+
+func (u *User) IsDeleted() bool {
+	return !u.DeletedAt.IsZero()
 }

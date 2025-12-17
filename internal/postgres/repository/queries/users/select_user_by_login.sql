@@ -8,5 +8,6 @@ SELECT
 FROM
     users
 WHERE
-    login = $1;
+    login = $1
+    AND deleted_at IS NULL;
 

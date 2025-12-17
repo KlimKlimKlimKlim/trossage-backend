@@ -108,6 +108,10 @@ func (c *Controller) UpdateUser(ctx context.Context, userID int64, displayName, 
 			return fmt.Errorf("failed to get user: %w", err)
 		}
 
+		if user.IsDeleted() {
+			return fmt.Errorf("user is deleted: %w", derrors.ErrUserNotFound)
+		}
+
 		if newPassword != "" {
 			ok, err := c.hasher.VerifyPassword(oldPassword, user.PasswordHash)
 			if err != nil {
@@ -173,6 +177,10 @@ func (c *Controller) DeleteUser(ctx context.Context, userID int64, password stri
 
 		if !ok {
 			return derrors.ErrUnauthorized
+		}
+
+		if user.IsDeleted() {
+			return fmt.Errorf("user is deleted: %w", derrors.ErrUserNotFound)
 		}
 
 		if err = tx.DeleteUser(ctx, userID); err != nil {

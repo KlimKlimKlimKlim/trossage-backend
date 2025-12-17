@@ -1,13 +1,16 @@
 CREATE TABLE users (
     id bigserial PRIMARY KEY,
-    login VARCHAR(20) NOT NULL,
+    login VARCHAR(30) NOT NULL,
     password_hash text NOT NULL,
-    display_name varchar(20) NOT NULL,
-    created_at timestamp NOT NULL DEFAULT NOW(),
-    updated_at timestamp NOT NULL DEFAULT NOW()
+    display_name varchar(30) NOT NULL,
+    deleted_at timestamptz DEFAULT NULL,
+    created_at timestamptz NOT NULL DEFAULT NOW(),
+    updated_at timestamptz NOT NULL DEFAULT NOW()
 );
 
-CREATE UNIQUE INDEX idx_users_login ON users (login);
+CREATE UNIQUE INDEX idx_users_login ON users (login)
+WHERE
+    deleted_at IS NULL;
 
 CREATE OR REPLACE FUNCTION update_updated_at_users ()
     RETURNS TRIGGER
