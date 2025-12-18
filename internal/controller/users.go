@@ -111,14 +111,6 @@ func (c *Controller) GetUserByID(ctx context.Context, userID int64) (models.User
 }
 
 func (c *Controller) UpdateUser(ctx context.Context, userID int64, displayName, oldPassword, newPassword string) (models.User, bool, string, error) {
-	if !validate.Password(newPassword) {
-		return models.User{}, false, "", derrors.ErrInvalidPassword
-	}
-
-	if !validate.DisplayName(displayName) {
-		return models.User{}, false, "", derrors.ErrInvalidDisplayName
-	}
-
 	var (
 		updatedUser         models.User
 		tokensRevoked       bool
@@ -136,6 +128,10 @@ func (c *Controller) UpdateUser(ctx context.Context, userID int64, displayName, 
 		}
 
 		if newPassword != "" {
+			if !validate.Password(newPassword) {
+				return derrors.ErrInvalidPassword
+			}
+
 			ok, err := c.hasher.VerifyPassword(oldPassword, user.PasswordHash)
 			if err != nil {
 				return fmt.Errorf("failed to verify password: %w", err)
@@ -169,6 +165,10 @@ func (c *Controller) UpdateUser(ctx context.Context, userID int64, displayName, 
 		}
 
 		if displayName != "" {
+			if !validate.DisplayName(displayName) {
+				return derrors.ErrInvalidDisplayName
+			}
+
 			user.DisplayName = displayName
 		}
 
