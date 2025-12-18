@@ -10,16 +10,17 @@ import (
 )
 
 // updateCurrentUser updates current user profile
-// @Summary      Update current user
-// @Description  Updates authenticated user display name and/or password. Password change revokes all refresh tokens.
-// @Tags         users
-// @Security     BearerAuth
-// @Param        request body dto.UpdateUserRequest true "Fields to update"
-// @Success      200 {object} dto.SuccessUpdateUserResponse
-// @Failure      400 {object} dto.ErrorResponse "Invalid request data or same password"
-// @Failure      401 {object} dto.ErrorResponse "Unauthorized"
-// @Failure      500 {object} dto.ErrorResponse "Internal server error"
-// @Router       /users/me [patch]
+//
+//	@Summary		Update current user
+//	@Description	Updates authenticated user display name and/or password. Password change revokes all refresh tokens.
+//	@Tags			users
+//	@Security		BearerAuth
+//	@Param			request	body		dto.UpdateUserRequest	true	"Fields to update"
+//	@Success		200		{object}	dto.SuccessUpdateUserResponse
+//	@Failure		400		{object}	dto.ErrorResponse	"Invalid request data or same password"
+//	@Failure		401		{object}	dto.ErrorResponse	"Unauthorized"
+//	@Failure		500		{object}	dto.ErrorResponse	"Internal server error"
+//	@Router			/users/me [patch]
 func (s *state) updateCurrentUser(ctx *gin.Context) {
 	userID, ok := middlewares.GetUserID(ctx)
 	if !ok {
@@ -43,7 +44,13 @@ func (s *state) updateCurrentUser(ctx *gin.Context) {
 		return
 	}
 
-	user, tokensRevoked, tokensRevokedReason, err := s.controller.UpdateUser(ctx, userID, req.DisplayName, req.OldPassword, req.NewPassword)
+	user, tokensRevoked, tokensRevokedReason, err := s.controller.UpdateUser(
+		ctx,
+		userID,
+		req.DisplayName,
+		req.OldPassword,
+		req.NewPassword,
+	)
 	if err != nil {
 		response.HandleError(ctx, err)
 		return

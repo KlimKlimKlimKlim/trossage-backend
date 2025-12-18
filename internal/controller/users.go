@@ -12,7 +12,10 @@ import (
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/postgres"
 )
 
-func (c *Controller) CreateUser(ctx context.Context, login, password, displayName string) (models.User, string, string, error) {
+func (c *Controller) CreateUser(
+	ctx context.Context,
+	login, password, displayName string,
+) (models.User, string, string, error) {
 	login = strings.ToLower(login)
 	if !validate.Login(login) {
 		return models.User{}, "", "", derrors.ErrInvalidLogin
@@ -110,7 +113,11 @@ func (c *Controller) GetUserByID(ctx context.Context, userID int64) (models.User
 	return user, nil
 }
 
-func (c *Controller) UpdateUser(ctx context.Context, userID int64, displayName, oldPassword, newPassword string) (models.User, bool, string, error) {
+func (c *Controller) UpdateUser(
+	ctx context.Context,
+	userID int64,
+	displayName, oldPassword, newPassword string,
+) (models.User, bool, string, error) {
 	var (
 		updatedUser         models.User
 		tokensRevoked       bool
@@ -216,7 +223,11 @@ func (c *Controller) DeleteUser(ctx context.Context, userID int64, password stri
 	return err
 }
 
-func (c *Controller) SearchUsersByLogin(ctx context.Context, query string, limit, offset int) ([]models.User, int, error) {
+func (c *Controller) SearchUsersByLogin(
+	ctx context.Context,
+	query string,
+	limit, offset int,
+) ([]models.User, int, error) {
 	users, err := c.RepoManager.Repo().SelectUsersByLoginPrefix(ctx, query, limit, offset)
 	if err != nil {
 		return nil, 0, fmt.Errorf("failed to search users: %w", err)

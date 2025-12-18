@@ -19,26 +19,26 @@ type Config struct {
 
 type Server struct {
 	ShutdownTimeout time.Duration `env:"SHUTDOWN_TIMEOUT" envDefault:"10s"`
-	System          SystemServer  `envPrefix:"SYSTEM_"`
-	API             APIServer     `envPrefix:"API_"`
+	System          SystemServer  `                                        envPrefix:"SYSTEM_"`
+	API             APIServer     `                                        envPrefix:"API_"`
 }
 
 type SystemServer struct {
-	Port              string        `env:"PORT" envDefault:":8081"`
-	ReadTimeout       time.Duration `env:"READ_TIMEOUT" envDefault:"5s"`
-	WriteTimeout      time.Duration `env:"WRITE_TIMEOUT" envDefault:"5s"`
-	IdleTimeout       time.Duration `env:"IDLE_TIMEOUT" envDefault:"60s"`
+	Port              string        `env:"PORT"                envDefault:":8081"`
+	ReadTimeout       time.Duration `env:"READ_TIMEOUT"        envDefault:"5s"`
+	WriteTimeout      time.Duration `env:"WRITE_TIMEOUT"       envDefault:"5s"`
+	IdleTimeout       time.Duration `env:"IDLE_TIMEOUT"        envDefault:"60s"`
 	ReadHeaderTimeout time.Duration `env:"READ_HEADER_TIMEOUT" envDefault:"2s"`
-	MaxHeaderBytes    int           `env:"MAX_HEADER_BYTES" envDefault:"1048576"` // 1 MB
+	MaxHeaderBytes    int           `env:"MAX_HEADER_BYTES"    envDefault:"1048576"` // 1 MB
 }
 
 type APIServer struct {
-	Port              string        `env:"PORT" envDefault:":8080"`
-	ReadTimeout       time.Duration `env:"READ_TIMEOUT" envDefault:"15s"`
-	WriteTimeout      time.Duration `env:"WRITE_TIMEOUT" envDefault:"15s"`
-	IdleTimeout       time.Duration `env:"IDLE_TIMEOUT" envDefault:"120s"`
+	Port              string        `env:"PORT"                envDefault:":8080"`
+	ReadTimeout       time.Duration `env:"READ_TIMEOUT"        envDefault:"15s"`
+	WriteTimeout      time.Duration `env:"WRITE_TIMEOUT"       envDefault:"15s"`
+	IdleTimeout       time.Duration `env:"IDLE_TIMEOUT"        envDefault:"120s"`
 	ReadHeaderTimeout time.Duration `env:"READ_HEADER_TIMEOUT" envDefault:"3s"`
-	MaxHeaderBytes    int           `env:"MAX_HEADER_BYTES" envDefault:"1048576"` // 1 MB
+	MaxHeaderBytes    int           `env:"MAX_HEADER_BYTES"    envDefault:"1048576"` // 1 MB
 }
 
 type Postgres struct {
@@ -48,18 +48,18 @@ type Postgres struct {
 	Password          string        `env:"PASSWORD,required"`
 	DBName            string        `env:"DB,required"`
 	SSLMode           string        `env:"SSL_MODE,required"`
-	MaxConns          int32         `env:"MAX_CONNS" envDefault:"25"`
-	MinConns          int32         `env:"MIN_CONNS" envDefault:"5"`
-	MaxConnLifetime   time.Duration `env:"MAX_CONN_LIFETIME" envDefault:"5m"`
-	MaxConnIdleTime   time.Duration `env:"MAX_CONN_IDLE_TIME" envDefault:"1m"`
+	MaxConns          int32         `env:"MAX_CONNS"           envDefault:"25"`
+	MinConns          int32         `env:"MIN_CONNS"           envDefault:"5"`
+	MaxConnLifetime   time.Duration `env:"MAX_CONN_LIFETIME"   envDefault:"5m"`
+	MaxConnIdleTime   time.Duration `env:"MAX_CONN_IDLE_TIME"  envDefault:"1m"`
 	HealthCheckPeriod time.Duration `env:"HEALTH_CHECK_PERIOD" envDefault:"15s"`
 }
 
 type Hasher struct {
-	Memory     uint32 `env:"MEMORY" envDefault:"65536"`
-	Iterations uint32 `env:"ITERATIONS" envDefault:"3"`
+	Memory     uint32 `env:"MEMORY"      envDefault:"65536"`
+	Iterations uint32 `env:"ITERATIONS"  envDefault:"3"`
 	SaltLength uint32 `env:"SALT_LENGTH" envDefault:"16"`
-	KeyLength  uint32 `env:"KEY_LENGTH" envDefault:"32"`
+	KeyLength  uint32 `env:"KEY_LENGTH"  envDefault:"32"`
 }
 
 type JWT struct {
@@ -81,7 +81,7 @@ type WorkerConfig struct {
 }
 
 type TokenCleanupConfig struct {
-	Interval         time.Duration `env:"INTERVAL" envDefault:"15m"`
+	Interval         time.Duration `env:"INTERVAL"          envDefault:"15m"`
 	ExpiredRetention time.Duration `env:"EXPIRED_RETENTION" envDefault:"1h"`
 	RevokedRetention time.Duration `env:"REVOKED_RETENTION" envDefault:"1h"`
 }

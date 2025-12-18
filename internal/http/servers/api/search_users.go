@@ -12,18 +12,19 @@ import (
 )
 
 // searchUsers returns users matching login prefix
-// @Summary      Search users
-// @Description  Search users by login prefix with pagination
-// @Tags         users
-// @Security     BearerAuth
-// @Param        q      query    string  true   "Search query (login prefix)"
-// @Param        limit  query    int     false  "Limit" default(20)
-// @Param        offset query    int     false  "Offset" default(0)
-// @Success      200 {object} dto.SuccessUsersSearchResponse
-// @Failure      401 {object} dto.ErrorResponse "Unauthorized"
-// @Failure      422 {object} dto.ErrorResponse "Invalid query"
-// @Failure      500 {object} dto.ErrorResponse "Internal server error"
-// @Router       /users/search [get]
+//
+//	@Summary		Search users
+//	@Description	Search users by login prefix with pagination
+//	@Tags			users
+//	@Security		BearerAuth
+//	@Param			q		query		string	true	"Search query (login prefix)"
+//	@Param			limit	query		int		false	"Limit"		default(20)
+//	@Param			offset	query		int		false	"Offset"	default(0)
+//	@Success		200		{object}	dto.SuccessUsersSearchResponse
+//	@Failure		401		{object}	dto.ErrorResponse	"Unauthorized"
+//	@Failure		422		{object}	dto.ErrorResponse	"Invalid query"
+//	@Failure		500		{object}	dto.ErrorResponse	"Internal server error"
+//	@Router			/users/search [get]
 func (s *state) searchUsers(ctx *gin.Context) {
 	query := strings.ToLower(strings.TrimSpace(ctx.Query("q")))
 	if query == "" {

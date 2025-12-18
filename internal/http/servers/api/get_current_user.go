@@ -10,14 +10,15 @@ import (
 )
 
 // getCurrentUser returns current authenticated user data
-// @Summary      Get current user
-// @Description  Returns authenticated user profile information
-// @Tags         users
-// @Security     BearerAuth
-// @Success      200 {object} dto.SuccessUserResponse
-// @Failure      401 {object} dto.ErrorResponse "Unauthorized"
-// @Failure      500 {object} dto.ErrorResponse "Internal server error"
-// @Router       /users/me [get]
+//
+//	@Summary		Get current user
+//	@Description	Returns authenticated user profile information
+//	@Tags			users
+//	@Security		BearerAuth
+//	@Success		200	{object}	dto.SuccessUserResponse
+//	@Failure		401	{object}	dto.ErrorResponse	"Unauthorized"
+//	@Failure		500	{object}	dto.ErrorResponse	"Internal server error"
+//	@Router			/users/me [get]
 func (s *state) getCurrentUser(ctx *gin.Context) {
 	userID, ok := middlewares.GetUserID(ctx)
 	if !ok {

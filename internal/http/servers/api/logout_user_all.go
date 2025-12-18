@@ -9,14 +9,15 @@ import (
 )
 
 // logoutUserAll revokes all user's refresh tokens (all sessions)
-// @Summary      Logout from all devices
-// @Description  Revokes all refresh tokens and ends all user sessions
-// @Tags         auth
-// @Security     BearerAuth
-// @Success      200 {object} dto.SuccessEmptyResponse
-// @Failure      401 {object} dto.ErrorResponse "Unauthorized"
-// @Failure      500 {object} dto.ErrorResponse "Internal server error"
-// @Router       /auth/logout-all [post]
+//
+//	@Summary		Logout from all devices
+//	@Description	Revokes all refresh tokens and ends all user sessions
+//	@Tags			auth
+//	@Security		BearerAuth
+//	@Success		200	{object}	dto.SuccessEmptyResponse
+//	@Failure		401	{object}	dto.ErrorResponse	"Unauthorized"
+//	@Failure		500	{object}	dto.ErrorResponse	"Internal server error"
+//	@Router			/auth/logout-all [post]
 func (s *state) logoutUserAll(ctx *gin.Context) {
 	userID, ok := middlewares.GetUserID(ctx)
 	if !ok {

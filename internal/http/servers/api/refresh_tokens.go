@@ -10,14 +10,15 @@ import (
 )
 
 // refreshToken issues new token pair using refresh token
-// @Summary      Refresh tokens
-// @Description  Generates new access and refresh tokens using valid refresh token
-// @Tags         auth
-// @Security     BearerAuth
-// @Success      200 {object} dto.SuccessTokenResponse
-// @Failure      401 {object} dto.ErrorResponse "Invalid or expired refresh token"
-// @Failure      500 {object} dto.ErrorResponse "Internal server error"
-// @Router       /auth/refresh [post]
+//
+//	@Summary		Refresh tokens
+//	@Description	Generates new access and refresh tokens using valid refresh token
+//	@Tags			auth
+//	@Security		BearerAuth
+//	@Success		200	{object}	dto.SuccessTokenResponse
+//	@Failure		401	{object}	dto.ErrorResponse	"Invalid or expired refresh token"
+//	@Failure		500	{object}	dto.ErrorResponse	"Internal server error"
+//	@Router			/auth/refresh [post]
 func (s *state) refreshToken(ctx *gin.Context) {
 	userID, ok := middlewares.GetUserID(ctx)
 	if !ok {

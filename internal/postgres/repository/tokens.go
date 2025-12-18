@@ -17,7 +17,6 @@ func (r *Repository) InsertRefreshToken(ctx context.Context, token models.Token)
 		&token.ID,
 		&token.CreatedAt,
 	)
-
 	if err != nil {
 		return models.Token{}, err
 	}
@@ -36,7 +35,6 @@ func (r *Repository) SelectRefreshToken(ctx context.Context, userID int64, token
 		&token.RevokedAt,
 		&token.CreatedAt,
 	)
-
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return models.Token{}, derrors.ErrTokenNotFound

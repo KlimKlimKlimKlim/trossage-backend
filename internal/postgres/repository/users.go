@@ -23,7 +23,6 @@ func (r *Repository) InsertUser(ctx context.Context, user models.User) (models.U
 		&user.CreatedAt,
 		&user.UpdatedAt,
 	)
-
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) && pgErr.Code == pgerrcode.UniqueViolation {
@@ -49,7 +48,6 @@ func (r *Repository) SelectUserByLogin(ctx context.Context, login string) (model
 		&user.CreatedAt,
 		&user.UpdatedAt,
 	)
-
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return models.User{}, derrors.ErrUserNotFound
@@ -73,7 +71,6 @@ func (r *Repository) SelectUserByID(ctx context.Context, userID int64) (models.U
 		&user.UpdatedAt,
 		&user.DeletedAt,
 	)
-
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return models.User{}, derrors.ErrUserNotFound
@@ -92,7 +89,6 @@ func (r *Repository) UpdateUser(ctx context.Context, user models.User) (models.U
 	).Scan(
 		&user.UpdatedAt,
 	)
-
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return models.User{}, derrors.ErrUserNotFound
@@ -116,7 +112,11 @@ func (r *Repository) DeleteUser(ctx context.Context, userID int64) error {
 	return nil
 }
 
-func (r *Repository) SelectUsersByLoginPrefix(ctx context.Context, query string, limit, offset int) ([]models.User, error) {
+func (r *Repository) SelectUsersByLoginPrefix(
+	ctx context.Context,
+	query string,
+	limit, offset int,
+) ([]models.User, error) {
 	rows, err := r.db.Query(ctx, users.SelectUsersByLoginPrefixQuery, query, limit, offset)
 	if err != nil {
 		return nil, err
