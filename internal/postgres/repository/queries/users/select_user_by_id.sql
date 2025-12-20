@@ -1,6 +1,6 @@
 SELECT
     id,
-    login,
+    user_login,
     password_hash,
     display_name,
     created_at,

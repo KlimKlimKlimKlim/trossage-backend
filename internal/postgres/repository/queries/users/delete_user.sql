@@ -1,7 +1,7 @@
 UPDATE
     users
 SET
-    login = CONCAT('deleted_user_', id),
+    user_login = CONCAT('deleted_user_', id),
     display_name = 'Deleted User',
     password_hash = '',
     deleted_at = NOW()

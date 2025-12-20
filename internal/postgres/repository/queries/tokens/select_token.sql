@@ -3,8 +3,8 @@ SELECT
     user_id,
     token_hash,
     expires_at,
-    COALESCE(revoked_at, '0001-01-01'::timestamptz) AS revoked_at,
-    created_at
+    created_at,
+    COALESCE(revoked_at, '0001-01-01'::timestamptz) AS revoked_at
 FROM
     refresh_tokens
 WHERE

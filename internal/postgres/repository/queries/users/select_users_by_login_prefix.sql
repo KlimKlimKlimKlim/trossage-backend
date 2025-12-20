@@ -1,14 +1,14 @@
 SELECT
     id,
-    login,
+    user_login,
     display_name,
     created_at
 FROM
     users
 WHERE
     deleted_at IS NULL
-    AND login LIKE $1 || '%'
+    AND user_login LIKE $1 || '%'
 ORDER BY
-    login
+    user_login
 LIMIT $2 OFFSET $3;
 

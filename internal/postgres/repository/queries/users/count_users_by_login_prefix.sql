@@ -1,8 +1,8 @@
 SELECT
-    COUNT(*)
+    COUNT(*) AS total
 FROM
     users
 WHERE
     deleted_at IS NULL
-    AND login LIKE $1 || '%';
+    AND user_login LIKE $1 || '%';
 
