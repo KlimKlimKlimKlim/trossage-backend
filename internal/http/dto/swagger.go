@@ -1,22 +1,19 @@
 package dto
 
-// SuccessResponse wraps successful API responses
 type SuccessResponse[T any] struct {
-	IsSuccess bool   `json:"is_success" example:"true"`
-	Error     string `json:"error"      example:""`
 	Data      T      `json:"data"`
+	Error     string `json:"error"      example:""`
+	IsSuccess bool   `json:"is_success" example:"true"`
 }
 
 type EmptyData struct{}
 
-// ErrorResponse wraps error API responses
 type ErrorResponse struct {
-	IsSuccess bool   `json:"is_success" example:"false"`
-	Error     string `json:"error"      example:"some error message"`
-	Data      any    `json:"data"                                    swaggertype:"object"`
+	Data      any    `json:"data"       swaggertype:"object"`
+	Error     string `json:"error"                           example:"some error message"`
+	IsSuccess bool   `json:"is_success"                      example:"false"`
 }
 
-// Endpoint response types
 type (
 	SuccessUserAndTokenResponse = SuccessResponse[UserAndTokenResponse]
 	SuccessTokenResponse        = SuccessResponse[TokenResponse]

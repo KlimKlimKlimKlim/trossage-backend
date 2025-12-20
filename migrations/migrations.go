@@ -8,19 +8,12 @@ import (
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	"github.com/golang-migrate/migrate/v4/source/iofs"
-
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/config"
 )
 
 //go:embed *.sql
 var migrationsFS embed.FS
 
-func RunMigrations(cfg *config.Postgres) error {
-	dbURL := fmt.Sprintf(
-		"postgresql://%s:%s@%s:%s/%s?sslmode=%s",
-		cfg.User, cfg.Password, cfg.Host, cfg.Port, cfg.DBName, cfg.SSLMode,
-	)
-
+func RunMigrations(dbURL string) error {
 	source, err := iofs.New(migrationsFS, ".")
 	if err != nil {
 		return fmt.Errorf("failed to create migration source: %w", err)

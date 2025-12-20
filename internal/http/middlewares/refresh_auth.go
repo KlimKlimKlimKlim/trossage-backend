@@ -9,14 +9,14 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/controller"
 	derrors "github.com/KlimKlimKlimKlim/trossage-backend/internal/errors"
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/http/response"
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/jwt"
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/models"
+	"github.com/KlimKlimKlimKlim/trossage-backend/internal/service"
 )
 
-func RefreshAuth(jwtController *jwt.Controller, rm controller.IRepoManager) gin.HandlerFunc {
+func RefreshAuth(jwtController *jwt.Controller, rm service.IRepoManager) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		tokenString, err := extractBearerToken(ctx)
 		if err != nil {
@@ -31,6 +31,7 @@ func RefreshAuth(jwtController *jwt.Controller, rm controller.IRepoManager) gin.
 		}
 
 		tokenHash := hashToken(tokenString)
+
 		token, err := rm.Repo().SelectRefreshToken(ctx, userID, tokenHash)
 		if err != nil {
 			if errors.Is(err, derrors.ErrTokenNotFound) {
@@ -38,6 +39,7 @@ func RefreshAuth(jwtController *jwt.Controller, rm controller.IRepoManager) gin.
 			}
 
 			response.HandleError(ctx, fmt.Errorf("failed to select token: %w", err))
+
 			return
 		}
 

@@ -21,7 +21,7 @@ import (
 //	@Failure		401		{object}	dto.ErrorResponse	"Unauthorized"
 //	@Failure		500		{object}	dto.ErrorResponse	"Internal server error"
 //	@Router			/users/me [patch]
-func (s *state) updateCurrentUser(ctx *gin.Context) {
+func (h *handler) updateCurrentUser(ctx *gin.Context) {
 	userID, ok := middlewares.GetUserID(ctx)
 	if !ok {
 		response.HandleError(ctx, derrors.ErrUserIDIsEmpty)
@@ -44,7 +44,7 @@ func (s *state) updateCurrentUser(ctx *gin.Context) {
 		return
 	}
 
-	user, tokensRevoked, tokensRevokedReason, err := s.controller.UpdateUser(
+	user, tokenRevocation, err := h.service.UpdateUser(
 		ctx,
 		userID,
 		req.DisplayName,
@@ -57,7 +57,7 @@ func (s *state) updateCurrentUser(ctx *gin.Context) {
 	}
 
 	var resp dto.UpdateUserResponse
-	resp.Fill(user, tokensRevoked, tokensRevokedReason)
+	resp.Fill(user, tokenRevocation.Revoked, tokenRevocation.Reason)
 
 	response.OK(ctx, resp)
 }

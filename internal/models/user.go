@@ -5,13 +5,13 @@ import (
 )
 
 type User struct {
-	ID           int64
-	Login        string
-	PasswordHash string
-	DisplayName  string
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
 	DeletedAt    time.Time
+	Login        string
+	PasswordHash string
+	DisplayName  string
+	ID           int64
 }
 
 func (u *User) IsDeleted() bool {

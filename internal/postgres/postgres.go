@@ -10,15 +10,14 @@ import (
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/config"
 )
 
-func New(ctx context.Context, cfg *config.Postgres) (*pgxpool.Pool, error) {
-	dsn := fmt.Sprintf(
-		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
-		cfg.Host, cfg.Port, cfg.User, cfg.Password, cfg.DBName, cfg.SSLMode,
-	)
+const (
+	pingTimeout = 5 * time.Second
+)
 
-	poolConfig, err := pgxpool.ParseConfig(dsn)
+func New(ctx context.Context, cfg *config.Postgres) (*pgxpool.Pool, error) {
+	poolConfig, err := pgxpool.ParseConfig(cfg.URL())
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse DSN: %w", err)
+		return nil, fmt.Errorf("failed to parse config: %w", err)
 	}
 
 	poolConfig.MaxConns = cfg.MaxConns
@@ -26,17 +25,17 @@ func New(ctx context.Context, cfg *config.Postgres) (*pgxpool.Pool, error) {
 	poolConfig.MaxConnLifetime = cfg.MaxConnLifetime
 	poolConfig.MaxConnIdleTime = cfg.MaxConnIdleTime
 	poolConfig.HealthCheckPeriod = cfg.HealthCheckPeriod
-	poolConfig.ConnConfig.ConnectTimeout = 10 * time.Second
-
-	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
-	defer cancel()
+	poolConfig.ConnConfig.ConnectTimeout = cfg.ConnectTimeout
 
 	pool, err := pgxpool.NewWithConfig(ctx, poolConfig)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create connection pool: %w", err)
 	}
 
-	if err = pool.Ping(ctx); err != nil {
+	pingCtx, cancel := context.WithTimeout(ctx, pingTimeout)
+	defer cancel()
+
+	if err = pool.Ping(pingCtx); err != nil {
 		pool.Close()
 		return nil, fmt.Errorf("failed to ping postgres: %w", err)
 	}

@@ -29,6 +29,7 @@ func GetUserID(ctx *gin.Context) (int64, bool) {
 	}
 
 	id, ok := userID.(int64)
+
 	return id, ok
 }
 
@@ -39,5 +40,6 @@ func GetTokenID(ctx *gin.Context) (int64, bool) {
 	}
 
 	id, ok := userID.(int64)
+
 	return id, ok
 }

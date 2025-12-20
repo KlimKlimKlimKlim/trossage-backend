@@ -1,8 +1,8 @@
 package errors
 
 type Error struct {
-	Code    int
 	Message string
+	Code    int
 }
 
 func New(msg string, status int) *Error {

@@ -2,6 +2,8 @@ package config
 
 import (
 	"fmt"
+	"net"
+	"net/url"
 	"time"
 
 	"github.com/caarlos0/env/v11"
@@ -9,18 +11,18 @@ import (
 )
 
 type Config struct {
-	Server   Server       `envPrefix:"SERVER_"`
 	Logger   Logger       `envPrefix:"LOGGER_"`
-	Postgres Postgres     `envPrefix:"POSTGRES_"`
-	Hasher   Hasher       `envPrefix:"HASHER_"`
 	JWT      JWT          `envPrefix:"JWT_"`
+	Postgres Postgres     `envPrefix:"POSTGRES_"`
+	Server   Server       `envPrefix:"SERVER_"`
 	Worker   WorkerConfig `envPrefix:"WORKER_"`
+	Hasher   Hasher       `envPrefix:"HASHER_"`
 }
 
 type Server struct {
-	ShutdownTimeout time.Duration `env:"SHUTDOWN_TIMEOUT" envDefault:"10s"`
-	System          SystemServer  `                                        envPrefix:"SYSTEM_"`
-	API             APIServer     `                                        envPrefix:"API_"`
+	System          SystemServer  `envPrefix:"SYSTEM_"`
+	API             APIServer     `envPrefix:"API_"`
+	ShutdownTimeout time.Duration `                    env:"SHUTDOWN_TIMEOUT" envDefault:"10s"`
 }
 
 type SystemServer struct {
@@ -29,7 +31,7 @@ type SystemServer struct {
 	WriteTimeout      time.Duration `env:"WRITE_TIMEOUT"       envDefault:"5s"`
 	IdleTimeout       time.Duration `env:"IDLE_TIMEOUT"        envDefault:"60s"`
 	ReadHeaderTimeout time.Duration `env:"READ_HEADER_TIMEOUT" envDefault:"2s"`
-	MaxHeaderBytes    int           `env:"MAX_HEADER_BYTES"    envDefault:"1048576"` // 1 MB
+	MaxHeaderBytes    int           `env:"MAX_HEADER_BYTES"    envDefault:"1048576"` // 1 MB.
 }
 
 type APIServer struct {
@@ -38,21 +40,37 @@ type APIServer struct {
 	WriteTimeout      time.Duration `env:"WRITE_TIMEOUT"       envDefault:"15s"`
 	IdleTimeout       time.Duration `env:"IDLE_TIMEOUT"        envDefault:"120s"`
 	ReadHeaderTimeout time.Duration `env:"READ_HEADER_TIMEOUT" envDefault:"3s"`
-	MaxHeaderBytes    int           `env:"MAX_HEADER_BYTES"    envDefault:"1048576"` // 1 MB
+	MaxHeaderBytes    int           `env:"MAX_HEADER_BYTES"    envDefault:"1048576"` // 1 MB.
 }
 
 type Postgres struct {
-	Host              string        `env:"HOST,required"`
-	Port              string        `env:"PORT,required"`
-	User              string        `env:"USER,required"`
-	Password          string        `env:"PASSWORD,required"`
-	DBName            string        `env:"DB,required"`
-	SSLMode           string        `env:"SSL_MODE,required"`
-	MaxConns          int32         `env:"MAX_CONNS"           envDefault:"25"`
-	MinConns          int32         `env:"MIN_CONNS"           envDefault:"5"`
+	Host              string        `env:"HOST,notEmpty"`
+	Port              string        `env:"PORT,notEmpty"`
+	User              string        `env:"USER,notEmpty"`
+	Password          string        `env:"PASSWORD,notEmpty"`
+	DBName            string        `env:"DB,notEmpty"`
+	SSLMode           string        `env:"SSL_MODE,notEmpty"`
 	MaxConnLifetime   time.Duration `env:"MAX_CONN_LIFETIME"   envDefault:"5m"`
 	MaxConnIdleTime   time.Duration `env:"MAX_CONN_IDLE_TIME"  envDefault:"1m"`
 	HealthCheckPeriod time.Duration `env:"HEALTH_CHECK_PERIOD" envDefault:"15s"`
+	ConnectTimeout    time.Duration `env:"CONNECT_TIMEOUT"     envDefault:"10s"`
+	MaxConns          int32         `env:"MAX_CONNS"           envDefault:"25"`
+	MinConns          int32         `env:"MIN_CONNS"           envDefault:"5"`
+}
+
+func (p *Postgres) URL() string {
+	dbURL := url.URL{
+		Scheme: "postgres",
+		User:   url.UserPassword(p.User, p.Password),
+		Host:   net.JoinHostPort(p.Host, p.Port),
+		Path:   p.DBName,
+	}
+
+	q := dbURL.Query()
+	q.Set("sslmode", p.SSLMode)
+	dbURL.RawQuery = q.Encode()
+
+	return dbURL.String()
 }
 
 type Hasher struct {
@@ -68,12 +86,12 @@ type JWT struct {
 }
 
 type JWTSetting struct {
-	Secret   string        `env:"SECRET,required"`
-	Lifetime time.Duration `env:"LIFETIME,required"`
+	Secret   string        `env:"SECRET,notEmpty"`
+	Lifetime time.Duration `env:"LIFETIME,notEmpty"`
 }
 
 type Logger struct {
-	Env string `env:"ENV,required"`
+	Env string `env:"ENV,notEmpty"`
 }
 
 type WorkerConfig struct {

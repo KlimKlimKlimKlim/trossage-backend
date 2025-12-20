@@ -1,4 +1,4 @@
-package controller
+package service
 
 import (
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/config"
@@ -6,7 +6,7 @@ import (
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/jwt"
 )
 
-type Controller struct {
+type Service struct {
 	hasher *hasher.Hasher
 
 	AccessJWTController  *jwt.Controller
@@ -15,8 +15,8 @@ type Controller struct {
 	RepoManager IRepoManager
 }
 
-func New(cfg *config.Config, repoManager IRepoManager) *Controller {
-	return &Controller{
+func New(cfg *config.Config, repoManager IRepoManager) *Service {
+	return &Service{
 		hasher:               hasher.New(&cfg.Hasher),
 		AccessJWTController:  jwt.New(&cfg.JWT.Access, jwt.AccessType),
 		RefreshJWTController: jwt.New(&cfg.JWT.Refresh, jwt.RefreshType),

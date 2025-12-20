@@ -1,4 +1,4 @@
-package controller
+package service
 
 import (
 	"context"
@@ -9,7 +9,7 @@ import (
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/postgres"
 )
 
-func (c *Controller) createTokens(ctx context.Context, tx postgres.IRepository, userID int64) (string, string, error) {
+func (c *Service) createTokens(ctx context.Context, tx postgres.IRepository, userID int64) (string, string, error) {
 	accessString, err := c.AccessJWTController.GenerateSignedToken(userID)
 	if err != nil {
 		return "", "", fmt.Errorf("failed to sign access token: %w", err)
@@ -27,7 +27,7 @@ func (c *Controller) createTokens(ctx context.Context, tx postgres.IRepository, 
 	return accessString, refreshString, nil
 }
 
-func (c *Controller) RefreshToken(ctx context.Context, userID, oldTokenID int64) (string, string, error) {
+func (c *Service) RefreshToken(ctx context.Context, userID, oldTokenID int64) (string, string, error) {
 	var accessString, refreshString string
 
 	err := c.RepoManager.InTx(ctx, func(tx postgres.IRepository) error {
@@ -51,6 +51,7 @@ func (c *Controller) RefreshToken(ctx context.Context, userID, oldTokenID int64)
 		}
 
 		var err error
+
 		accessString, refreshString, err = c.createTokens(ctx, tx, userID)
 		if err != nil {
 			return fmt.Errorf("failed to create new tokens: %w", err)
@@ -65,7 +66,7 @@ func (c *Controller) RefreshToken(ctx context.Context, userID, oldTokenID int64)
 	return accessString, refreshString, nil
 }
 
-func (c *Controller) Logout(ctx context.Context, tokenID int64) error {
+func (c *Service) Logout(ctx context.Context, tokenID int64) error {
 	if err := c.RepoManager.Repo().RevokeRefreshTokenByID(ctx, tokenID); err != nil {
 		return fmt.Errorf("failed to revoke token: %w", err)
 	}
@@ -73,7 +74,7 @@ func (c *Controller) Logout(ctx context.Context, tokenID int64) error {
 	return nil
 }
 
-func (c *Controller) LogoutAll(ctx context.Context, userID int64) error {
+func (c *Service) LogoutAll(ctx context.Context, userID int64) error {
 	if err := c.RepoManager.Repo().RevokeRefreshTokensByUserID(ctx, userID); err != nil {
 		return fmt.Errorf("failed to revoke tokens: %w", err)
 	}

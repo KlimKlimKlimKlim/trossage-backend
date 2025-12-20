@@ -35,6 +35,8 @@ var (
 )
 
 var (
-	ErrUserIDIsEmpty  = errors.New("user_id is empty")
-	ErrTokenIDIsEmpty = errors.New("token_id is empty")
+	ErrUserIDIsEmpty    = errors.New("user_id is empty")
+	ErrTokenIDIsEmpty   = errors.New("token_id is empty")
+	ErrUnknownLoggerEnv = errors.New("unknown logger environment")
+	ErrPanicInTx        = errors.New("panic in transaction")
 )

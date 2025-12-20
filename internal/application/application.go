@@ -14,13 +14,13 @@ import (
 	"golang.org/x/sync/errgroup"
 
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/config"
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/controller"
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/http/servers/api"
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/http/servers/system"
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/logger"
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/postgres"
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/postgres/repository"
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/workers/token_cleanup"
+	"github.com/KlimKlimKlimKlim/trossage-backend/internal/service"
+	"github.com/KlimKlimKlimKlim/trossage-backend/internal/workers/tokencleanup"
 	"github.com/KlimKlimKlimKlim/trossage-backend/migrations"
 )
 
@@ -29,13 +29,13 @@ type App struct {
 	config *config.Config
 
 	errorGroup    *errgroup.Group
-	errorGroupCtx context.Context
+	errorGroupCtx context.Context //nolint:containedctx // errgroup must share one context across workers
 
 	pool *pgxpool.Pool
 
-	controller *controller.Controller
+	service *service.Service
 
-	tokenCleanupWorker *token_cleanup.Worker
+	tokenCleanupWorker *tokencleanup.Worker
 
 	systemServer *http.Server
 	apiServer    *http.Server
@@ -60,22 +60,23 @@ func (a *App) Init(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("failed to connect to postgres: %w", err)
 	}
+
 	a.pool = pool
 	a.log.Info("Database connected")
 
-	if err = migrations.RunMigrations(&a.config.Postgres); err != nil {
+	if err = migrations.RunMigrations(a.config.Postgres.URL()); err != nil {
 		return fmt.Errorf("failed to run migrations: %w", err)
 	}
 
 	a.log.Info("Migrations run")
 
 	repoManager := postgres.NewManager(pool, repository.NewRepository(pool))
-	a.controller = controller.New(a.config, repoManager)
+	a.service = service.New(a.config, repoManager)
 
-	a.tokenCleanupWorker = token_cleanup.New(a.log, repoManager, &a.config.Worker.TokenCleanup)
+	a.tokenCleanupWorker = tokencleanup.New(a.log, repoManager, &a.config.Worker.TokenCleanup)
 
 	a.systemServer = system.New(&a.config.Server.System)
-	a.apiServer = api.New(a.log, &a.config.Server.API, a.controller)
+	a.apiServer = api.New(a.log, &a.config.Server.API, a.service)
 
 	return nil
 }
@@ -107,6 +108,7 @@ func (a *App) Start(ctx context.Context) error {
 		if err := a.tokenCleanupWorker.Run(a.errorGroupCtx); err != nil {
 			return fmt.Errorf("token cleanup worker: %w", err)
 		}
+
 		return nil
 	})
 
@@ -118,6 +120,7 @@ func (a *App) Wait() error {
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 
 	errChan := make(chan error, 1)
+
 	go func() {
 		if err := a.errorGroup.Wait(); err != nil {
 			errChan <- err

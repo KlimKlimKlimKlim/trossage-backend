@@ -18,21 +18,21 @@ import (
 //	@Failure	409		{object}	dto.ErrorResponse	"User already exists"
 //	@Failure	500		{object}	dto.ErrorResponse	"Internal server error"
 //	@Router		/auth/register [post]
-func (s *state) registerUser(ctx *gin.Context) {
+func (h *handler) registerUser(ctx *gin.Context) {
 	var req dto.RegisterUserRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		response.HandleError(ctx, derrors.ErrInvalidBody)
 		return
 	}
 
-	user, accessToken, refreshToken, err := s.controller.CreateUser(ctx, req.Login, req.Password, req.DisplayName)
+	user, jwtPair, err := h.service.CreateUser(ctx, req.Login, req.Password, req.DisplayName)
 	if err != nil {
 		response.HandleError(ctx, err)
 		return
 	}
 
 	var resp dto.UserAndTokenResponse
-	resp.Fill(user, accessToken, refreshToken)
+	resp.Fill(user, jwtPair.AccessToken, jwtPair.RefreshToken)
 
 	response.Created(ctx, resp)
 }

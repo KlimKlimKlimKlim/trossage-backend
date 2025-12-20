@@ -19,14 +19,14 @@ import (
 //	@Failure		401	{object}	dto.ErrorResponse	"Unauthorized"
 //	@Failure		500	{object}	dto.ErrorResponse	"Internal server error"
 //	@Router			/users/me [get]
-func (s *state) getCurrentUser(ctx *gin.Context) {
+func (h *handler) getCurrentUser(ctx *gin.Context) {
 	userID, ok := middlewares.GetUserID(ctx)
 	if !ok {
 		response.HandleError(ctx, derrors.ErrUserIDIsEmpty)
 		return
 	}
 
-	user, err := s.controller.GetUserByID(ctx, userID)
+	user, err := h.service.GetUserByID(ctx, userID)
 	if err != nil {
 		response.HandleError(ctx, err)
 		return

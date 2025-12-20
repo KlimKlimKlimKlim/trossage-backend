@@ -25,7 +25,7 @@ import (
 //	@Failure		422		{object}	dto.ErrorResponse	"Invalid query"
 //	@Failure		500		{object}	dto.ErrorResponse	"Internal server error"
 //	@Router			/users/search [get]
-func (s *state) searchUsers(ctx *gin.Context) {
+func (h *handler) searchUsers(ctx *gin.Context) {
 	query := strings.ToLower(strings.TrimSpace(ctx.Query("q")))
 	if query == "" {
 		response.HandleError(ctx, derrors.ErrEmptyQuery)
@@ -38,11 +38,12 @@ func (s *state) searchUsers(ctx *gin.Context) {
 	if limit <= 0 || limit > 100 {
 		limit = 20
 	}
+
 	if offset < 0 {
 		offset = 0
 	}
 
-	users, total, err := s.controller.SearchUsersByLogin(ctx, query, limit, offset)
+	users, total, err := h.service.SearchUsersByLogin(ctx, query, limit, offset)
 	if err != nil {
 		response.HandleError(ctx, err)
 		return

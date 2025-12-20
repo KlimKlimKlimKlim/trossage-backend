@@ -14,9 +14,9 @@ import (
 )
 
 type Controller struct {
+	tokenType TokenType
 	secret    []byte
 	lifetime  time.Duration
-	tokenType TokenType
 }
 
 func New(cfg *config.JWTSetting, tokenType TokenType) *Controller {
@@ -82,7 +82,7 @@ func (jc *Controller) GenerateSignedTokenAndModel(userID int64) (string, models.
 
 func (jc *Controller) ProcessToken(tokenString string) (int64, error) {
 	c := &claims{}
-	token, err := jwt.ParseWithClaims(tokenString, c, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(tokenString, c, func(token *jwt.Token) (any, error) {
 		return jc.secret, nil
 	})
 

@@ -1,4 +1,4 @@
-package token_cleanup
+package tokencleanup
 
 import (
 	"context"
@@ -8,17 +8,17 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/config"
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/controller"
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/logger"
+	"github.com/KlimKlimKlimKlim/trossage-backend/internal/service"
 )
 
 type Worker struct {
 	log        *zap.Logger
-	repository controller.IRepoManager
+	repository service.IRepoManager
 	cfg        *config.TokenCleanupConfig
 }
 
-func New(log *zap.Logger, rm controller.IRepoManager, cfg *config.TokenCleanupConfig) *Worker {
+func New(log *zap.Logger, rm service.IRepoManager, cfg *config.TokenCleanupConfig) *Worker {
 	return &Worker{
 		log:        log.With(zap.String(logger.WorkerField, workerName)),
 		repository: rm,
@@ -50,14 +50,14 @@ func (w *Worker) cleanup(ctx context.Context) error {
 	w.log.Debug("Starting token cleanup")
 
 	now := time.Now()
-
 	expiredThreshold := now.Add(-w.cfg.ExpiredRetention)
+	revokedThreshold := now.Add(-w.cfg.RevokedRetention)
+
 	expiredCount, err := w.repository.Repo().DeleteExpiredTokens(ctx, expiredThreshold)
 	if err != nil {
 		return fmt.Errorf("failed to delete expired tokens: %w", err)
 	}
 
-	revokedThreshold := now.Add(-w.cfg.RevokedRetention)
 	revokedCount, err := w.repository.Repo().DeleteRevokedTokens(ctx, revokedThreshold)
 	if err != nil {
 		return fmt.Errorf("failed to delete revoked tokens: %w", err)

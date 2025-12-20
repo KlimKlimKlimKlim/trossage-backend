@@ -7,44 +7,44 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/config"
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/controller"
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/http/middlewares"
+	"github.com/KlimKlimKlimKlim/trossage-backend/internal/service"
 )
 
-type state struct {
-	controller *controller.Controller
+type handler struct {
+	service *service.Service
 }
 
-func New(log *zap.Logger, cfg *config.APIServer, c *controller.Controller) *http.Server {
-	s := &state{controller: c}
+func New(log *zap.Logger, cfg *config.APIServer, svc *service.Service) *http.Server {
+	hdl := &handler{service: svc}
 
 	router := gin.New()
 	router.Use(gin.Recovery())
 	router.Use(middlewares.Logging(log))
 
-	authMiddleware := middlewares.Auth(c.AccessJWTController)
+	authMiddleware := middlewares.Auth(svc.AccessJWTController)
 
 	apiRouter := router.Group("/api")
 	{
 		authRouter := apiRouter.Group("/auth")
 		{
-			authRouter.POST("/register", s.registerUser)
-			authRouter.POST("/login", s.loginUser)
-			authRouter.POST("/logout-all", authMiddleware, s.logoutUserAll)
+			authRouter.POST("/register", hdl.registerUser)
+			authRouter.POST("/login", hdl.loginUser)
+			authRouter.POST("/logout-all", authMiddleware, hdl.logoutUserAll)
 
-			authRouter.Use(middlewares.RefreshAuth(c.RefreshJWTController, c.RepoManager))
-			authRouter.POST("/refresh", s.refreshToken)
-			authRouter.POST("/logout", s.logoutUser)
+			authRouter.Use(middlewares.RefreshAuth(svc.RefreshJWTController, svc.RepoManager))
+			authRouter.POST("/refresh", hdl.refreshToken)
+			authRouter.POST("/logout", hdl.logoutUser)
 		}
 
 		apiRouter.Use(authMiddleware)
 		usersRouter := apiRouter.Group("/users")
 		{
-			usersRouter.GET("/me", s.getCurrentUser)
-			usersRouter.PATCH("/me", s.updateCurrentUser)
-			usersRouter.DELETE("/me", s.deleteCurrentUser)
+			usersRouter.GET("/me", hdl.getCurrentUser)
+			usersRouter.PATCH("/me", hdl.updateCurrentUser)
+			usersRouter.DELETE("/me", hdl.deleteCurrentUser)
 
-			usersRouter.GET("/search", s.searchUsers)
+			usersRouter.GET("/search", hdl.searchUsers)
 		}
 	}
 

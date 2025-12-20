@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -9,33 +10,33 @@ import (
 )
 
 func Logging(logger *zap.Logger) gin.HandlerFunc {
-	return func(c *gin.Context) {
+	return func(ctx *gin.Context) {
 		start := time.Now()
 
-		requestID := c.GetHeader(requestIDHeader)
+		requestID := ctx.GetHeader(requestIDHeader)
 		if requestID == "" {
 			requestID = uuid.New().String()
 		}
 
-		c.Next()
+		ctx.Next()
 
 		fields := []zap.Field{
 			zap.String("request_id", requestID),
-			zap.String("method", c.Request.Method),
-			zap.String("path", c.Request.URL.Path),
-			zap.Int("status", c.Writer.Status()),
+			zap.String("method", ctx.Request.Method),
+			zap.String("path", ctx.Request.URL.Path),
+			zap.Int("status", ctx.Writer.Status()),
 			zap.Duration("duration", time.Since(start)),
-			zap.String("user_agent", c.Request.UserAgent()),
+			zap.String("user_agent", ctx.Request.UserAgent()),
 		}
 
-		if len(c.Errors) > 0 {
-			fields = append(fields, zap.Error(c.Errors[0].Err))
+		if len(ctx.Errors) > 0 {
+			fields = append(fields, zap.Error(ctx.Errors[0].Err))
 		}
 
 		switch {
-		case c.Writer.Status() >= 500:
+		case ctx.Writer.Status() >= http.StatusInternalServerError:
 			logger.Error("HTTP request", fields...)
-		case c.Writer.Status() >= 400:
+		case ctx.Writer.Status() >= http.StatusBadRequest:
 			logger.Warn("HTTP request", fields...)
 		default:
 			logger.Info("HTTP request", fields...)

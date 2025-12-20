@@ -27,9 +27,11 @@ func Password(password string) bool {
 		if unicode.IsLetter(char) {
 			hasLetter = true
 		}
+
 		if unicode.IsDigit(char) {
 			hasDigit = true
 		}
+
 		if hasLetter && hasDigit {
 			return true
 		}

@@ -10,20 +10,20 @@ import (
 )
 
 type Response struct {
-	IsSuccess bool   `json:"is_success"`
-	Error     string `json:"error"`
 	Data      any    `json:"data"`
+	Error     string `json:"error"`
+	IsSuccess bool   `json:"is_success"`
 }
 
-func OK(c *gin.Context, data any) {
-	c.JSON(http.StatusOK, Response{IsSuccess: true, Data: data})
+func OK(ctx *gin.Context, data any) {
+	ctx.JSON(http.StatusOK, Response{IsSuccess: true, Data: data})
 }
 
-func Created(c *gin.Context, data any) {
-	c.JSON(http.StatusCreated, Response{IsSuccess: true, Data: data})
+func Created(ctx *gin.Context, data any) {
+	ctx.JSON(http.StatusCreated, Response{IsSuccess: true, Data: data})
 }
 
-func HandleError(c *gin.Context, err error) {
+func HandleError(ctx *gin.Context, err error) {
 	var (
 		code    int
 		message string
@@ -40,13 +40,13 @@ func HandleError(c *gin.Context, err error) {
 		message = derrors.ErrInternalServerError.Message
 	}
 
-	_ = c.Error(err)
+	_ = ctx.Error(err)
 
 	resp := Response{
 		IsSuccess: false,
 		Error:     message,
 	}
 
-	c.JSON(code, resp)
-	c.Abort()
+	ctx.JSON(code, resp)
+	ctx.Abort()
 }

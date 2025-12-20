@@ -18,14 +18,14 @@ import (
 //	@Failure		401	{object}	dto.ErrorResponse	"Unauthorized"
 //	@Failure		500	{object}	dto.ErrorResponse	"Internal server error"
 //	@Router			/auth/logout-all [post]
-func (s *state) logoutUserAll(ctx *gin.Context) {
+func (h *handler) logoutUserAll(ctx *gin.Context) {
 	userID, ok := middlewares.GetUserID(ctx)
 	if !ok {
 		response.HandleError(ctx, derrors.ErrUserIDIsEmpty)
 		return
 	}
 
-	if err := s.controller.LogoutAll(ctx, userID); err != nil {
+	if err := h.service.LogoutAll(ctx, userID); err != nil {
 		response.HandleError(ctx, err)
 		return
 	}

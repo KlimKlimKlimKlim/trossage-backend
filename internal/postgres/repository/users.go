@@ -75,6 +75,7 @@ func (r *Repository) SelectUserByID(ctx context.Context, userID int64) (models.U
 		if errors.Is(err, pgx.ErrNoRows) {
 			return models.User{}, derrors.ErrUserNotFound
 		}
+
 		return models.User{}, err
 	}
 
@@ -93,6 +94,7 @@ func (r *Repository) UpdateUser(ctx context.Context, user models.User) (models.U
 		if errors.Is(err, pgx.ErrNoRows) {
 			return models.User{}, derrors.ErrUserNotFound
 		}
+
 		return models.User{}, err
 	}
 
@@ -123,9 +125,11 @@ func (r *Repository) SelectUsersByLoginPrefix(
 	}
 	defer rows.Close()
 
-	var result []models.User
+	result := make([]models.User, 0, limit)
+
 	for rows.Next() {
 		var user models.User
+
 		err = rows.Scan(
 			&user.ID,
 			&user.Login,
@@ -135,6 +139,7 @@ func (r *Repository) SelectUsersByLoginPrefix(
 		if err != nil {
 			return nil, err
 		}
+
 		result = append(result, user)
 	}
 
@@ -143,9 +148,9 @@ func (r *Repository) SelectUsersByLoginPrefix(
 
 func (r *Repository) CountUsersByLoginPrefix(ctx context.Context, query string) (int, error) {
 	var count int
-	err := r.db.QueryRow(ctx, users.CountUsersByLoginPrefixQuery, query).Scan(&count)
-	if err != nil {
+	if err := r.db.QueryRow(ctx, users.CountUsersByLoginPrefixQuery, query).Scan(&count); err != nil {
 		return 0, err
 	}
+
 	return count, nil
 }

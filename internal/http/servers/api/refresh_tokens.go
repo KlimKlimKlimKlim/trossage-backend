@@ -19,7 +19,7 @@ import (
 //	@Failure		401	{object}	dto.ErrorResponse	"Invalid or expired refresh token"
 //	@Failure		500	{object}	dto.ErrorResponse	"Internal server error"
 //	@Router			/auth/refresh [post]
-func (s *state) refreshToken(ctx *gin.Context) {
+func (h *handler) refreshToken(ctx *gin.Context) {
 	userID, ok := middlewares.GetUserID(ctx)
 	if !ok {
 		response.HandleError(ctx, derrors.ErrUserIDIsEmpty)
@@ -32,7 +32,7 @@ func (s *state) refreshToken(ctx *gin.Context) {
 		return
 	}
 
-	accessToken, refreshTokenNew, err := s.controller.RefreshToken(ctx, userID, tokenID)
+	accessToken, refreshTokenNew, err := h.service.RefreshToken(ctx, userID, tokenID)
 	if err != nil {
 		response.HandleError(ctx, err)
 		return

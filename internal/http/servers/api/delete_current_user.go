@@ -21,7 +21,7 @@ import (
 //	@Failure		401		{object}	dto.ErrorResponse	"Unauthorized or invalid password"
 //	@Failure		500		{object}	dto.ErrorResponse	"Internal server error"
 //	@Router			/users/me [delete]
-func (s *state) deleteCurrentUser(ctx *gin.Context) {
+func (h *handler) deleteCurrentUser(ctx *gin.Context) {
 	userID, ok := middlewares.GetUserID(ctx)
 	if !ok {
 		response.HandleError(ctx, derrors.ErrUserIDIsEmpty)
@@ -34,7 +34,7 @@ func (s *state) deleteCurrentUser(ctx *gin.Context) {
 		return
 	}
 
-	if err := s.controller.DeleteUser(ctx, userID, req.Password); err != nil {
+	if err := h.service.DeleteUser(ctx, userID, req.Password); err != nil {
 		response.HandleError(ctx, err)
 		return
 	}

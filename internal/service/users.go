@@ -1,4 +1,4 @@
-package controller
+package service
 
 import (
 	"context"
@@ -6,36 +6,36 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/controller/validate"
 	derrors "github.com/KlimKlimKlimKlim/trossage-backend/internal/errors"
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/models"
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/postgres"
+	"github.com/KlimKlimKlimKlim/trossage-backend/internal/service/validate"
 )
 
-func (c *Controller) CreateUser(
+func (c *Service) CreateUser(
 	ctx context.Context,
 	login, password, displayName string,
-) (models.User, string, string, error) {
+) (models.User, models.JWTPair, error) {
 	login = strings.ToLower(login)
 	if !validate.Login(login) {
-		return models.User{}, "", "", derrors.ErrInvalidLogin
+		return models.User{}, models.JWTPair{}, derrors.ErrInvalidLogin
 	}
 
 	if !validate.Password(password) {
-		return models.User{}, "", "", derrors.ErrInvalidPassword
+		return models.User{}, models.JWTPair{}, derrors.ErrInvalidPassword
 	}
 
 	if !validate.DisplayName(displayName) {
-		return models.User{}, "", "", derrors.ErrInvalidDisplayName
+		return models.User{}, models.JWTPair{}, derrors.ErrInvalidDisplayName
 	}
 
 	ph, err := c.hasher.HashPassword(password)
 	if err != nil {
-		return models.User{}, "", "", fmt.Errorf("failed to hash password: %w", err)
+		return models.User{}, models.JWTPair{}, fmt.Errorf("failed to hash password: %w", err)
 	}
 
 	var (
-		accessString, refreshString string
+		jwtPair models.JWTPair
 
 		user = models.User{
 			Login:        login,
@@ -50,7 +50,7 @@ func (c *Controller) CreateUser(
 			return fmt.Errorf("failed to insert user: %w", err)
 		}
 
-		accessString, refreshString, err = c.createTokens(ctx, tx, user.ID)
+		jwtPair.AccessToken, jwtPair.RefreshToken, err = c.createTokens(ctx, tx, user.ID)
 		if err != nil {
 			return fmt.Errorf("failed to create tokens: %w", err)
 		}
@@ -58,20 +58,21 @@ func (c *Controller) CreateUser(
 		return nil
 	})
 	if err != nil {
-		return models.User{}, "", "", err
+		return models.User{}, models.JWTPair{}, err
 	}
 
-	return user, accessString, refreshString, nil
+	return user, jwtPair, nil
 }
 
-func (c *Controller) LoginUser(ctx context.Context, login, password string) (models.User, string, string, error) {
+func (c *Service) LoginUser(ctx context.Context, login, password string) (models.User, models.JWTPair, error) {
 	var (
-		user                        models.User
-		accessString, refreshString string
+		user    models.User
+		JWTPair models.JWTPair
 	)
 
 	err := c.RepoManager.InTx(ctx, func(tx postgres.IRepository) error {
 		var err error
+
 		user, err = tx.SelectUserByLogin(ctx, login)
 		if err != nil {
 			if errors.Is(err, derrors.ErrUserNotFound) {
@@ -90,7 +91,7 @@ func (c *Controller) LoginUser(ctx context.Context, login, password string) (mod
 			return fmt.Errorf("password is wrong: %w", derrors.ErrUnauthorized)
 		}
 
-		accessString, refreshString, err = c.createTokens(ctx, tx, user.ID)
+		JWTPair.AccessToken, JWTPair.RefreshToken, err = c.createTokens(ctx, tx, user.ID)
 		if err != nil {
 			return fmt.Errorf("failed to create tokens: %w", err)
 		}
@@ -98,13 +99,13 @@ func (c *Controller) LoginUser(ctx context.Context, login, password string) (mod
 		return nil
 	})
 	if err != nil {
-		return models.User{}, "", "", err
+		return models.User{}, models.JWTPair{}, err
 	}
 
-	return user, accessString, refreshString, nil
+	return user, JWTPair, nil
 }
 
-func (c *Controller) GetUserByID(ctx context.Context, userID int64) (models.User, error) {
+func (c *Service) GetUserByID(ctx context.Context, userID int64) (models.User, error) {
 	user, err := c.RepoManager.Repo().SelectUserByID(ctx, userID)
 	if err != nil {
 		return models.User{}, fmt.Errorf("failed to get user: %w", err)
@@ -113,15 +114,14 @@ func (c *Controller) GetUserByID(ctx context.Context, userID int64) (models.User
 	return user, nil
 }
 
-func (c *Controller) UpdateUser(
+func (c *Service) UpdateUser(
 	ctx context.Context,
 	userID int64,
 	displayName, oldPassword, newPassword string,
-) (models.User, bool, string, error) {
+) (models.User, models.TokenRevocation, error) {
 	var (
-		updatedUser         models.User
-		tokensRevoked       bool
-		tokensRevokedReason string
+		updatedUser     models.User
+		tokenRevocation models.TokenRevocation
 	)
 
 	err := c.RepoManager.InTx(ctx, func(tx postgres.IRepository) error {
@@ -135,48 +135,18 @@ func (c *Controller) UpdateUser(
 		}
 
 		if newPassword != "" {
-			if !validate.Password(newPassword) {
-				return derrors.ErrInvalidPassword
+			if err = c.updateUserPassword(ctx, tx, &user, oldPassword, newPassword); err != nil {
+				return err
 			}
 
-			ok, err := c.hasher.VerifyPassword(oldPassword, user.PasswordHash)
-			if err != nil {
-				return fmt.Errorf("failed to verify password: %w", err)
-			}
-
-			if !ok {
-				return derrors.ErrUnauthorized
-			}
-
-			isSame, err := c.hasher.VerifyPassword(newPassword, user.PasswordHash)
-			if err != nil {
-				return fmt.Errorf("failed to verify password: %w", err)
-			}
-
-			if isSame {
-				return derrors.ErrSamePassword
-			}
-
-			newHash, err := c.hasher.HashPassword(newPassword)
-			if err != nil {
-				return fmt.Errorf("failed to hash password: %w", err)
-			}
-
-			user.PasswordHash = newHash
-			tokensRevoked = true
-			tokensRevokedReason = models.PasswordChangedReason
-
-			if err = tx.RevokeRefreshTokensByUserID(ctx, userID); err != nil {
-				return fmt.Errorf("failed to revoke tokens: %w", err)
-			}
+			tokenRevocation.Revoked = true
+			tokenRevocation.Reason = models.PasswordChangedReason
 		}
 
 		if displayName != "" {
-			if !validate.DisplayName(displayName) {
-				return derrors.ErrInvalidDisplayName
+			if err = c.updateUserDisplayName(&user, displayName); err != nil {
+				return err
 			}
-
-			user.DisplayName = displayName
 		}
 
 		updatedUser, err = tx.UpdateUser(ctx, user)
@@ -187,13 +157,65 @@ func (c *Controller) UpdateUser(
 		return nil
 	})
 	if err != nil {
-		return models.User{}, false, "", err
+		return models.User{}, models.TokenRevocation{}, err
 	}
 
-	return updatedUser, tokensRevoked, tokensRevokedReason, nil
+	return updatedUser, tokenRevocation, nil
 }
 
-func (c *Controller) DeleteUser(ctx context.Context, userID int64, password string) error {
+func (c *Service) updateUserPassword(
+	ctx context.Context,
+	tx postgres.IRepository,
+	user *models.User,
+	oldPassword, newPassword string,
+) error {
+	if !validate.Password(newPassword) {
+		return derrors.ErrInvalidPassword
+	}
+
+	ok, err := c.hasher.VerifyPassword(oldPassword, user.PasswordHash)
+	if err != nil {
+		return fmt.Errorf("failed to verify password: %w", err)
+	}
+
+	if !ok {
+		return derrors.ErrUnauthorized
+	}
+
+	isSame, err := c.hasher.VerifyPassword(newPassword, user.PasswordHash)
+	if err != nil {
+		return fmt.Errorf("failed to verify password: %w", err)
+	}
+
+	if isSame {
+		return derrors.ErrSamePassword
+	}
+
+	newHash, err := c.hasher.HashPassword(newPassword)
+	if err != nil {
+		return fmt.Errorf("failed to hash password: %w", err)
+	}
+
+	user.PasswordHash = newHash
+
+	if err = tx.RevokeRefreshTokensByUserID(ctx, user.ID); err != nil {
+		return fmt.Errorf("failed to revoke tokens: %w", err)
+	}
+
+	return nil
+}
+
+func (c *Service) updateUserDisplayName(user *models.User, displayName string) error {
+	if !validate.DisplayName(displayName) {
+		return derrors.ErrInvalidDisplayName
+	}
+
+	user.DisplayName = displayName
+
+	return nil
+}
+
+func (c *Service) DeleteUser(ctx context.Context, userID int64, password string) error {
 	err := c.RepoManager.InTx(ctx, func(tx postgres.IRepository) error {
 		user, err := tx.SelectUserByID(ctx, userID)
 		if err != nil {
@@ -223,7 +245,7 @@ func (c *Controller) DeleteUser(ctx context.Context, userID int64, password stri
 	return err
 }
 
-func (c *Controller) SearchUsersByLogin(
+func (c *Service) SearchUsersByLogin(
 	ctx context.Context,
 	query string,
 	limit, offset int,

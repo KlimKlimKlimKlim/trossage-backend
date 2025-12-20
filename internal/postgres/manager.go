@@ -8,6 +8,7 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 
+	derrors "github.com/KlimKlimKlimKlim/trossage-backend/internal/errors"
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/postgres/repository"
 )
 
@@ -23,7 +24,7 @@ func NewManager(pool *pgxpool.Pool, repo IRepository) *Manager {
 	}
 }
 
-func (m *Manager) Repo() IRepository {
+func (m *Manager) Repo() IRepository { //nolint:ireturn // It must return interface, manager cannot return a structure.
 	return m.repo
 }
 
@@ -36,13 +37,14 @@ func (m *Manager) InTx(ctx context.Context, fn func(tx IRepository) error) (err 
 	defer func() {
 		if r := recover(); r != nil {
 			_ = tx.Rollback(ctx)
-			err = fmt.Errorf("panic in transaction: %v\nstack: %s", r, debug.Stack())
+			err = fmt.Errorf("%w: %v\nstack: %s", derrors.ErrPanicInTx, r, debug.Stack())
+
 			return
 		}
 
 		if err != nil {
 			if rbErr := tx.Rollback(ctx); rbErr != nil {
-				err = fmt.Errorf("tx rollback error: %w (original error: %v)", rbErr, err)
+				err = fmt.Errorf("tx rollback error: %w (original error: %w)", rbErr, err)
 			}
 		} else {
 			if cmErr := tx.Commit(ctx); cmErr != nil {

@@ -18,14 +18,14 @@ import (
 //	@Failure		401	{object}	dto.ErrorResponse	"Invalid or expired refresh token"
 //	@Failure		500	{object}	dto.ErrorResponse	"Internal server error"
 //	@Router			/auth/logout [post]
-func (s *state) logoutUser(ctx *gin.Context) {
+func (h *handler) logoutUser(ctx *gin.Context) {
 	tokenID, ok := middlewares.GetTokenID(ctx)
 	if !ok {
 		response.HandleError(ctx, derrors.ErrTokenIDIsEmpty)
 		return
 	}
 
-	if err := s.controller.Logout(ctx, tokenID); err != nil {
+	if err := h.service.Logout(ctx, tokenID); err != nil {
 		response.HandleError(ctx, err)
 		return
 	}

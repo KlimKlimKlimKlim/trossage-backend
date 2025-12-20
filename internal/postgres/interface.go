@@ -7,7 +7,7 @@ import (
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/models"
 )
 
-type IRepository interface {
+type IRepository interface { //nolint:interfacebloat // it's okay for repository interfaces
 	InsertUser(ctx context.Context, user models.User) (models.User, error)
 	SelectUserByLogin(ctx context.Context, login string) (models.User, error)
 	SelectUserByID(ctx context.Context, userID int64) (models.User, error)

@@ -1,4 +1,4 @@
-package token_cleanup
+package tokencleanup
 
 const (
 	workerName = "token-cleanup"

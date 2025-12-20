@@ -18,21 +18,21 @@ import (
 //	@Failure	401		{object}	dto.ErrorResponse	"Invalid credentials"
 //	@Failure	500		{object}	dto.ErrorResponse	"Internal server error"
 //	@Router		/auth/login [post]
-func (s *state) loginUser(ctx *gin.Context) {
+func (h *handler) loginUser(ctx *gin.Context) {
 	var req dto.LoginUserRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		response.HandleError(ctx, derrors.ErrInvalidBody)
 		return
 	}
 
-	user, accessToken, refreshToken, err := s.controller.LoginUser(ctx, req.Login, req.Password)
+	user, jwtPair, err := h.service.LoginUser(ctx, req.Login, req.Password)
 	if err != nil {
 		response.HandleError(ctx, err)
 		return
 	}
 
 	var resp dto.UserAndTokenResponse
-	resp.Fill(user, accessToken, refreshToken)
+	resp.Fill(user, jwtPair.AccessToken, jwtPair.RefreshToken)
 
 	response.OK(ctx, resp)
 }
