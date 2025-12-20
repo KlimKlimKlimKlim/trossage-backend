@@ -1,0 +1,289 @@
+version: "2"
+
+run:
+  relative-path-mode: gomod
+  timeout: 3m
+  tests: true
+  modules-download-mode: readonly
+  allow-parallel-runners: true
+  allow-serial-runners: true
+  issues-exit-code: 2
+  concurrency: 4
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0
+  uniq-by-line: false
+  new: false
+  fix: false
+
+output:
+  formats:
+    text:
+      path: stdout
+      print-linter-name: true
+      print-issued-lines: true
+      colors: true
+  sort-order:
+    - linter
+    - severity
+    - file
+  show-stats: true
+
+severity:
+  default: error
+
+formatters:
+  enable:
+    - gofumpt
+    - goimports
+    - golines
+    - swaggo
+  settings:
+    gofumpt:
+      module-path: github.com/KlimKlimKlimKlim/trossage-backend
+      extra-rules: true
+    goimports:
+      local-prefixes:
+        - github.com/KlimKlimKlimKlim/trossage-backend
+    golines:
+      max-len: 120
+      tab-len: 4
+      shorten-comments: true
+      reformat-tags: true
+      chain-split-dots: true
+
+linters:
+  default: none
+  exclusions:
+    paths:
+      - "docs/docs.go$"
+  enable:
+    - asasalint
+    - asciicheck
+    - bidichk
+    - bodyclose
+    - canonicalheader
+    - containedctx
+    - contextcheck
+    - cyclop
+    - dogsled
+    - dupl
+    - dupword
+    - durationcheck
+    - embeddedstructfieldcheck
+    - err113
+    - errcheck
+    - errchkjson
+    - errname
+    - errorlint
+    - exhaustive
+    - exptostd
+    - fatcontext
+    - forbidigo
+    - forcetypeassert
+    - funlen
+    - gocheckcompilerdirectives
+    - gochecknoglobals
+    - gochecknoinits
+    - gocognit
+    - goconst
+    - gocritic
+    - godoclint
+    - godot
+    - godox
+    - goprintffuncname
+    - gosec
+    - gosmopolitan
+    - govet
+    - grouper
+    - iface
+    - importas
+    - inamedparam
+    - ineffassign
+    - interfacebloat
+    - intrange
+    - iotamixing
+    - ireturn
+    - lll
+    - loggercheck
+    - maintidx
+    - makezero
+    - mirror
+    - misspell
+    - mnd
+    - modernize
+    - musttag
+    - nakedret
+    - nestif
+    - nilerr
+    - nilnesserr
+    - nilnil
+    - noctx
+    - nolintlint
+    - nosprintfhostport
+    - paralleltest
+    - perfsprint
+    - prealloc
+    - predeclared
+    - promlinter
+    - protogetter
+    - reassign
+    - recvcheck
+    - revive
+    - rowserrcheck
+    - sloglint
+    - spancheck
+    - sqlclosecheck
+    - staticcheck
+    - tagliatelle
+    - testableexamples
+    - testifylint
+    - thelper
+    - tparallel
+    - unconvert
+    - unparam
+    - unqueryvet
+    - unused
+    - usestdlibvars
+    - usetesting
+    - varnamelen
+    - wastedassign
+    - whitespace
+    - wsl_v5
+
+  settings:
+    bidichk:
+      left-to-right-embedding: false
+      right-to-left-embedding: false
+      pop-directional-formatting: false
+      left-to-right-override: false
+      right-to-left-override: false
+      left-to-right-isolate: false
+      right-to-left-isolate: false
+      first-strong-isolate: false
+      pop-directional-isolate: false
+    cyclop:
+      max-complexity: 15
+      package-average: 6
+    dupl:
+      threshold: 100
+    embeddedstructfieldcheck:
+      forbid-mutex: true
+    errcheck:
+      check-type-assertions: true
+      check-blank: false
+      verbose: true
+      exclude-functions:
+        - encoding/json.Marshal
+        - encoding/json.MarshalIndent
+    errchkjson:
+      check-error-free-encoding: true
+      report-no-exported: true
+    exhaustive:
+      check:
+        - switch
+        - map
+    fatcontext:
+      check-struct-pointers: true
+    gocognit:
+      min-complexity: 20
+    godot:
+      scope: all
+      period: true
+      capital: true
+    govet:
+      enable-all: true
+    grouper:
+      const-require-grouping: true
+      import-require-single-import: true
+    iface:
+      enable:
+        - identical
+        - unused
+        - opaque
+        - unexported
+    importas:
+      no-unaliased: true
+    lll:
+      line-length: 120
+      tab-width: 1
+    maintidx:
+      under: 40
+    nestif:
+      min-complexity: 4
+    nilnil:
+      only-two: false
+      detect-opposite: true
+    nolintlint:
+      allow-unused: false
+      allow-no-explanation: [ ]
+      require-explanation: true
+      require-specific: true
+    prealloc:
+      simple: false
+      range-loops: true
+      for-loops: true
+    predeclared:
+      qualified-name: true
+    promlinter:
+      strict: true
+    revive:
+      max-open-files: 2048
+      confidence: 0.8
+      severity: warning
+      enable-default-rules: true
+      enable-all-rules: false
+      directives:
+        - name: specify-disable-reason
+          severity: error
+      rules:
+        - name: error-strings
+        - name: error-return
+        - name: error-naming
+        - name: var-naming
+          arguments:
+            - [ ]
+            - [ ]
+            - - skip-package-name-checks: true
+                upper-case-const: true
+        - name: receiver-naming
+        - name: indent-error-flow
+        - name: superfluous-else
+        - name: context-as-argument
+        - name: context-keys-type
+        - name: unhandled-error
+          arguments: [ "fmt.Printf", "fmt.Println" ]
+        - name: unchecked-type-assertion
+        - name: range-val-in-closure
+        - name: range-val-address
+        - name: datarace
+        - name: atomic
+        - name: function-result-limit
+          arguments: [ 3 ]
+        - name: argument-limit
+          arguments: [ 5 ]
+        - name: var-declaration
+        - name: increment-decrement
+        - name: time-equal
+        - name: time-naming
+    rowserrcheck:
+      packages:
+        - github.com/jackc/pgx/v5
+    tagliatelle:
+      case:
+        rules:
+          json: snake
+          yaml: snake
+          bson: snake
+          mapstructure: snake
+          envconfig: upperSnake
+        use-field-name: true
+    testifylint:
+      enable-all: true
+    unconvert:
+      fast-math: true
+      safe: true
+    varnamelen:
+      max-distance: 10
+      min-name-length: 2
