@@ -32,8 +32,8 @@ func (r *Repository) SelectRefreshToken(ctx context.Context, userID int64, token
 		&token.UserID,
 		&token.TokenHash,
 		&token.ExpiresAt,
-		&token.RevokedAt,
 		&token.CreatedAt,
+		&token.RevokedAt,
 	)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
