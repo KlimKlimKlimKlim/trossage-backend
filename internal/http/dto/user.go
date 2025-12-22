@@ -3,6 +3,7 @@ package dto
 import (
 	"time"
 
+	derrors "github.com/KlimKlimKlimKlim/trossage-backend/internal/errors"
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/models"
 )
 
@@ -55,6 +56,18 @@ type UpdateUserRequest struct {
 	DisplayName string `json:"display_name,omitempty" binding:"omitempty,min=1,max=20" example:"John Doe Updated"`
 	OldPassword string `json:"old_password,omitempty" binding:"omitempty"              example:"currentPassword123"`
 	NewPassword string `json:"new_password,omitempty" binding:"omitempty,min=8,max=63" example:"newSecurePass123"`
+}
+
+func (r *UpdateUserRequest) Validate() error {
+	if r.DisplayName == "" && r.NewPassword == "" {
+		return derrors.ErrEmptyBody
+	}
+
+	if r.NewPassword != "" && r.OldPassword == "" {
+		return derrors.ErrUnauthorized
+	}
+
+	return nil
 }
 
 type UpdateUserResponse struct {

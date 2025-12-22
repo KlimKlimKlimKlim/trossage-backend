@@ -34,13 +34,8 @@ func (h *handler) updateCurrentUser(ctx *gin.Context) {
 		return
 	}
 
-	if req.DisplayName == "" && req.NewPassword == "" {
-		response.HandleError(ctx, derrors.ErrEmptyBody)
-		return
-	}
-
-	if req.NewPassword != "" && req.OldPassword == "" {
-		response.HandleError(ctx, derrors.ErrUnauthorized)
+	if err := req.Validate(); err != nil {
+		response.HandleError(ctx, err)
 		return
 	}
 
