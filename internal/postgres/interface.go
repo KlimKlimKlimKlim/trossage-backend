@@ -13,8 +13,8 @@ type IRepository interface { //nolint:interfacebloat // it's okay for repository
 	SelectUserByID(ctx context.Context, userID int64) (models.User, error)
 	UpdateUser(ctx context.Context, user models.User) (models.User, error)
 	DeleteUser(ctx context.Context, userID int64) error
-	SelectUsersByLoginPrefix(ctx context.Context, query string, limit, offset int) ([]models.User, error)
-	CountUsersByLoginPrefix(ctx context.Context, query string) (int, error)
+	SelectUsersByLoginPrefix(ctx context.Context, userID int64, query string, limit, offset int) ([]models.User, error)
+	CountUsersByLoginPrefix(ctx context.Context, userID int64, query string) (int, error)
 
 	InsertRefreshToken(ctx context.Context, token models.Token) (models.Token, error)
 	SelectRefreshToken(ctx context.Context, userID int64, tokenHash string) (models.Token, error)

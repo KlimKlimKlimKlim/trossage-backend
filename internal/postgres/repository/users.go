@@ -116,10 +116,11 @@ func (r *Repository) DeleteUser(ctx context.Context, userID int64) error {
 
 func (r *Repository) SelectUsersByLoginPrefix(
 	ctx context.Context,
+	userID int64,
 	query string,
 	limit, offset int,
 ) ([]models.User, error) {
-	rows, err := r.db.Query(ctx, users.SelectUsersByLoginPrefixQuery, query, limit, offset)
+	rows, err := r.db.Query(ctx, users.SelectUsersByLoginPrefixQuery, userID, query, limit, offset)
 	if err != nil {
 		return nil, err
 	}
@@ -146,9 +147,9 @@ func (r *Repository) SelectUsersByLoginPrefix(
 	return result, rows.Err()
 }
 
-func (r *Repository) CountUsersByLoginPrefix(ctx context.Context, query string) (int, error) {
+func (r *Repository) CountUsersByLoginPrefix(ctx context.Context, userID int64, query string) (int, error) {
 	var count int
-	if err := r.db.QueryRow(ctx, users.CountUsersByLoginPrefixQuery, query).Scan(&count); err != nil {
+	if err := r.db.QueryRow(ctx, users.CountUsersByLoginPrefixQuery, userID, query).Scan(&count); err != nil {
 		return 0, err
 	}
 

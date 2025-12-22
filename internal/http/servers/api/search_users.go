@@ -1,13 +1,12 @@
 package api
 
 import (
-	"strconv"
-	"strings"
-
 	"github.com/gin-gonic/gin"
 
 	derrors "github.com/KlimKlimKlimKlim/trossage-backend/internal/errors"
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/http/dto"
+	"github.com/KlimKlimKlimKlim/trossage-backend/internal/http/middlewares"
+	"github.com/KlimKlimKlimKlim/trossage-backend/internal/http/params"
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/http/response"
 )
 
@@ -26,24 +25,22 @@ import (
 //	@Failure		500		{object}	dto.ErrorResponse	"Internal server error"
 //	@Router			/users/search [get]
 func (h *handler) searchUsers(ctx *gin.Context) {
-	query := strings.ToLower(strings.TrimSpace(ctx.Query("q")))
-	if query == "" {
-		response.HandleError(ctx, derrors.ErrEmptyQuery)
+	query, err := params.ParseSearchQuery(ctx.Query("q"))
+	if err != nil {
+		response.HandleError(ctx, err)
 		return
 	}
 
-	limit, _ := strconv.Atoi(ctx.DefaultQuery("limit", "20"))
-	offset, _ := strconv.Atoi(ctx.DefaultQuery("offset", "0"))
+	limit := params.ParseLimit(ctx.Query("limit"))
+	offset := params.ParseOffset(ctx.Query("offset"))
 
-	if limit <= 0 || limit > 100 {
-		limit = 20
+	userID, ok := middlewares.GetUserID(ctx)
+	if !ok {
+		response.HandleError(ctx, derrors.ErrUserIDIsEmpty)
+		return
 	}
 
-	if offset < 0 {
-		offset = 0
-	}
-
-	users, total, err := h.service.SearchUsersByLogin(ctx, query, limit, offset)
+	users, total, err := h.service.SearchUsersByLogin(ctx, userID, query, limit, offset)
 	if err != nil {
 		response.HandleError(ctx, err)
 		return
