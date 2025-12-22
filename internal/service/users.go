@@ -12,6 +12,10 @@ import (
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/service/validate"
 )
 
+const (
+	PasswordChangedReason = "password changed"
+)
+
 func (c *Service) CreateUser(
 	ctx context.Context,
 	login, password, displayName string,
@@ -140,7 +144,7 @@ func (c *Service) UpdateUser(
 			}
 
 			tokenRevocation.Revoked = true
-			tokenRevocation.Reason = models.PasswordChangedReason
+			tokenRevocation.Reason = PasswordChangedReason
 		}
 
 		if displayName != "" {

@@ -6,32 +6,32 @@ import (
 )
 
 var (
-	ErrInternalServerError = New("Internal server error", http.StatusInternalServerError)
+	ErrInternalServerError = New(http.StatusInternalServerError, "Internal server error")
 
-	ErrInvalidBody  = New("Invalid body", http.StatusBadRequest)
-	ErrEmptyBody    = New("Empty body", http.StatusUnprocessableEntity)
-	ErrEmptyQuery   = New("Empty query", http.StatusUnprocessableEntity)
+	ErrInvalidBody  = New(http.StatusBadRequest, "Invalid body")
+	ErrEmptyBody    = New(http.StatusUnprocessableEntity, "Empty body")
+	ErrEmptyQuery   = New(http.StatusUnprocessableEntity, "Empty query")
 	ErrInvalidLogin = New(
-		"Login must be 3-20 characters long and contain only lowercase letters, digits, and underscores",
 		http.StatusUnprocessableEntity,
+		"Login must be 3-20 characters long and contain only lowercase letters, digits, and underscores",
 	)
 	ErrInvalidPassword = New(
-		"Password must be 8-63 characters long, contain at least one letter and one digit, and use only allowed characters",
 		http.StatusUnprocessableEntity,
+		"Password must be 8-63 characters long, contain at least one letter and one digit, and use only allowed characters",
 	)
 	ErrInvalidDisplayName = New(
-		"Display name must be 1-20 characters long and contain only letters, digits, spaces, dots, underscores, and hyphens",
 		http.StatusUnprocessableEntity,
+		"Display name must be 1-20 characters long and contain only letters, digits, spaces, dots, underscores, and hyphens",
 	)
 
-	ErrUnauthorized = New("Unauthorized", http.StatusUnauthorized)
+	ErrUnauthorized = New(http.StatusUnauthorized, "Unauthorized")
 
-	ErrUserNotFound      = New("User not found", http.StatusNotFound)
-	ErrUserAlreadyExists = New("User already exists", http.StatusConflict)
+	ErrUserNotFound      = New(http.StatusNotFound, "User not found")
+	ErrUserAlreadyExists = New(http.StatusConflict, "User already exists")
 
-	ErrTokenNotFound = New("Token not found", http.StatusNotFound)
+	ErrTokenNotFound = New(http.StatusNotFound, "Token not found")
 
-	ErrSamePassword = New("New password must be different from current", http.StatusUnprocessableEntity)
+	ErrSamePassword = New(http.StatusUnprocessableEntity, "New password must be different from current")
 )
 
 var (
