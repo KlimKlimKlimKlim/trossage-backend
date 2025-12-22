@@ -23,6 +23,7 @@ var (
 		http.StatusUnprocessableEntity,
 		"Display name must be 1-20 characters long and contain only letters, digits, spaces, dots, underscores, and hyphens",
 	)
+	ErrSearchQueryTooShort = New(http.StatusUnprocessableEntity, "Search query too short")
 
 	ErrUnauthorized = New(http.StatusUnauthorized, "Unauthorized")
 
