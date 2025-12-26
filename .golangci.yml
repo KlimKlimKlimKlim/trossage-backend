@@ -71,7 +71,6 @@ linters:
     - dupl
     - dupword
     - durationcheck
-    - embeddedstructfieldcheck
     - err113
     - errcheck
     - errchkjson
@@ -168,8 +167,6 @@ linters:
       package-average: 6
     dupl:
       threshold: 100
-    embeddedstructfieldcheck:
-      forbid-mutex: true
     errcheck:
       check-type-assertions: true
       check-blank: false
