@@ -13,6 +13,10 @@ type Token struct {
 	UserID    int64
 }
 
+func (t *Token) IsRevoked() bool {
+	return !t.RevokedAt.IsZero()
+}
+
 type JWTPair struct {
 	AccessToken  string
 	RefreshToken string

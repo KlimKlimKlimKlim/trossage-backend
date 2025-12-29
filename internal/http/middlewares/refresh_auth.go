@@ -66,7 +66,7 @@ func isTokenValid(token models.Token) bool {
 		return false
 	}
 
-	if !token.RevokedAt.IsZero() {
+	if token.IsRevoked() {
 		return false
 	}
 
