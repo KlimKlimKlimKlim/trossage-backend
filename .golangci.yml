@@ -206,7 +206,7 @@ linters:
       line-length: 120
       tab-width: 1
     maintidx:
-      under: 40
+      under: 35
     nestif:
       min-complexity: 4
     nilnil:

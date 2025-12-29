@@ -109,7 +109,7 @@ func (s *Service) LoginUser(ctx context.Context, login, password string) (models
 }
 
 func (s *Service) GetUserByID(ctx context.Context, userID int64) (models.User, error) {
-	user, err := s.RepoManager.Repo().SelectUserByID(ctx, userID)
+	user, err := s.getAndCheckUserByID(ctx, s.RepoManager.Repo(), userID)
 	if err != nil {
 		return models.User{}, fmt.Errorf("failed to get user: %w", err)
 	}
@@ -265,4 +265,17 @@ func (s *Service) SearchUsersByLogin(
 	}
 
 	return users, total, nil
+}
+
+func (s *Service) getAndCheckUserByID(ctx context.Context, tx postgres.IRepository, userID int64) (models.User, error) {
+	user, err := tx.SelectUserByID(ctx, userID)
+	if err != nil {
+		return models.User{}, fmt.Errorf("failed to select user: %w", err)
+	}
+
+	if user.IsDeleted() {
+		return models.User{}, fmt.Errorf("user is deleted: %w", derrors.ErrUserNotFound)
+	}
+
+	return user, nil
 }

@@ -46,6 +46,11 @@ func New(log *zap.Logger, cfg *config.APIServer, svc *service.Service) *http.Ser
 
 			usersRouter.GET("/search", hdl.searchUsers)
 		}
+
+		chatsRouter := apiRouter.Group("/chats")
+		{
+			chatsRouter.POST("/", hdl.createChat)
+		}
 	}
 
 	return &http.Server{

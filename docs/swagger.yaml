@@ -1,5 +1,28 @@
 components:
   schemas:
+    dto.ChatResponse:
+      properties:
+        created_at:
+          example: "2025-12-23T00:00:00Z"
+          type: string
+        id:
+          example: 123
+          type: integer
+        other_user:
+          $ref: '#/components/schemas/dto.UserResponse'
+        type:
+          example: private
+          type: string
+      type: object
+    dto.CreateChatRequest:
+      properties:
+        user_id:
+          example: 456
+          minimum: 1
+          type: integer
+      required:
+      - user_id
+      type: object
     dto.DeleteUserRequest:
       properties:
         password:
@@ -53,6 +76,17 @@ components:
       - display_name
       - login
       - password
+      type: object
+    dto.SuccessChatResponse:
+      properties:
+        data:
+          $ref: '#/components/schemas/dto.ChatResponse'
+        error:
+          example: ""
+          type: string
+        is_success:
+          example: true
+          type: boolean
       type: object
     dto.SuccessEmptyResponse:
       properties:
@@ -365,6 +399,64 @@ paths:
       summary: Register user
       tags:
       - auth
+  /chats:
+    post:
+      description: Create a new chat
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/dto.CreateChatRequest'
+        description: Chat creation request
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto.SuccessChatResponse'
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto.ErrorResponse'
+          description: Invalid request
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto.ErrorResponse'
+          description: Unauthorized
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto.ErrorResponse'
+          description: User not found
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto.ErrorResponse'
+          description: Chat already exists
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto.ErrorResponse'
+          description: Cannot create chat with yourself
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto.ErrorResponse'
+          description: Internal server error
+      security:
+      - BearerAuth: []
+      summary: Create chat
+      tags:
+      - chats
   /users/me:
     delete:
       description: Permanently deletes authenticated user account and all associated

@@ -33,6 +33,10 @@ var (
 	ErrTokenNotFound = New(http.StatusNotFound, "Token not found")
 
 	ErrSamePassword = New(http.StatusUnprocessableEntity, "New password must be different from current")
+
+	ErrCannotChatWithYourself = New(http.StatusUnprocessableEntity, "Cannot create chat with yourself")
+	ErrChatAlreadyExists      = New(http.StatusConflict, "Chat already exists")
+	ErrChatNotFound           = New(http.StatusNotFound, "Chat not found")
 )
 
 var (
@@ -40,4 +44,5 @@ var (
 	ErrTokenIDIsEmpty   = errors.New("token_id is empty")
 	ErrUnknownLoggerEnv = errors.New("unknown logger environment")
 	ErrPanicInTx        = errors.New("panic in transaction")
+	ErrEmptyInput       = errors.New("empty input")
 )

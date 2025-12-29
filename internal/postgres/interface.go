@@ -23,4 +23,8 @@ type IRepository interface { //nolint:interfacebloat // it's okay for repository
 	RevokeRefreshTokensByUserID(ctx context.Context, userID int64) error
 	DeleteExpiredTokens(ctx context.Context, olderThan time.Time) (int64, error)
 	DeleteRevokedTokens(ctx context.Context, olderThan time.Time) (int64, error)
+
+	SelectChatBetweenUsers(ctx context.Context, userID1, userID2 int64) (int64, error)
+	InsertChat(ctx context.Context, chatType models.ChatType) (models.Chat, error)
+	InsertChatParticipants(ctx context.Context, chatID int64, userIDs ...int64) error
 }
