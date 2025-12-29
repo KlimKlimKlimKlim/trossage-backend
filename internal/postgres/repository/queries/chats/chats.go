@@ -12,3 +12,9 @@ var InsertChatQuery string
 
 //go:embed insert_chat_participants.sql
 var InsertChatParticipantsQuery string
+
+//go:embed select_user_chats.sql
+var SelectUserChatsQuery string
+
+//go:embed count_user_chats.sql
+var CountUserChatsQuery string

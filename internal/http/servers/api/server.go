@@ -50,6 +50,7 @@ func New(log *zap.Logger, cfg *config.APIServer, svc *service.Service) *http.Ser
 		chatsRouter := apiRouter.Group("/chats")
 		{
 			chatsRouter.POST("/", hdl.createChat)
+			chatsRouter.GET("/", hdl.getChats)
 		}
 	}
 

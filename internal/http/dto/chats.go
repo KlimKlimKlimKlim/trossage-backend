@@ -11,10 +11,11 @@ type CreateChatRequest struct {
 }
 
 type ChatResponse struct {
-	CreatedAt time.Time     `json:"created_at"           example:"2025-12-23T00:00:00Z"`
-	OtherUser *UserResponse `json:"other_user,omitempty"`
-	Type      string        `json:"type"                 example:"private"`
-	ID        int64         `json:"id"                   example:"123"`
+	CreatedAt   time.Time        `json:"created_at"             example:"2025-12-23T00:00:00Z"`
+	OtherUser   *UserResponse    `json:"other_user,omitempty"`
+	LastMessage *LastMessageInfo `json:"last_message,omitempty"`
+	Type        string           `json:"type"                   example:"private"`
+	ID          int64            `json:"id"                     example:"123"`
 }
 
 func (dto *ChatResponse) Fill(chat models.Chat, otherUser models.User) {
@@ -22,9 +23,56 @@ func (dto *ChatResponse) Fill(chat models.Chat, otherUser models.User) {
 	dto.Type = string(chat.Type)
 	dto.CreatedAt = chat.CreatedAt
 
-	if chat.Type == models.ChatTypePrivate && otherUser.ID != 0 {
+	if chat.Type == models.ChatTypePrivate && !otherUser.IsEmpty() {
 		other := &UserResponse{}
 		other.Fill(otherUser)
 		dto.OtherUser = other
+	}
+}
+
+type LastMessageInfo struct {
+	CreatedAt time.Time    `json:"created_at" example:"2025-12-23T00:15:30Z"`
+	Text      string       `json:"text"       example:"Привет!"`
+	Sender    UserResponse `json:"sender"`
+}
+
+func (dto *LastMessageInfo) FillFromModel(msg models.LastMessage) {
+	dto.Text = msg.Text
+	dto.Sender.Fill(msg.Sender)
+	dto.CreatedAt = msg.CreatedAt
+}
+
+type ChatsListResponse struct {
+	Chats  []ChatResponse `json:"chats"`
+	Total  int            `json:"total"  example:"42"`
+	Limit  int            `json:"limit"  example:"20"`
+	Offset int            `json:"offset" example:"0"`
+}
+
+func (dto *ChatsListResponse) Fill(chats []models.ChatWithDetails, total, limit, offset int) {
+	dto.Chats = make([]ChatResponse, len(chats))
+	for i, chat := range chats {
+		dto.Chats[i].FillFromDetails(chat)
+	}
+
+	dto.Total = total
+	dto.Limit = limit
+	dto.Offset = offset
+}
+
+func (dto *ChatResponse) FillFromDetails(chat models.ChatWithDetails) {
+	dto.ID = chat.ID
+	dto.Type = string(chat.Type)
+	dto.CreatedAt = chat.CreatedAt
+
+	if chat.Type == models.ChatTypePrivate && !chat.OtherUser.IsEmpty() {
+		other := &UserResponse{}
+		other.Fill(chat.OtherUser)
+		dto.OtherUser = other
+	}
+
+	if !chat.LastMessage.IsEmpty() {
+		dto.LastMessage = &LastMessageInfo{}
+		dto.LastMessage.FillFromModel(chat.LastMessage)
 	}
 }

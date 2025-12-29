@@ -22,4 +22,5 @@ type (
 	SuccessUpdateUserResponse   = SuccessResponse[UpdateUserResponse]
 	SuccessUsersSearchResponse  = SuccessResponse[UsersSearchResponse]
 	SuccessChatResponse         = SuccessResponse[ChatResponse]
+	SuccessChatsListResponse    = SuccessResponse[ChatsListResponse]
 )

@@ -8,11 +8,30 @@ components:
         id:
           example: 123
           type: integer
+        last_message:
+          $ref: '#/components/schemas/dto.LastMessageInfo'
         other_user:
           $ref: '#/components/schemas/dto.UserResponse'
         type:
           example: private
           type: string
+      type: object
+    dto.ChatsListResponse:
+      properties:
+        chats:
+          items:
+            $ref: '#/components/schemas/dto.ChatResponse'
+          type: array
+          uniqueItems: false
+        limit:
+          example: 20
+          type: integer
+        offset:
+          example: 0
+          type: integer
+        total:
+          example: 42
+          type: integer
       type: object
     dto.CreateChatRequest:
       properties:
@@ -43,6 +62,17 @@ components:
         is_success:
           example: false
           type: boolean
+      type: object
+    dto.LastMessageInfo:
+      properties:
+        created_at:
+          example: "2025-12-23T00:15:30Z"
+          type: string
+        sender:
+          $ref: '#/components/schemas/dto.UserResponse'
+        text:
+          example: Привет!
+          type: string
       type: object
     dto.LoginUserRequest:
       properties:
@@ -81,6 +111,17 @@ components:
       properties:
         data:
           $ref: '#/components/schemas/dto.ChatResponse'
+        error:
+          example: ""
+          type: string
+        is_success:
+          example: true
+          type: boolean
+      type: object
+    dto.SuccessChatsListResponse:
+      properties:
+        data:
+          $ref: '#/components/schemas/dto.ChatsListResponse'
         error:
           example: ""
           type: string
@@ -400,6 +441,45 @@ paths:
       tags:
       - auth
   /chats:
+    get:
+      description: Get user's chat list with pagination
+      parameters:
+      - description: Limit
+        in: query
+        name: limit
+        schema:
+          default: 20
+          type: integer
+      - description: Offset
+        in: query
+        name: offset
+        schema:
+          default: 0
+          type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto.SuccessChatsListResponse'
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto.ErrorResponse'
+          description: Unauthorized
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto.ErrorResponse'
+          description: Internal server error
+      security:
+      - BearerAuth: []
+      summary: Get chats
+      tags:
+      - chats
     post:
       description: Create a new chat
       requestBody:

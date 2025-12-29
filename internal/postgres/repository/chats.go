@@ -51,3 +51,39 @@ func (r *Repository) InsertChatParticipants(ctx context.Context, chatID int64, u
 
 	return err
 }
+
+func (r *Repository) SelectUserChats(
+	ctx context.Context,
+	userID int64,
+	limit, offset int,
+) ([]models.ChatWithDetails, error) {
+	rows, err := r.db.Query(ctx, chats.SelectUserChatsQuery, userID, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	result := make([]models.ChatWithDetails, 0, limit)
+
+	for rows.Next() {
+		chat, err := r.scanChatWithDetails(rows)
+		if err != nil {
+			return nil, err
+		}
+
+		result = append(result, chat)
+	}
+
+	return result, rows.Err()
+}
+
+func (r *Repository) CountUserChats(ctx context.Context, userID int64) (int, error) {
+	var count int
+
+	err := r.db.QueryRow(ctx, chats.CountUserChatsQuery, userID).Scan(&count)
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}

@@ -62,3 +62,35 @@ func (s *Service) CreateChat(ctx context.Context, userID, otherUserID int64) (mo
 
 	return chat, otherUser, nil
 }
+
+func (s *Service) GetUserChats(
+	ctx context.Context,
+	userID int64,
+	limit, offset int,
+) ([]models.ChatWithDetails, int, error) {
+	var (
+		chats []models.ChatWithDetails
+		total int
+	)
+
+	err := s.RepoManager.InTx(ctx, func(tx postgres.IRepository) error {
+		var err error
+
+		chats, err = s.RepoManager.Repo().SelectUserChats(ctx, userID, limit, offset)
+		if err != nil {
+			return fmt.Errorf("failed to get user chats: %w", err)
+		}
+
+		total, err = s.RepoManager.Repo().CountUserChats(ctx, userID)
+		if err != nil {
+			return fmt.Errorf("failed to count user chats: %w", err)
+		}
+
+		return nil
+	})
+	if err != nil {
+		return nil, 0, err
+	}
+
+	return chats, total, nil
+}

@@ -18,3 +18,19 @@ type Chat struct {
 	Title     string
 	ID        int64
 }
+
+type ChatWithDetails struct {
+	LastMessage LastMessage
+	Chat
+	OtherUser User
+}
+
+type LastMessage struct {
+	CreatedAt time.Time
+	Text      string
+	Sender    User
+}
+
+func (m LastMessage) IsEmpty() bool {
+	return m.Sender.ID == 0
+}
