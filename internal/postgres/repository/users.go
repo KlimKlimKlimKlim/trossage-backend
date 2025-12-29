@@ -13,7 +13,7 @@ import (
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/postgres/repository/queries/users"
 )
 
-func (r *Repository) InsertUser(ctx context.Context, user models.User) (models.User, error) {
+func (r *Repository) InsertUser(ctx context.Context, user models.AuthUser) (models.AuthUser, error) {
 	err := r.db.QueryRow(ctx, users.InsertUserQuery,
 		user.Login,
 		user.PasswordHash,
@@ -26,19 +26,19 @@ func (r *Repository) InsertUser(ctx context.Context, user models.User) (models.U
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) && pgErr.Code == pgerrcode.UniqueViolation {
-			return models.User{}, derrors.ErrUserAlreadyExists
+			return models.AuthUser{}, derrors.ErrUserAlreadyExists
 		}
 
-		return models.User{}, err
+		return models.AuthUser{}, err
 	}
 
 	return user, nil
 }
 
-func (r *Repository) SelectUserByLogin(ctx context.Context, login string) (models.User, error) {
-	var user models.User
+func (r *Repository) SelectAuthUserByLogin(ctx context.Context, login string) (models.AuthUser, error) {
+	var user models.AuthUser
 
-	err := r.db.QueryRow(ctx, users.SelectUserByLoginQuery,
+	err := r.db.QueryRow(ctx, users.SelectAuthUserByLoginQuery,
 		login,
 	).Scan(
 		&user.ID,
@@ -50,10 +50,33 @@ func (r *Repository) SelectUserByLogin(ctx context.Context, login string) (model
 	)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return models.User{}, derrors.ErrUserNotFound
+			return models.AuthUser{}, derrors.ErrUserNotFound
 		}
 
-		return models.User{}, err
+		return models.AuthUser{}, err
+	}
+
+	return user, nil
+}
+
+func (r *Repository) SelectAuthUserByID(ctx context.Context, userID int64) (models.AuthUser, error) {
+	var user models.AuthUser
+
+	err := r.db.QueryRow(ctx, users.SelectAuthUserByIDQuery, userID).Scan(
+		&user.ID,
+		&user.Login,
+		&user.PasswordHash,
+		&user.DisplayName,
+		&user.CreatedAt,
+		&user.UpdatedAt,
+		&user.DeletedAt,
+	)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return models.AuthUser{}, derrors.ErrUserNotFound
+		}
+
+		return models.AuthUser{}, err
 	}
 
 	return user, nil
@@ -65,7 +88,6 @@ func (r *Repository) SelectUserByID(ctx context.Context, userID int64) (models.U
 	err := r.db.QueryRow(ctx, users.SelectUserByIDQuery, userID).Scan(
 		&user.ID,
 		&user.Login,
-		&user.PasswordHash,
 		&user.DisplayName,
 		&user.CreatedAt,
 		&user.UpdatedAt,
@@ -82,7 +104,7 @@ func (r *Repository) SelectUserByID(ctx context.Context, userID int64) (models.U
 	return user, nil
 }
 
-func (r *Repository) UpdateUser(ctx context.Context, user models.User) (models.User, error) {
+func (r *Repository) UpdateUser(ctx context.Context, user models.AuthUser) (models.AuthUser, error) {
 	err := r.db.QueryRow(ctx, users.UpdateUserQuery,
 		user.ID,
 		user.DisplayName,
@@ -92,10 +114,10 @@ func (r *Repository) UpdateUser(ctx context.Context, user models.User) (models.U
 	)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return models.User{}, derrors.ErrUserNotFound
+			return models.AuthUser{}, derrors.ErrUserNotFound
 		}
 
-		return models.User{}, err
+		return models.AuthUser{}, err
 	}
 
 	return user, nil

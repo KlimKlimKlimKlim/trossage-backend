@@ -7,8 +7,11 @@ import (
 //go:embed insert_user.sql
 var InsertUserQuery string
 
-//go:embed select_user_by_login.sql
-var SelectUserByLoginQuery string
+//go:embed select_auth_user_by_login.sql
+var SelectAuthUserByLoginQuery string
+
+//go:embed select_auth_user_by_id.sql
+var SelectAuthUserByIDQuery string
 
 //go:embed select_user_by_id.sql
 var SelectUserByIDQuery string

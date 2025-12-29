@@ -5,15 +5,19 @@ import (
 )
 
 type User struct {
-	CreatedAt    time.Time
-	UpdatedAt    time.Time
-	DeletedAt    time.Time
-	Login        string
-	PasswordHash string
-	DisplayName  string
-	ID           int64
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+	DeletedAt   time.Time
+	Login       string
+	DisplayName string
+	ID          int64
 }
 
 func (u *User) IsDeleted() bool {
 	return !u.DeletedAt.IsZero()
+}
+
+type AuthUser struct {
+	PasswordHash string
+	User
 }

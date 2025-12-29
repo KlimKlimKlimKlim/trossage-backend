@@ -40,13 +40,12 @@ func (c *Service) CreateUser(
 
 	var (
 		jwtPair models.JWTPair
-
-		user = models.User{
-			Login:        login,
-			PasswordHash: ph,
-			DisplayName:  displayName,
-		}
+		user    models.AuthUser
 	)
+
+	user.Login = login
+	user.DisplayName = displayName
+	user.PasswordHash = ph
 
 	err = c.RepoManager.InTx(ctx, func(tx postgres.IRepository) error {
 		user, err = tx.InsertUser(ctx, user)
@@ -65,19 +64,19 @@ func (c *Service) CreateUser(
 		return models.User{}, models.JWTPair{}, err
 	}
 
-	return user, jwtPair, nil
+	return user.User, jwtPair, nil
 }
 
 func (c *Service) LoginUser(ctx context.Context, login, password string) (models.User, models.JWTPair, error) {
 	var (
-		user    models.User
+		user    models.AuthUser
 		JWTPair models.JWTPair
 	)
 
 	err := c.RepoManager.InTx(ctx, func(tx postgres.IRepository) error {
 		var err error
 
-		user, err = tx.SelectUserByLogin(ctx, login)
+		user, err = tx.SelectAuthUserByLogin(ctx, login)
 		if err != nil {
 			if errors.Is(err, derrors.ErrUserNotFound) {
 				return fmt.Errorf("user not found: %w", derrors.ErrUnauthorized)
@@ -106,7 +105,7 @@ func (c *Service) LoginUser(ctx context.Context, login, password string) (models
 		return models.User{}, models.JWTPair{}, err
 	}
 
-	return user, JWTPair, nil
+	return user.User, JWTPair, nil
 }
 
 func (c *Service) GetUserByID(ctx context.Context, userID int64) (models.User, error) {
@@ -124,12 +123,12 @@ func (c *Service) UpdateUser(
 	displayName, oldPassword, newPassword string,
 ) (models.User, models.TokenRevocation, error) {
 	var (
-		updatedUser     models.User
+		updatedUser     models.AuthUser
 		tokenRevocation models.TokenRevocation
 	)
 
 	err := c.RepoManager.InTx(ctx, func(tx postgres.IRepository) error {
-		user, err := tx.SelectUserByID(ctx, userID)
+		user, err := tx.SelectAuthUserByID(ctx, userID)
 		if err != nil {
 			return fmt.Errorf("failed to get user: %w", err)
 		}
@@ -164,13 +163,13 @@ func (c *Service) UpdateUser(
 		return models.User{}, models.TokenRevocation{}, err
 	}
 
-	return updatedUser, tokenRevocation, nil
+	return updatedUser.User, tokenRevocation, nil
 }
 
 func (c *Service) updateUserPassword(
 	ctx context.Context,
 	tx postgres.IRepository,
-	user *models.User,
+	user *models.AuthUser,
 	oldPassword, newPassword string,
 ) error {
 	if !validate.Password(newPassword) {
@@ -209,7 +208,7 @@ func (c *Service) updateUserPassword(
 	return nil
 }
 
-func (c *Service) updateUserDisplayName(user *models.User, displayName string) error {
+func (c *Service) updateUserDisplayName(user *models.AuthUser, displayName string) error {
 	if !validate.DisplayName(displayName) {
 		return derrors.ErrInvalidDisplayName
 	}
@@ -221,7 +220,7 @@ func (c *Service) updateUserDisplayName(user *models.User, displayName string) e
 
 func (c *Service) DeleteUser(ctx context.Context, userID int64, password string) error {
 	err := c.RepoManager.InTx(ctx, func(tx postgres.IRepository) error {
-		user, err := tx.SelectUserByID(ctx, userID)
+		user, err := tx.SelectAuthUserByID(ctx, userID)
 		if err != nil {
 			return fmt.Errorf("failed to get user: %w", err)
 		}

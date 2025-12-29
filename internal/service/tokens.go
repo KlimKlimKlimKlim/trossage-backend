@@ -31,7 +31,7 @@ func (c *Service) RefreshToken(ctx context.Context, userID, oldTokenID int64) (s
 	var accessString, refreshString string
 
 	err := c.RepoManager.InTx(ctx, func(tx postgres.IRepository) error {
-		if user, err := tx.SelectUserByID(ctx, userID); err != nil {
+		if user, err := tx.SelectAuthUserByID(ctx, userID); err != nil {
 			switch {
 			case errors.Is(err, derrors.ErrUserNotFound):
 				return fmt.Errorf("user not found: %w", derrors.ErrUnauthorized)

@@ -8,10 +8,11 @@ import (
 )
 
 type IRepository interface { //nolint:interfacebloat // it's okay for repository interfaces
-	InsertUser(ctx context.Context, user models.User) (models.User, error)
-	SelectUserByLogin(ctx context.Context, login string) (models.User, error)
+	InsertUser(ctx context.Context, user models.AuthUser) (models.AuthUser, error)
+	SelectAuthUserByLogin(ctx context.Context, login string) (models.AuthUser, error)
+	SelectAuthUserByID(ctx context.Context, userID int64) (models.AuthUser, error)
 	SelectUserByID(ctx context.Context, userID int64) (models.User, error)
-	UpdateUser(ctx context.Context, user models.User) (models.User, error)
+	UpdateUser(ctx context.Context, user models.AuthUser) (models.AuthUser, error)
 	DeleteUser(ctx context.Context, userID int64) error
 	SelectUsersByLoginPrefix(ctx context.Context, userID int64, query string, limit, offset int) ([]models.User, error)
 	CountUsersByLoginPrefix(ctx context.Context, userID int64, query string) (int, error)
