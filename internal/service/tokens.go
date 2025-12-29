@@ -9,13 +9,13 @@ import (
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/postgres"
 )
 
-func (c *Service) createTokens(ctx context.Context, tx postgres.IRepository, userID int64) (string, string, error) {
-	accessString, err := c.AccessJWTController.GenerateSignedToken(userID)
+func (s *Service) createTokens(ctx context.Context, tx postgres.IRepository, userID int64) (string, string, error) {
+	accessString, err := s.AccessJWTController.GenerateSignedToken(userID)
 	if err != nil {
 		return "", "", fmt.Errorf("failed to sign access token: %w", err)
 	}
 
-	refreshString, storeToken, err := c.RefreshJWTController.GenerateSignedTokenAndModel(userID)
+	refreshString, storeToken, err := s.RefreshJWTController.GenerateSignedTokenAndModel(userID)
 	if err != nil {
 		return "", "", fmt.Errorf("failed to sign access token: %w", err)
 	}
@@ -27,10 +27,10 @@ func (c *Service) createTokens(ctx context.Context, tx postgres.IRepository, use
 	return accessString, refreshString, nil
 }
 
-func (c *Service) RefreshToken(ctx context.Context, userID, oldTokenID int64) (string, string, error) {
+func (s *Service) RefreshToken(ctx context.Context, userID, oldTokenID int64) (string, string, error) {
 	var accessString, refreshString string
 
-	err := c.RepoManager.InTx(ctx, func(tx postgres.IRepository) error {
+	err := s.RepoManager.InTx(ctx, func(tx postgres.IRepository) error {
 		if user, err := tx.SelectAuthUserByID(ctx, userID); err != nil {
 			switch {
 			case errors.Is(err, derrors.ErrUserNotFound):
@@ -52,7 +52,7 @@ func (c *Service) RefreshToken(ctx context.Context, userID, oldTokenID int64) (s
 
 		var err error
 
-		accessString, refreshString, err = c.createTokens(ctx, tx, userID)
+		accessString, refreshString, err = s.createTokens(ctx, tx, userID)
 		if err != nil {
 			return fmt.Errorf("failed to create new tokens: %w", err)
 		}
@@ -66,16 +66,16 @@ func (c *Service) RefreshToken(ctx context.Context, userID, oldTokenID int64) (s
 	return accessString, refreshString, nil
 }
 
-func (c *Service) Logout(ctx context.Context, tokenID int64) error {
-	if err := c.RepoManager.Repo().RevokeRefreshTokenByID(ctx, tokenID); err != nil {
+func (s *Service) Logout(ctx context.Context, tokenID int64) error {
+	if err := s.RepoManager.Repo().RevokeRefreshTokenByID(ctx, tokenID); err != nil {
 		return fmt.Errorf("failed to revoke token: %w", err)
 	}
 
 	return nil
 }
 
-func (c *Service) LogoutAll(ctx context.Context, userID int64) error {
-	if err := c.RepoManager.Repo().RevokeRefreshTokensByUserID(ctx, userID); err != nil {
+func (s *Service) LogoutAll(ctx context.Context, userID int64) error {
+	if err := s.RepoManager.Repo().RevokeRefreshTokensByUserID(ctx, userID); err != nil {
 		return fmt.Errorf("failed to revoke tokens: %w", err)
 	}
 

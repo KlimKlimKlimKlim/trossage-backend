@@ -16,7 +16,7 @@ const (
 	PasswordChangedReason = "password changed"
 )
 
-func (c *Service) CreateUser(
+func (s *Service) CreateUser(
 	ctx context.Context,
 	login, password, displayName string,
 ) (models.User, models.JWTPair, error) {
@@ -33,7 +33,7 @@ func (c *Service) CreateUser(
 		return models.User{}, models.JWTPair{}, derrors.ErrInvalidDisplayName
 	}
 
-	ph, err := c.hasher.HashPassword(password)
+	ph, err := s.hasher.HashPassword(password)
 	if err != nil {
 		return models.User{}, models.JWTPair{}, fmt.Errorf("failed to hash password: %w", err)
 	}
@@ -47,13 +47,13 @@ func (c *Service) CreateUser(
 	user.DisplayName = displayName
 	user.PasswordHash = ph
 
-	err = c.RepoManager.InTx(ctx, func(tx postgres.IRepository) error {
+	err = s.RepoManager.InTx(ctx, func(tx postgres.IRepository) error {
 		user, err = tx.InsertUser(ctx, user)
 		if err != nil {
 			return fmt.Errorf("failed to insert user: %w", err)
 		}
 
-		jwtPair.AccessToken, jwtPair.RefreshToken, err = c.createTokens(ctx, tx, user.ID)
+		jwtPair.AccessToken, jwtPair.RefreshToken, err = s.createTokens(ctx, tx, user.ID)
 		if err != nil {
 			return fmt.Errorf("failed to create tokens: %w", err)
 		}
@@ -67,13 +67,13 @@ func (c *Service) CreateUser(
 	return user.User, jwtPair, nil
 }
 
-func (c *Service) LoginUser(ctx context.Context, login, password string) (models.User, models.JWTPair, error) {
+func (s *Service) LoginUser(ctx context.Context, login, password string) (models.User, models.JWTPair, error) {
 	var (
 		user    models.AuthUser
 		JWTPair models.JWTPair
 	)
 
-	err := c.RepoManager.InTx(ctx, func(tx postgres.IRepository) error {
+	err := s.RepoManager.InTx(ctx, func(tx postgres.IRepository) error {
 		var err error
 
 		user, err = tx.SelectAuthUserByLogin(ctx, login)
@@ -85,7 +85,7 @@ func (c *Service) LoginUser(ctx context.Context, login, password string) (models
 			return fmt.Errorf("failed to select user: %w", err)
 		}
 
-		ok, err := c.hasher.VerifyPassword(password, user.PasswordHash)
+		ok, err := s.hasher.VerifyPassword(password, user.PasswordHash)
 		if err != nil {
 			return fmt.Errorf("failed to verify password: %w", err)
 		}
@@ -94,7 +94,7 @@ func (c *Service) LoginUser(ctx context.Context, login, password string) (models
 			return fmt.Errorf("password is wrong: %w", derrors.ErrUnauthorized)
 		}
 
-		JWTPair.AccessToken, JWTPair.RefreshToken, err = c.createTokens(ctx, tx, user.ID)
+		JWTPair.AccessToken, JWTPair.RefreshToken, err = s.createTokens(ctx, tx, user.ID)
 		if err != nil {
 			return fmt.Errorf("failed to create tokens: %w", err)
 		}
@@ -108,8 +108,8 @@ func (c *Service) LoginUser(ctx context.Context, login, password string) (models
 	return user.User, JWTPair, nil
 }
 
-func (c *Service) GetUserByID(ctx context.Context, userID int64) (models.User, error) {
-	user, err := c.RepoManager.Repo().SelectUserByID(ctx, userID)
+func (s *Service) GetUserByID(ctx context.Context, userID int64) (models.User, error) {
+	user, err := s.RepoManager.Repo().SelectUserByID(ctx, userID)
 	if err != nil {
 		return models.User{}, fmt.Errorf("failed to get user: %w", err)
 	}
@@ -117,7 +117,7 @@ func (c *Service) GetUserByID(ctx context.Context, userID int64) (models.User, e
 	return user, nil
 }
 
-func (c *Service) UpdateUser(
+func (s *Service) UpdateUser(
 	ctx context.Context,
 	userID int64,
 	displayName, oldPassword, newPassword string,
@@ -127,7 +127,7 @@ func (c *Service) UpdateUser(
 		tokenRevocation models.TokenRevocation
 	)
 
-	err := c.RepoManager.InTx(ctx, func(tx postgres.IRepository) error {
+	err := s.RepoManager.InTx(ctx, func(tx postgres.IRepository) error {
 		user, err := tx.SelectAuthUserByID(ctx, userID)
 		if err != nil {
 			return fmt.Errorf("failed to get user: %w", err)
@@ -138,7 +138,7 @@ func (c *Service) UpdateUser(
 		}
 
 		if newPassword != "" {
-			if err = c.updateUserPassword(ctx, tx, &user, oldPassword, newPassword); err != nil {
+			if err = s.updateUserPassword(ctx, tx, &user, oldPassword, newPassword); err != nil {
 				return err
 			}
 
@@ -147,7 +147,7 @@ func (c *Service) UpdateUser(
 		}
 
 		if displayName != "" {
-			if err = c.updateUserDisplayName(&user, displayName); err != nil {
+			if err = s.updateUserDisplayName(&user, displayName); err != nil {
 				return err
 			}
 		}
@@ -166,7 +166,7 @@ func (c *Service) UpdateUser(
 	return updatedUser.User, tokenRevocation, nil
 }
 
-func (c *Service) updateUserPassword(
+func (s *Service) updateUserPassword(
 	ctx context.Context,
 	tx postgres.IRepository,
 	user *models.AuthUser,
@@ -176,7 +176,7 @@ func (c *Service) updateUserPassword(
 		return derrors.ErrInvalidPassword
 	}
 
-	ok, err := c.hasher.VerifyPassword(oldPassword, user.PasswordHash)
+	ok, err := s.hasher.VerifyPassword(oldPassword, user.PasswordHash)
 	if err != nil {
 		return fmt.Errorf("failed to verify password: %w", err)
 	}
@@ -185,7 +185,7 @@ func (c *Service) updateUserPassword(
 		return derrors.ErrUnauthorized
 	}
 
-	isSame, err := c.hasher.VerifyPassword(newPassword, user.PasswordHash)
+	isSame, err := s.hasher.VerifyPassword(newPassword, user.PasswordHash)
 	if err != nil {
 		return fmt.Errorf("failed to verify password: %w", err)
 	}
@@ -194,7 +194,7 @@ func (c *Service) updateUserPassword(
 		return derrors.ErrSamePassword
 	}
 
-	newHash, err := c.hasher.HashPassword(newPassword)
+	newHash, err := s.hasher.HashPassword(newPassword)
 	if err != nil {
 		return fmt.Errorf("failed to hash password: %w", err)
 	}
@@ -208,7 +208,7 @@ func (c *Service) updateUserPassword(
 	return nil
 }
 
-func (c *Service) updateUserDisplayName(user *models.AuthUser, displayName string) error {
+func (s *Service) updateUserDisplayName(user *models.AuthUser, displayName string) error {
 	if !validate.DisplayName(displayName) {
 		return derrors.ErrInvalidDisplayName
 	}
@@ -218,14 +218,14 @@ func (c *Service) updateUserDisplayName(user *models.AuthUser, displayName strin
 	return nil
 }
 
-func (c *Service) DeleteUser(ctx context.Context, userID int64, password string) error {
-	err := c.RepoManager.InTx(ctx, func(tx postgres.IRepository) error {
+func (s *Service) DeleteUser(ctx context.Context, userID int64, password string) error {
+	err := s.RepoManager.InTx(ctx, func(tx postgres.IRepository) error {
 		user, err := tx.SelectAuthUserByID(ctx, userID)
 		if err != nil {
 			return fmt.Errorf("failed to get user: %w", err)
 		}
 
-		ok, err := c.hasher.VerifyPassword(password, user.PasswordHash)
+		ok, err := s.hasher.VerifyPassword(password, user.PasswordHash)
 		if err != nil {
 			return fmt.Errorf("failed to verify password: %w", err)
 		}
@@ -248,18 +248,18 @@ func (c *Service) DeleteUser(ctx context.Context, userID int64, password string)
 	return err
 }
 
-func (c *Service) SearchUsersByLogin(
+func (s *Service) SearchUsersByLogin(
 	ctx context.Context,
 	userID int64,
 	query string,
 	limit, offset int,
 ) ([]models.User, int, error) {
-	users, err := c.RepoManager.Repo().SelectUsersByLoginPrefix(ctx, userID, query, limit, offset)
+	users, err := s.RepoManager.Repo().SelectUsersByLoginPrefix(ctx, userID, query, limit, offset)
 	if err != nil {
 		return nil, 0, fmt.Errorf("failed to search users: %w", err)
 	}
 
-	total, err := c.RepoManager.Repo().CountUsersByLoginPrefix(ctx, userID, query)
+	total, err := s.RepoManager.Repo().CountUsersByLoginPrefix(ctx, userID, query)
 	if err != nil {
 		return nil, 0, fmt.Errorf("failed to count users: %w", err)
 	}
