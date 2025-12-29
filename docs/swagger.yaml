@@ -86,6 +86,23 @@ components:
       - login
       - password
       type: object
+    dto.MessageResponse:
+      properties:
+        chat_id:
+          example: 123
+          type: integer
+        created_at:
+          example: "2025-12-29T13:00:00Z"
+          type: string
+        id:
+          example: 456
+          type: integer
+        sender:
+          $ref: '#/components/schemas/dto.UserResponse'
+        text:
+          example: Привет!
+          type: string
+      type: object
     dto.RegisterUserRequest:
       properties:
         display_name:
@@ -106,6 +123,16 @@ components:
       - display_name
       - login
       - password
+      type: object
+    dto.SendMessageRequest:
+      properties:
+        text:
+          example: Привет!
+          maxLength: 4096
+          minLength: 1
+          type: string
+      required:
+      - text
       type: object
     dto.SuccessChatResponse:
       properties:
@@ -133,6 +160,17 @@ components:
       properties:
         data:
           $ref: '#/components/schemas/dto.EmptyData'
+        error:
+          example: ""
+          type: string
+        is_success:
+          example: true
+          type: boolean
+      type: object
+    dto.SuccessMessageResponse:
+      properties:
+        data:
+          $ref: '#/components/schemas/dto.MessageResponse'
         error:
           example: ""
           type: string
@@ -537,6 +575,65 @@ paths:
       summary: Create chat
       tags:
       - chats
+  /chats/{chat_id}/messages:
+    post:
+      description: Send a new message
+      parameters:
+      - description: Chat ID
+        in: path
+        name: chat_id
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/dto.SendMessageRequest'
+        description: Message body
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto.SuccessMessageResponse'
+          description: Created
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto.ErrorResponse'
+          description: Invalid body
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto.ErrorResponse'
+          description: Unauthorized
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto.ErrorResponse'
+          description: User is not member
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto.ErrorResponse'
+          description: Chat not found
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto.ErrorResponse'
+          description: Message is empty
+      security:
+      - BearerAuth: []
+      summary: Send message
+      tags:
+      - messages
   /users/me:
     delete:
       description: Permanently deletes authenticated user account and all associated

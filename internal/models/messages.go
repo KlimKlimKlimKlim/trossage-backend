@@ -6,6 +6,8 @@ import (
 
 type Message struct {
 	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt time.Time
 	Text      string
 	ID        int64
 	ChatID    int64

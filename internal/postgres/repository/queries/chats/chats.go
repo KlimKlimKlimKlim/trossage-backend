@@ -18,3 +18,9 @@ var SelectUserChatsQuery string
 
 //go:embed count_user_chats.sql
 var CountUserChatsQuery string
+
+//go:embed is_user_member.sql
+var IsUserMemberQuery string
+
+//go:embed select_chat_by_id.sql
+var SelectChatByIDQuery string

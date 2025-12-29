@@ -24,6 +24,7 @@ var (
 		"Display name must be 1-20 characters long and contain only letters, digits, spaces, dots, underscores, and hyphens",
 	)
 	ErrSearchQueryTooShort = New(http.StatusUnprocessableEntity, "Search query too short")
+	ErrInvalidPathParams   = New(http.StatusBadRequest, "invalid path params")
 
 	ErrUnauthorized = New(http.StatusUnauthorized, "Unauthorized")
 
@@ -37,6 +38,9 @@ var (
 	ErrCannotChatWithYourself = New(http.StatusUnprocessableEntity, "Cannot create chat with yourself")
 	ErrChatAlreadyExists      = New(http.StatusConflict, "Chat already exists")
 	ErrChatNotFound           = New(http.StatusNotFound, "Chat not found")
+	ErrUserIsNotMember        = New(http.StatusForbidden, "User is not member")
+
+	ErrMessageIsEmpty = New(http.StatusUnprocessableEntity, "Message is empty")
 )
 
 var (

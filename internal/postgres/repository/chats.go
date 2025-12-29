@@ -87,3 +87,35 @@ func (r *Repository) CountUserChats(ctx context.Context, userID int64) (int, err
 
 	return count, nil
 }
+
+func (r *Repository) IsUserMember(ctx context.Context, chatID, userID int64) (bool, error) {
+	var isMember bool
+
+	err := r.db.QueryRow(ctx, chats.IsUserMemberQuery, chatID, userID).Scan(&isMember)
+	if err != nil {
+		return false, err
+	}
+
+	return isMember, nil
+}
+
+func (r *Repository) SelectChatByID(ctx context.Context, chatID int64) (models.Chat, error) {
+	var chat models.Chat
+
+	err := r.db.QueryRow(ctx, chats.SelectChatByIDQuery, chatID).Scan(
+		&chat.ID,
+		&chat.Type,
+		&chat.CreatedAt,
+		&chat.UpdatedAt,
+		&chat.DeletedAt,
+	)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return models.Chat{}, derrors.ErrChatNotFound
+		}
+
+		return models.Chat{}, err
+	}
+
+	return chat, nil
+}

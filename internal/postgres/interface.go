@@ -29,4 +29,8 @@ type IRepository interface { //nolint:interfacebloat // it's okay for repository
 	InsertChatParticipants(ctx context.Context, chatID int64, userIDs ...int64) error
 	SelectUserChats(ctx context.Context, userID int64, limit, offset int) ([]models.ChatWithDetails, error)
 	CountUserChats(ctx context.Context, userID int64) (int, error)
+	IsUserMember(ctx context.Context, chatID, userID int64) (bool, error)
+	SelectChatByID(ctx context.Context, chatID int64) (models.Chat, error)
+
+	CreateMessage(ctx context.Context, chatID, senderID int64, text string) (models.Message, error)
 }
