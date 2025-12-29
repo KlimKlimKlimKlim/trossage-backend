@@ -97,11 +97,29 @@ components:
         id:
           example: 456
           type: integer
-        sender:
-          $ref: '#/components/schemas/dto.UserResponse'
+        sender_id:
+          example: 789
+          type: integer
         text:
           example: Привет!
           type: string
+      type: object
+    dto.MessagesResponse:
+      properties:
+        limit:
+          example: 20
+          type: integer
+        messages:
+          items:
+            $ref: '#/components/schemas/dto.MessageResponse'
+          type: array
+          uniqueItems: false
+        offset:
+          example: 0
+          type: integer
+        total:
+          example: 150
+          type: integer
       type: object
     dto.RegisterUserRequest:
       properties:
@@ -171,6 +189,17 @@ components:
       properties:
         data:
           $ref: '#/components/schemas/dto.MessageResponse'
+        error:
+          example: ""
+          type: string
+        is_success:
+          example: true
+          type: boolean
+      type: object
+    dto.SuccessMessagesResponse:
+      properties:
+        data:
+          $ref: '#/components/schemas/dto.MessagesResponse'
         error:
           example: ""
           type: string
@@ -576,6 +605,63 @@ paths:
       tags:
       - chats
   /chats/{chat_id}/messages:
+    get:
+      description: Get messages from chat
+      parameters:
+      - description: Chat ID
+        in: path
+        name: chat_id
+        required: true
+        schema:
+          type: integer
+      - description: Limit
+        in: query
+        name: limit
+        schema:
+          default: 20
+          type: integer
+      - description: Offset
+        in: query
+        name: offset
+        schema:
+          default: 0
+          type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto.SuccessMessagesResponse'
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto.ErrorResponse'
+          description: Invalid path params
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto.ErrorResponse'
+          description: Unauthorized
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto.ErrorResponse'
+          description: User is not member
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto.ErrorResponse'
+          description: Chat not found
+      security:
+      - BearerAuth: []
+      summary: Get messages
+      tags:
+      - messages
     post:
       description: Send a new message
       parameters:

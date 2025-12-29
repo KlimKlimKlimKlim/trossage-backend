@@ -24,7 +24,7 @@ var (
 		"Display name must be 1-20 characters long and contain only letters, digits, spaces, dots, underscores, and hyphens",
 	)
 	ErrSearchQueryTooShort = New(http.StatusUnprocessableEntity, "Search query too short")
-	ErrInvalidPathParams   = New(http.StatusBadRequest, "invalid path params")
+	ErrInvalidPathParams   = New(http.StatusBadRequest, "Invalid path params")
 
 	ErrUnauthorized = New(http.StatusUnauthorized, "Unauthorized")
 

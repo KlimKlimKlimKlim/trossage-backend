@@ -24,4 +24,5 @@ type (
 	SuccessChatResponse         = SuccessResponse[ChatResponse]
 	SuccessChatsListResponse    = SuccessResponse[ChatsListResponse]
 	SuccessMessageResponse      = SuccessResponse[MessageResponse]
+	SuccessMessagesResponse     = SuccessResponse[MessagesResponse]
 )

@@ -14,16 +14,13 @@ func (s *Service) CreateMessage(
 	ctx context.Context,
 	senderID, chatID int64,
 	text string,
-) (models.Message, models.User, error) {
+) (models.Message, error) {
 	text = strings.TrimSpace(text)
 	if text == "" {
-		return models.Message{}, models.User{}, derrors.ErrMessageIsEmpty
+		return models.Message{}, derrors.ErrMessageIsEmpty
 	}
 
-	var (
-		message models.Message
-		sender  models.User
-	)
+	var message models.Message
 
 	err := s.RepoManager.InTx(ctx, func(tx postgres.IRepository) error {
 		_, err := tx.SelectChatByID(ctx, chatID)
@@ -31,7 +28,7 @@ func (s *Service) CreateMessage(
 			return fmt.Errorf("failed to select chat: %w", err)
 		}
 
-		sender, err = tx.SelectUserByID(ctx, senderID)
+		_, err = tx.SelectUserByID(ctx, senderID)
 		if err != nil {
 			return fmt.Errorf("failed to select user: %w", err)
 		}
@@ -53,8 +50,47 @@ func (s *Service) CreateMessage(
 		return nil
 	})
 	if err != nil {
-		return models.Message{}, models.User{}, err
+		return models.Message{}, err
 	}
 
-	return message, sender, nil
+	return message, nil
+}
+
+func (s *Service) GetMessages(
+	ctx context.Context,
+	userID, chatID int64,
+	limit, offset int,
+) ([]models.Message, int, error) {
+	var (
+		messages []models.Message
+		total    int
+	)
+
+	err := s.RepoManager.InTx(ctx, func(tx postgres.IRepository) error {
+		isMember, err := tx.IsUserMember(ctx, chatID, userID)
+		if err != nil {
+			return fmt.Errorf("failed to check is user member: %w", err)
+		}
+
+		if !isMember {
+			return derrors.ErrUserIsNotMember
+		}
+
+		messages, err = tx.SelectMessages(ctx, chatID, limit, offset)
+		if err != nil {
+			return fmt.Errorf("failed to select messages: %w", err)
+		}
+
+		total, err = tx.CountChatMessages(ctx, chatID)
+		if err != nil {
+			return fmt.Errorf("failed to count messages: %w", err)
+		}
+
+		return nil
+	})
+	if err != nil {
+		return nil, 0, err
+	}
+
+	return messages, total, nil
 }

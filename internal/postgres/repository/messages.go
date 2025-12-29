@@ -23,3 +23,43 @@ func (r *Repository) CreateMessage(ctx context.Context, chatID, senderID int64, 
 
 	return msg, nil
 }
+
+func (r *Repository) SelectMessages(ctx context.Context, chatID int64, limit, offset int) ([]models.Message, error) {
+	rows, err := r.db.Query(ctx, messages.SelectMessagesQuery, chatID, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	result := make([]models.Message, 0, limit)
+
+	for rows.Next() {
+		var message models.Message
+
+		err = rows.Scan(
+			&message.ID,
+			&message.ChatID,
+			&message.SenderID,
+			&message.Text,
+			&message.CreatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		result = append(result, message)
+	}
+
+	return result, rows.Err()
+}
+
+func (r *Repository) CountChatMessages(ctx context.Context, chatID int64) (int, error) {
+	var count int
+
+	err := r.db.QueryRow(ctx, messages.CountChatMessagesQuery, chatID).Scan(&count)
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}
