@@ -79,5 +79,7 @@ func (s *Service) LogoutAll(ctx context.Context, userID int64) error {
 		return fmt.Errorf("failed to revoke tokens: %w", err)
 	}
 
+	s.WSHub.DisconnectUser(userID)
+
 	return nil
 }

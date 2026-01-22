@@ -14,7 +14,7 @@ type IHub interface { //nolint:iface // used by external packages
 }
 
 type IClient interface {
-	Close(graceful bool, status websocket.StatusCode, reason string)
+	Close(graceful bool, code websocket.StatusCode, reason string)
 	Send(message []byte) error
 	UserID() int64
 }

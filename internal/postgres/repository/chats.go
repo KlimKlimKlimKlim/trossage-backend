@@ -119,3 +119,24 @@ func (r *Repository) SelectChatByID(ctx context.Context, chatID int64) (models.C
 
 	return chat, nil
 }
+
+func (r *Repository) SelectChatMembers(ctx context.Context, chatID int64) ([]int64, error) {
+	rows, err := r.db.Query(ctx, chats.SelectChatMembersQuery, chatID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	userIDs := make([]int64, 0)
+
+	for rows.Next() {
+		var userID int64
+		if err = rows.Scan(&userID); err != nil {
+			return nil, err
+		}
+
+		userIDs = append(userIDs, userID)
+	}
+
+	return userIDs, rows.Err()
+}

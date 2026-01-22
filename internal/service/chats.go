@@ -8,6 +8,7 @@ import (
 	derrors "github.com/KlimKlimKlimKlim/trossage-backend/internal/errors"
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/models"
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/postgres"
+	"github.com/KlimKlimKlimKlim/trossage-backend/internal/websocket/hub"
 )
 
 func (s *Service) CreateChat(ctx context.Context, userID, otherUserID int64) (models.Chat, models.User, error) {
@@ -16,12 +17,15 @@ func (s *Service) CreateChat(ctx context.Context, userID, otherUserID int64) (mo
 	}
 
 	var (
-		chat      models.Chat
-		otherUser models.User
+		chat        models.Chat
+		currentUser models.User
+		otherUser   models.User
 	)
 
 	err := s.RepoManager.InTx(ctx, func(tx postgres.IRepository) error {
-		_, err := s.getAndCheckUserByID(ctx, tx, userID)
+		var err error
+
+		currentUser, err = s.getAndCheckUserByID(ctx, tx, userID)
 		if err != nil {
 			return fmt.Errorf("failed to select user: %w", err)
 		}
@@ -59,6 +63,8 @@ func (s *Service) CreateChat(ctx context.Context, userID, otherUserID int64) (mo
 	if err != nil {
 		return models.Chat{}, models.User{}, err
 	}
+
+	s.WSHub.BroadcastToUser(otherUserID, hub.NewChatCreatedEvent(chat, currentUser))
 
 	return chat, otherUser, nil
 }

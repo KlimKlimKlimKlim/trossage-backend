@@ -1,53 +1,44 @@
 package hub
 
-import "encoding/json"
+import (
+	"github.com/KlimKlimKlimKlim/trossage-backend/internal/http/dto"
+	"github.com/KlimKlimKlimKlim/trossage-backend/internal/models"
+)
 
 type EventType string
 
 const (
-	EventTypeNewMessage     EventType = "new_message"
-	EventTypeMessageEdited  EventType = "message_edited"
-	EventTypeMessageDeleted EventType = "message_deleted"
-	EventTypeChatCreated    EventType = "chat_created"
-	EventTypeChatUpdated    EventType = "chat_updated"
+	EventTypeNewMessage  EventType = "new_message"
+	EventTypeChatCreated EventType = "chat_created"
+	EventTypeUserLogout  EventType = "user_logout"
 )
 
-// ServerEvent - событие от сервера к клиенту.
-type ServerEvent struct {
-	Type EventType       `json:"type"`
-	Data json.RawMessage `json:"data"`
+type Event struct {
+	Data any       `json:"data"`
+	Type EventType `json:"type"`
 }
 
-// NewMessageEvent - данные события нового сообщения.
-type NewMessageEvent struct {
-	Text      string `json:"text"`
-	CreatedAt string `json:"created_at"`
-	ChatID    int64  `json:"chat_id"`
-	MessageID int64  `json:"message_id"`
-	SenderID  int64  `json:"sender_id"`
-}
-
-// MessageDeletedEvent - сообщение удалено.
-type MessageDeletedEvent struct {
-	ChatID    int64 `json:"chat_id"`
-	MessageID int64 `json:"message_id"`
-}
-
-// ChatCreatedEvent - создан новый чат.
-type ChatCreatedEvent struct {
-	ChatID int64 `json:"chat_id"`
-	UserID int64 `json:"user_id"` // С кем создан чат.
-}
-
-// NewServerEvent создает событие для отправки клиенту.
-func NewServerEvent(eventType EventType, data any) (*ServerEvent, error) {
-	rawData, err := json.Marshal(data)
-	if err != nil {
-		return nil, err
-	}
-
-	return &ServerEvent{
+func newEvent(eventType EventType, data any) *Event {
+	return &Event{
 		Type: eventType,
-		Data: rawData,
-	}, nil
+		Data: data,
+	}
+}
+
+func NewNewMessageEvent(message models.Message) *Event {
+	var messageDTO dto.MessageResponse
+	messageDTO.Fill(message)
+
+	return newEvent(EventTypeNewMessage, messageDTO)
+}
+
+func NewChatCreatedEvent(chat models.Chat, user models.User) *Event {
+	var chatDTO dto.ChatResponse
+	chatDTO.Fill(chat, user)
+
+	return newEvent(EventTypeChatCreated, chatDTO)
+}
+
+func NewUserLogoutEvent() *Event {
+	return newEvent(EventTypeUserLogout, nil)
 }

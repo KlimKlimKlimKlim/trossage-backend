@@ -163,6 +163,10 @@ func (s *Service) UpdateUser(
 		return models.User{}, models.TokenRevocation{}, err
 	}
 
+	if newPassword != "" {
+		s.WSHub.DisconnectUser(userID)
+	}
+
 	return updatedUser.User, tokenRevocation, nil
 }
 
@@ -242,10 +246,19 @@ func (s *Service) DeleteUser(ctx context.Context, userID int64, password string)
 			return fmt.Errorf("failed to delete user: %w", err)
 		}
 
+		if err = tx.RevokeRefreshTokensByUserID(ctx, userID); err != nil {
+			return fmt.Errorf("failed to revoke tokens: %w", err)
+		}
+
 		return nil
 	})
+	if err != nil {
+		return err
+	}
 
-	return err
+	s.WSHub.DisconnectUser(userID)
+
+	return nil
 }
 
 func (s *Service) SearchUsersByLogin(

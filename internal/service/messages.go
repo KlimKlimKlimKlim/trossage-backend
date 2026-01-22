@@ -8,6 +8,7 @@ import (
 	derrors "github.com/KlimKlimKlimKlim/trossage-backend/internal/errors"
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/models"
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/postgres"
+	"github.com/KlimKlimKlimKlim/trossage-backend/internal/websocket/hub"
 )
 
 func (s *Service) CreateMessage(
@@ -20,7 +21,10 @@ func (s *Service) CreateMessage(
 		return models.Message{}, derrors.ErrMessageIsEmpty
 	}
 
-	var message models.Message
+	var (
+		message models.Message
+		userIDs []int64
+	)
 
 	err := s.RepoManager.InTx(ctx, func(tx postgres.IRepository) error {
 		_, err := tx.SelectChatByID(ctx, chatID)
@@ -47,11 +51,18 @@ func (s *Service) CreateMessage(
 			return fmt.Errorf("failed to create message: %w", err)
 		}
 
+		userIDs, err = tx.SelectChatMembers(ctx, chatID)
+		if err != nil {
+			return fmt.Errorf("failed to select chat members: %w", err)
+		}
+
 		return nil
 	})
 	if err != nil {
 		return models.Message{}, err
 	}
+
+	s.WSHub.BroadcastToUsers(userIDs, hub.NewNewMessageEvent(message))
 
 	return message, nil
 }

@@ -19,12 +19,12 @@ func (c *Client) writePump() {
 
 	for {
 		select {
-		case message, ok := <-c.send:
+		case event, ok := <-c.send:
 			if !ok {
 				return
 			}
 
-			if err := c.writeMessage(message); err != nil {
+			if err := c.writeEvent(event); err != nil {
 				return
 			}
 
@@ -39,11 +39,11 @@ func (c *Client) writePump() {
 	}
 }
 
-func (c *Client) writeMessage(message []byte) error {
+func (c *Client) writeEvent(event []byte) error {
 	writeCtx, cancel := context.WithTimeout(c.ctx, c.hub.WriteTimeout())
 	defer cancel()
 
-	return c.conn.Write(writeCtx, wslib.MessageText, message)
+	return c.conn.Write(writeCtx, wslib.MessageText, event)
 }
 
 func (c *Client) writePing() error {

@@ -24,3 +24,6 @@ var IsUserMemberQuery string
 
 //go:embed select_chat_by_id.sql
 var SelectChatByIDQuery string
+
+//go:embed select_chat_members.sql
+var SelectChatMembersQuery string

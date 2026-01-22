@@ -10,6 +10,7 @@ import (
 	"golang.org/x/sync/errgroup"
 
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/config"
+	"github.com/KlimKlimKlimKlim/trossage-backend/internal/logger"
 	ws "github.com/KlimKlimKlimKlim/trossage-backend/internal/websocket"
 )
 
@@ -30,7 +31,7 @@ var _ ws.IHub = (*Hub)(nil)
 
 func New(log *zap.Logger, cfg *config.WebSocket) *Hub {
 	return &Hub{
-		log:        log,
+		log:        log.With(zap.String(logger.WorkerField, workerName)),
 		config:     cfg,
 		clients:    make(map[int64][]ws.IClient),
 		register:   make(chan ws.IClient, cfg.ChannelBufferSize),

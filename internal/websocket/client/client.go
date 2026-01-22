@@ -17,7 +17,7 @@ type Client struct {
 	conn   *wslib.Conn
 	send   chan []byte
 	userID int64
-	mu     sync.Mutex
+	mu     sync.RWMutex
 	closed bool
 }
 
@@ -41,36 +41,36 @@ func (c *Client) UserID() int64 {
 }
 
 func (c *Client) Run() {
-	c.mu.Lock()
+	c.mu.RLock()
 
 	if c.closed {
-		c.mu.Unlock()
+		c.mu.RUnlock()
 		return
 	}
 
-	c.mu.Unlock()
+	c.mu.RUnlock()
 
 	go c.writePump()
 	go c.readPump()
 }
 
-func (c *Client) Send(message []byte) error {
-	c.mu.Lock()
-	defer c.mu.Unlock()
+func (c *Client) Send(event []byte) error {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
 
 	if c.closed {
 		return derrors.ErrClientClosed
 	}
 
 	select {
-	case c.send <- message:
+	case c.send <- event:
 		return nil
 	default:
 		return derrors.ErrSendBufferFull
 	}
 }
 
-func (c *Client) Close(mustUnreg bool, code wslib.StatusCode, reason string) {
+func (c *Client) Close(graceful bool, code wslib.StatusCode, reason string) {
 	c.mu.Lock()
 
 	if c.closed {
@@ -84,7 +84,7 @@ func (c *Client) Close(mustUnreg bool, code wslib.StatusCode, reason string) {
 
 	c.mu.Unlock()
 
-	if mustUnreg {
+	if graceful {
 		c.hub.Unregister(c)
 	}
 
