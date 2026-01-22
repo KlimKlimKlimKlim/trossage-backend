@@ -3,6 +3,7 @@ package validate
 import (
 	"regexp"
 	"unicode"
+	"unicode/utf8"
 )
 
 var (
@@ -41,7 +42,8 @@ func Password(password string) bool {
 }
 
 func DisplayName(displayName string) bool {
-	if len(displayName) == 0 || len(displayName) > 20 {
+	runeCount := utf8.RuneCountInString(displayName)
+	if runeCount == 0 || runeCount > 20 {
 		return false
 	}
 

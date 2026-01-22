@@ -262,12 +262,12 @@ func (s *Service) SearchUsersByLogin(
 	err := s.RepoManager.InTx(ctx, func(tx postgres.IRepository) error {
 		var err error
 
-		users, err = s.RepoManager.Repo().SelectUsersByLoginPrefix(ctx, userID, query, limit, offset)
+		users, err = tx.SelectUsersByLoginPrefix(ctx, userID, query, limit, offset)
 		if err != nil {
 			return fmt.Errorf("failed to search users: %w", err)
 		}
 
-		total, err = s.RepoManager.Repo().CountUsersByLoginPrefix(ctx, userID, query)
+		total, err = tx.CountUsersByLoginPrefix(ctx, userID, query)
 		if err != nil {
 			return fmt.Errorf("failed to count users: %w", err)
 		}

@@ -117,14 +117,16 @@ func (a *App) Start(ctx context.Context) error {
 
 func (a *App) Wait() error {
 	quit := make(chan os.Signal, 1)
+
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	defer signal.Stop(quit)
 
 	errChan := make(chan error, 1)
+	defer close(errChan)
 
 	go func() {
-		if err := a.errorGroup.Wait(); err != nil {
-			errChan <- err
-		}
+		err := a.errorGroup.Wait()
+		errChan <- err
 	}()
 
 	select {
@@ -132,8 +134,12 @@ func (a *App) Wait() error {
 		a.log.Info("Received shutdown signal", zap.String("signal", sig.String()))
 		return nil
 	case err := <-errChan:
-		a.log.Error("Component error", zap.Error(err))
-		return err
+		if err != nil {
+			a.log.Error("Component error", zap.Error(err))
+			return err
+		}
+
+		return nil
 	}
 }
 
@@ -142,14 +148,6 @@ func (a *App) Stop() error {
 
 	shutdownCtx, cancel := context.WithTimeout(context.Background(), a.config.Server.ShutdownTimeout)
 	defer cancel()
-
-	if a.systemServer != nil {
-		if err := a.systemServer.Shutdown(shutdownCtx); err != nil {
-			a.log.Error("System HTTP server shutdown error", zap.Error(err))
-		} else {
-			a.log.Info("System HTTP server stopped")
-		}
-	}
 
 	if a.apiServer != nil {
 		if err := a.apiServer.Shutdown(shutdownCtx); err != nil {
@@ -162,6 +160,14 @@ func (a *App) Stop() error {
 	if a.pool != nil {
 		a.pool.Close()
 		a.log.Info("Database disconnected")
+	}
+
+	if a.systemServer != nil {
+		if err := a.systemServer.Shutdown(shutdownCtx); err != nil {
+			a.log.Error("System HTTP server shutdown error", zap.Error(err))
+		} else {
+			a.log.Info("System HTTP server stopped")
+		}
 	}
 
 	_ = a.log.Sync()

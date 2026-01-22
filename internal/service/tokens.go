@@ -31,26 +31,26 @@ func (s *Service) RefreshToken(ctx context.Context, userID, oldTokenID int64) (s
 	var accessString, refreshString string
 
 	err := s.RepoManager.InTx(ctx, func(tx postgres.IRepository) error {
-		if user, err := tx.SelectAuthUserByID(ctx, userID); err != nil {
-			switch {
-			case errors.Is(err, derrors.ErrUserNotFound):
+		user, err := tx.SelectAuthUserByID(ctx, userID)
+		if err != nil {
+			if errors.Is(err, derrors.ErrUserNotFound) {
 				return fmt.Errorf("user not found: %w", derrors.ErrUnauthorized)
-			case user.IsDeleted():
-				return fmt.Errorf("user is deleted: %w", derrors.ErrUnauthorized)
 			}
 
 			return fmt.Errorf("failed to select user: %w", err)
 		}
 
-		if err := tx.RevokeRefreshTokenByID(ctx, oldTokenID); err != nil {
+		if user.IsDeleted() {
+			return fmt.Errorf("user is deleted: %w", derrors.ErrUnauthorized)
+		}
+
+		if err = tx.RevokeRefreshTokenByID(ctx, oldTokenID); err != nil {
 			if errors.Is(err, derrors.ErrTokenNotFound) {
 				return fmt.Errorf("token not found: %w", derrors.ErrUnauthorized)
 			}
 
 			return fmt.Errorf("failed to revoke old token: %w", err)
 		}
-
-		var err error
 
 		accessString, refreshString, err = s.createTokens(ctx, tx, userID)
 		if err != nil {

@@ -76,12 +76,12 @@ func (s *Service) GetUserChats(
 	err := s.RepoManager.InTx(ctx, func(tx postgres.IRepository) error {
 		var err error
 
-		chats, err = s.RepoManager.Repo().SelectUserChats(ctx, userID, limit, offset)
+		chats, err = tx.SelectUserChats(ctx, userID, limit, offset)
 		if err != nil {
 			return fmt.Errorf("failed to get user chats: %w", err)
 		}
 
-		total, err = s.RepoManager.Repo().CountUserChats(ctx, userID)
+		total, err = tx.CountUserChats(ctx, userID)
 		if err != nil {
 			return fmt.Errorf("failed to count user chats: %w", err)
 		}
