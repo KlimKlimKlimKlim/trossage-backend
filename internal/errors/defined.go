@@ -49,4 +49,7 @@ var (
 	ErrUnknownLoggerEnv = errors.New("unknown logger environment")
 	ErrPanicInTx        = errors.New("panic in transaction")
 	ErrEmptyInput       = errors.New("empty input")
+
+	ErrClientClosed   = errors.New("client is closed")
+	ErrSendBufferFull = errors.New("send buffer is full")
 )

@@ -22,6 +22,7 @@ type Config struct {
 type Server struct {
 	System          SystemServer  `envPrefix:"SYSTEM_"`
 	API             APIServer     `envPrefix:"API_"`
+	WebSocket       WebSocket     `envPrefix:"WEBSOCKET_"`
 	RateLimit       RateLimit     `envPrefix:"RATE_LIMIT_"`
 	ShutdownTimeout time.Duration `                        env:"SHUTDOWN_TIMEOUT" envDefault:"10s"`
 }
@@ -103,6 +104,15 @@ type TokenCleanupConfig struct {
 	Interval         time.Duration `env:"INTERVAL"          envDefault:"15m"`
 	ExpiredRetention time.Duration `env:"EXPIRED_RETENTION" envDefault:"1h"`
 	RevokedRetention time.Duration `env:"REVOKED_RETENTION" envDefault:"1h"`
+}
+
+type WebSocket struct {
+	AllowedOrigins        []string      `env:"ALLOWED_ORIGINS"          envDefault:"http://localhost:8080"`
+	PingInterval          time.Duration `env:"PING_INTERVAL"            envDefault:"54s"`
+	WriteTimeout          time.Duration `env:"WRITE_TIMEOUT"            envDefault:"10s"`
+	ClientBufferSize      int           `env:"CLIENT_BUFFER_SIZE"       envDefault:"256"`
+	ChannelBufferSize     int           `env:"CHANNEL_BUFFER_SIZE"      envDefault:"256"`
+	MaxConnectionsPerUser int           `env:"MAX_CONNECTIONS_PER_USER" envDefault:"5"`
 }
 
 type RateLimit struct {

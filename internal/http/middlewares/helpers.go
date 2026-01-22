@@ -8,7 +8,7 @@ import (
 	derrors "github.com/KlimKlimKlimKlim/trossage-backend/internal/errors"
 )
 
-func extractBearerToken(ctx *gin.Context) (string, error) {
+func extractHeaderToken(ctx *gin.Context) (string, error) {
 	authHeader := ctx.GetHeader(authorizationHeader)
 	if authHeader == "" || !strings.HasPrefix(authHeader, bearerPrefix) {
 		return "", derrors.ErrUnauthorized
@@ -20,6 +20,15 @@ func extractBearerToken(ctx *gin.Context) (string, error) {
 	}
 
 	return token, nil
+}
+
+func extractQueryToken(ctx *gin.Context) (string, error) {
+	queryToken := ctx.Query("token")
+	if queryToken == "" {
+		return "", derrors.ErrUnauthorized
+	}
+
+	return queryToken, nil
 }
 
 func GetUserID(ctx *gin.Context) (int64, bool) {

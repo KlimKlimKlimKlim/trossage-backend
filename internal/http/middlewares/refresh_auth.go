@@ -18,7 +18,7 @@ import (
 
 func RefreshAuth(jwtController *jwt.Controller, rm service.IRepoManager) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		tokenString, err := extractBearerToken(ctx)
+		tokenString, err := extractHeaderToken(ctx)
 		if err != nil {
 			response.HandleError(ctx, fmt.Errorf("failed to extract token: %w", err))
 			return

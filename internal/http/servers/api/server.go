@@ -23,10 +23,13 @@ func New(log *zap.Logger, cfg *config.Config, svc *service.Service) *http.Server
 	router.Use(middlewares.Logging(log))
 
 	authMiddleware := middlewares.Auth(svc.AccessJWTController)
+	wsAuthMiddleware := middlewares.WebSocketAuth(svc.AccessJWTController)
 	rateLimitMiddleware := middlewares.RateLimit(&cfg.Server.RateLimit)
 
 	apiRouter := router.Group("/api")
 	{
+		apiRouter.GET("/ws", wsAuthMiddleware, hdl.connectWebSocket(&cfg.Server.WebSocket))
+
 		authRouter := apiRouter.Group("/auth")
 		{
 			authRouter.POST("/register", rateLimitMiddleware, hdl.registerUser)

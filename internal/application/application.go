@@ -20,6 +20,7 @@ import (
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/postgres"
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/postgres/repository"
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/service"
+	ws "github.com/KlimKlimKlimKlim/trossage-backend/internal/websocket/hub"
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/workers/tokencleanup"
 	"github.com/KlimKlimKlimKlim/trossage-backend/migrations"
 )
@@ -34,6 +35,7 @@ type App struct {
 	pool *pgxpool.Pool
 
 	service *service.Service
+	wsHub   *ws.Hub
 
 	tokenCleanupWorker *tokencleanup.Worker
 
@@ -70,8 +72,9 @@ func (a *App) Init(ctx context.Context) error {
 
 	a.log.Info("Migrations run")
 
+	a.wsHub = ws.New(a.log, &a.config.Server.WebSocket)
 	repoManager := postgres.NewManager(pool, repository.NewRepository(pool))
-	a.service = service.New(a.config, repoManager)
+	a.service = service.New(a.config, repoManager, a.wsHub)
 
 	a.tokenCleanupWorker = tokencleanup.New(a.log, repoManager, &a.config.Worker.TokenCleanup)
 
@@ -83,6 +86,13 @@ func (a *App) Init(ctx context.Context) error {
 
 func (a *App) Start(ctx context.Context) error {
 	a.errorGroup, a.errorGroupCtx = errgroup.WithContext(ctx)
+
+	a.errorGroup.Go(func() error {
+		a.log.Info("WebSocket Hub starting")
+		a.wsHub.Run(a.errorGroupCtx)
+
+		return nil
+	})
 
 	a.errorGroup.Go(func() error {
 		a.log.Info("System HTTP server starting", zap.String("address", a.systemServer.Addr))
@@ -155,6 +165,11 @@ func (a *App) Stop() error {
 		} else {
 			a.log.Info("API HTTP server stopped")
 		}
+	}
+
+	if a.wsHub != nil {
+		a.wsHub.Stop(shutdownCtx)
+		a.log.Info("WebSocket Hub stopped")
 	}
 
 	if a.pool != nil {
