@@ -13,6 +13,7 @@ require (
 	github.com/jackc/pgx/v5 v5.7.6
 	github.com/joho/godotenv v1.5.1
 	github.com/swaggo/swag/v2 v2.0.0-rc4
+	github.com/ulule/limiter/v3 v3.11.2
 	go.uber.org/zap v1.27.1
 	golang.org/x/sync v0.19.0
 )

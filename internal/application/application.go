@@ -76,7 +76,7 @@ func (a *App) Init(ctx context.Context) error {
 	a.tokenCleanupWorker = tokencleanup.New(a.log, repoManager, &a.config.Worker.TokenCleanup)
 
 	a.systemServer = system.New(&a.config.Server.System)
-	a.apiServer = api.New(a.log, &a.config.Server.API, a.service)
+	a.apiServer = api.New(a.log, a.config, a.service)
 
 	return nil
 }

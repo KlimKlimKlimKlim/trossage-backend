@@ -22,7 +22,8 @@ type Config struct {
 type Server struct {
 	System          SystemServer  `envPrefix:"SYSTEM_"`
 	API             APIServer     `envPrefix:"API_"`
-	ShutdownTimeout time.Duration `                    env:"SHUTDOWN_TIMEOUT" envDefault:"10s"`
+	RateLimit       RateLimit     `envPrefix:"RATE_LIMIT_"`
+	ShutdownTimeout time.Duration `                        env:"SHUTDOWN_TIMEOUT" envDefault:"10s"`
 }
 
 type SystemServer struct {
@@ -102,6 +103,11 @@ type TokenCleanupConfig struct {
 	Interval         time.Duration `env:"INTERVAL"          envDefault:"15m"`
 	ExpiredRetention time.Duration `env:"EXPIRED_RETENTION" envDefault:"1h"`
 	RevokedRetention time.Duration `env:"REVOKED_RETENTION" envDefault:"1h"`
+}
+
+type RateLimit struct {
+	Period time.Duration `env:"PERIOD" envDefault:"1m"`
+	Limit  int64         `env:"LIMIT"  envDefault:"10"`
 }
 
 func New() (*Config, error) {

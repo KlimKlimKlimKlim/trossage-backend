@@ -15,7 +15,7 @@ type handler struct {
 	service *service.Service
 }
 
-func New(log *zap.Logger, cfg *config.APIServer, svc *service.Service) *http.Server {
+func New(log *zap.Logger, cfg *config.Config, svc *service.Service) *http.Server {
 	hdl := &handler{service: svc}
 
 	router := gin.New()
@@ -23,13 +23,14 @@ func New(log *zap.Logger, cfg *config.APIServer, svc *service.Service) *http.Ser
 	router.Use(middlewares.Logging(log))
 
 	authMiddleware := middlewares.Auth(svc.AccessJWTController)
+	rateLimitMiddleware := middlewares.RateLimit(&cfg.Server.RateLimit)
 
 	apiRouter := router.Group("/api")
 	{
 		authRouter := apiRouter.Group("/auth")
 		{
-			authRouter.POST("/register", hdl.registerUser)
-			authRouter.POST("/login", hdl.loginUser)
+			authRouter.POST("/register", rateLimitMiddleware, hdl.registerUser)
+			authRouter.POST("/login", rateLimitMiddleware, hdl.loginUser)
 			authRouter.POST("/logout-all", authMiddleware, hdl.logoutUserAll)
 
 			authRouter.Use(middlewares.RefreshAuth(svc.RefreshJWTController, svc.RepoManager))
@@ -58,12 +59,12 @@ func New(log *zap.Logger, cfg *config.APIServer, svc *service.Service) *http.Ser
 	}
 
 	return &http.Server{
-		Addr:              cfg.Port,
+		Addr:              cfg.Server.API.Port,
 		Handler:           router,
-		ReadTimeout:       cfg.ReadTimeout,
-		WriteTimeout:      cfg.WriteTimeout,
-		IdleTimeout:       cfg.IdleTimeout,
-		ReadHeaderTimeout: cfg.ReadHeaderTimeout,
-		MaxHeaderBytes:    cfg.MaxHeaderBytes,
+		ReadTimeout:       cfg.Server.API.ReadTimeout,
+		WriteTimeout:      cfg.Server.API.WriteTimeout,
+		IdleTimeout:       cfg.Server.API.IdleTimeout,
+		ReadHeaderTimeout: cfg.Server.API.ReadHeaderTimeout,
+		MaxHeaderBytes:    cfg.Server.API.MaxHeaderBytes,
 	}
 }
