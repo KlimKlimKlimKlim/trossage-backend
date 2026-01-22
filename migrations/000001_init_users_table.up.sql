@@ -16,6 +16,10 @@ CREATE UNIQUE INDEX idx_users_login ON users (user_login)
 WHERE
     deleted_at IS NULL;
 
+CREATE INDEX idx_users_login_prefix ON users (user_login text_pattern_ops)
+WHERE
+    deleted_at IS NULL;
+
 CREATE OR REPLACE FUNCTION update_updated_at_users ()
     RETURNS TRIGGER
     AS $$

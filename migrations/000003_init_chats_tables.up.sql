@@ -32,7 +32,7 @@ CREATE TRIGGER set_updated_at_chats
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_chats ();
 
-CREATE INDEX idx_chats_last_message ON chats (last_message_at DESC)
+CREATE INDEX idx_chats_last_message ON chats (last_message_at DESC NULLS LAST)
 WHERE
     deleted_at IS NULL;
 

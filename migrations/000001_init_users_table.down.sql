@@ -9,5 +9,7 @@ DROP FUNCTION IF EXISTS update_updated_at_users ();
 
 DROP INDEX IF EXISTS idx_users_login;
 
+DROP INDEX IF EXISTS idx_users_login_prefix;
+
 DROP TABLE IF EXISTS users;
 
