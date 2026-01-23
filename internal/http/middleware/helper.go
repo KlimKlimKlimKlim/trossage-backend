@@ -22,15 +22,6 @@ func extractHeaderToken(ctx *gin.Context) (string, error) {
 	return token, nil
 }
 
-func extractQueryToken(ctx *gin.Context) (string, error) {
-	queryToken := ctx.Query("token")
-	if queryToken == "" {
-		return "", derrors.ErrUnauthorized
-	}
-
-	return queryToken, nil
-}
-
 func GetUserID(ctx *gin.Context) (int64, bool) {
 	userID, exists := ctx.Get(contextKeyUserID)
 	if !exists {

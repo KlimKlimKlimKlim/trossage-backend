@@ -11,7 +11,6 @@ const (
 	EventTypeTyping      EventType = "typing"
 	EventTypeNewMessage  EventType = "new_message"
 	EventTypeChatCreated EventType = "chat_created"
-	EventTypeUserLogout  EventType = "user_logout"
 )
 
 type Event struct {
@@ -45,8 +44,4 @@ func NewChatCreatedEvent(chat model.Chat, user model.User) *Event {
 	chatDTO.Fill(chat, user)
 
 	return newEvent(EventTypeChatCreated, chatDTO)
-}
-
-func NewUserLogoutEvent() *Event {
-	return newEvent(EventTypeUserLogout, nil)
 }

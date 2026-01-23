@@ -5,4 +5,5 @@ const (
 	ReasonUserLogout          = "user logout"
 	ReasonMaxConnectionsLimit = "max connections limit reached"
 	ReasonRegisterFailed      = "registration failed"
+	ReasonConnectionError     = "connection error"
 )

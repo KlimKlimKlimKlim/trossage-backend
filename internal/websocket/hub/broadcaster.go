@@ -42,8 +42,6 @@ func (h *Hub) BroadcastToUsers(userIDs []int64, event *Event) {
 }
 
 func (h *Hub) DisconnectUser(userID int64) {
-	h.BroadcastToUser(userID, NewUserLogoutEvent())
-
 	h.mu.RLock()
 	clients := make([]ws.IClient, len(h.clients[userID]))
 	copy(clients, h.clients[userID])

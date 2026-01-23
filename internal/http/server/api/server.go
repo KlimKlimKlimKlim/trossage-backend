@@ -20,16 +20,19 @@ func New(log *zap.Logger, cfg *config.Config, svc *service.Service) *http.Server
 
 	router := gin.New()
 	router.Use(gin.Recovery())
-	router.Use(middleware.Logging(log))
-
-	authMiddleware := middleware.Auth(svc.AccessJWTController)
-	wsAuthMiddleware := middleware.WebSocketAuth(svc.AccessJWTController)
-	rateLimitMiddleware := middleware.RateLimit(&cfg.Server.RateLimit)
 
 	apiRouter := router.Group("/api")
-	{
-		apiRouter.GET("/ws", wsAuthMiddleware, hdl.connectWebSocket(&cfg.Server.WebSocket))
 
+	{
+		apiRouter.GET("/ws", hdl.connectWebSocket(log, svc.AccessJWTController, &cfg.Server.WebSocket))
+	}
+
+	authMiddleware := middleware.Auth(svc.AccessJWTController)
+	rateLimitMiddleware := middleware.RateLimit(&cfg.Server.RateLimit)
+
+	apiRouter.Use(middleware.Logging(log))
+
+	{
 		authRouter := apiRouter.Group("/auth")
 		{
 			authRouter.POST("/register", rateLimitMiddleware, hdl.registerUser)

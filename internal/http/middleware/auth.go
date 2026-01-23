@@ -10,16 +10,8 @@ import (
 )
 
 func Auth(jwtController *jwt.Controller) gin.HandlerFunc {
-	return auth(jwtController, extractHeaderToken)
-}
-
-func WebSocketAuth(jwtController *jwt.Controller) gin.HandlerFunc {
-	return auth(jwtController, extractQueryToken)
-}
-
-func auth(jwtController *jwt.Controller, tokenExtractor func(*gin.Context) (string, error)) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		token, err := tokenExtractor(ctx)
+		token, err := extractHeaderToken(ctx)
 		if err != nil {
 			response.HandleError(ctx, fmt.Errorf("failed to extract token: %w", err))
 			return

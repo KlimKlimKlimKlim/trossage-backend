@@ -80,7 +80,7 @@ func (h *Hub) closeAllClients(ctx context.Context) {
 
 	for _, client := range clientsCopy {
 		eg.Go(func() error {
-			client.Close(false, wslib.StatusNormalClosure, ws.ReasonServerShutdown)
+			client.Close(false, wslib.StatusGoingAway, ws.ReasonServerShutdown)
 			return nil
 		})
 	}

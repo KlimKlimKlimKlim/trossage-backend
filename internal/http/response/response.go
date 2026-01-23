@@ -42,10 +42,6 @@ func HandleError(ctx *gin.Context, err error) {
 
 	_ = ctx.Error(err)
 
-	if ctx.Writer.Written() {
-		return
-	}
-
 	resp := Response{
 		IsSuccess: false,
 		Error:     message,

@@ -52,7 +52,6 @@ func (h *Hub) registerClient(client ws.IClient) {
 
 func (h *Hub) unregisterClient(client ws.IClient) {
 	h.mu.Lock()
-	defer h.mu.Unlock()
 
 	clients := h.clients[client.UserID()]
 	for i, c := range clients {
@@ -66,8 +65,11 @@ func (h *Hub) unregisterClient(client ws.IClient) {
 		delete(h.clients, client.UserID())
 	}
 
+	remaining := len(h.clients[client.UserID()])
+	h.mu.Unlock()
+
 	h.log.Debug("Client disconnected",
 		zap.Int64("user_id", client.UserID()),
-		zap.Int("remaining", len(h.clients[client.UserID()])),
+		zap.Int("remaining", remaining),
 	)
 }

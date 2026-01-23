@@ -1,6 +1,9 @@
 package logger
 
 import (
+	"io"
+	"log"
+
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -10,6 +13,8 @@ import (
 )
 
 func New(cfg config.Logger) (*zap.Logger, error) {
+	log.SetOutput(io.Discard)
+
 	switch cfg.Env {
 	case "prod":
 		gin.SetMode(gin.ReleaseMode)

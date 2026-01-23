@@ -14,7 +14,7 @@ func (c *Client) writePump() {
 
 	defer func() {
 		ticker.Stop()
-		c.Close(true, wslib.StatusGoingAway, ws.ReasonServerShutdown)
+		c.Close(true, wslib.StatusGoingAway, ws.ReasonConnectionError)
 	}()
 
 	for {
