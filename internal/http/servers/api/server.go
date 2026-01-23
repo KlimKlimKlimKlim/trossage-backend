@@ -58,6 +58,8 @@ func New(log *zap.Logger, cfg *config.Config, svc *service.Service) *http.Server
 
 			chatsRouter.POST("/:chat_id/messages", hdl.sendMessage)
 			chatsRouter.GET("/:chat_id/messages", hdl.getMessages)
+
+			chatsRouter.POST("/:chat_id/typing", hdl.sendTyping)
 		}
 	}
 

@@ -271,6 +271,46 @@ components:
           example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
           type: string
       type: object
+    dto.TypingOperation:
+      properties:
+        length:
+          example: 3
+          maximum: 4096
+          minimum: 1
+          type: integer
+        position:
+          example: 5
+          maximum: 4096
+          minimum: 0
+          type: integer
+        text:
+          example: привет
+          maxLength: 4096
+          minLength: 1
+          type: string
+        type:
+          enum:
+          - insert
+          - delete
+          - replace
+          - clear
+          example: insert
+          type: string
+      required:
+      - type
+      type: object
+    dto.TypingUpdateRequest:
+      properties:
+        operations:
+          items:
+            $ref: '#/components/schemas/dto.TypingOperation'
+          maxItems: 50
+          minItems: 1
+          type: array
+          uniqueItems: false
+      required:
+      - operations
+      type: object
     dto.UpdateUserRequest:
       properties:
         display_name:
@@ -720,6 +760,63 @@ paths:
       summary: Send message
       tags:
       - messages
+  /chats/{chat_id}/typing:
+    post:
+      description: |-
+        Sends draft message editing operations in real-time.
+        Operations:
+        - `insert`: add text at position (requires position, text)
+        - `delete`: remove characters from position (requires position, length)
+        - `replace`: replace entire text, e.g. autocorrect (requires position, text)
+        - `clear`: complete input field clear on send/cancel
+      parameters:
+      - description: Chat ID
+        in: path
+        name: chat_id
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/dto.TypingUpdateRequest'
+        description: Typing operations
+        required: true
+      responses:
+        "204":
+          content:
+            application/json: {}
+          description: No Content
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto.ErrorResponse'
+          description: Invalid body
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto.ErrorResponse'
+          description: Unauthorized
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto.ErrorResponse'
+          description: User is not member
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto.ErrorResponse'
+          description: Chat not found
+      security:
+      - BearerAuth: []
+      summary: Send typing operations
+      tags:
+      - typing
   /users/me:
     delete:
       description: Permanently deletes authenticated user account and all associated
@@ -879,5 +976,40 @@ paths:
       summary: Search users
       tags:
       - users
+  /ws:
+    get:
+      description: Establish WebSocket connection for receiving real-time chat events
+        (server -> client only)
+      parameters:
+      - description: JWT token (alternative to Authorization header for WebSocket
+          clients)
+        in: query
+        name: token
+        schema:
+          type: string
+      responses:
+        "101":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: Switching Protocols
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto.ErrorResponse'
+          description: Unauthorized
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto.ErrorResponse'
+          description: Internal server error
+      security:
+      - BearerAuth: []
+      summary: Connect to WebSocket
+      tags:
+      - websocket
 servers:
 - url: /api

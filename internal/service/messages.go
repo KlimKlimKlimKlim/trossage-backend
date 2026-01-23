@@ -27,16 +27,6 @@ func (s *Service) CreateMessage(
 	)
 
 	err := s.RepoManager.InTx(ctx, func(tx postgres.IRepository) error {
-		_, err := tx.SelectChatByID(ctx, chatID)
-		if err != nil {
-			return fmt.Errorf("failed to select chat: %w", err)
-		}
-
-		_, err = tx.SelectUserByID(ctx, senderID)
-		if err != nil {
-			return fmt.Errorf("failed to select user: %w", err)
-		}
-
 		isMember, err := tx.IsUserMember(ctx, chatID, senderID)
 		if err != nil {
 			return fmt.Errorf("failed to check is user member: %w", err)

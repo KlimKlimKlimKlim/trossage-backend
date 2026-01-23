@@ -8,6 +8,7 @@ import (
 type EventType string
 
 const (
+	EventTypeTyping      EventType = "typing"
 	EventTypeNewMessage  EventType = "new_message"
 	EventTypeChatCreated EventType = "chat_created"
 	EventTypeUserLogout  EventType = "user_logout"
@@ -23,6 +24,13 @@ func newEvent(eventType EventType, data any) *Event {
 		Type: eventType,
 		Data: data,
 	}
+}
+
+func NewTypingEvent(senderID, chatID int64, operations []dto.TypingOperation) *Event {
+	var typingDTO dto.TypingEventResponse
+	typingDTO.Fill(senderID, chatID, operations)
+
+	return newEvent(EventTypeTyping, typingDTO)
 }
 
 func NewNewMessageEvent(message models.Message) *Event {
