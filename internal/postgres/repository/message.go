@@ -34,20 +34,20 @@ func (r *Repository) SelectMessages(ctx context.Context, chatID int64, limit, of
 	result := make([]model.Message, 0, limit)
 
 	for rows.Next() {
-		var message model.Message
+		var scannedMessage model.Message
 
 		err = rows.Scan(
-			&message.ID,
-			&message.ChatID,
-			&message.SenderID,
-			&message.Text,
-			&message.CreatedAt,
+			&scannedMessage.ID,
+			&scannedMessage.ChatID,
+			&scannedMessage.SenderID,
+			&scannedMessage.Text,
+			&scannedMessage.CreatedAt,
 		)
 		if err != nil {
 			return nil, err
 		}
 
-		result = append(result, message)
+		result = append(result, scannedMessage)
 	}
 
 	return result, rows.Err()
