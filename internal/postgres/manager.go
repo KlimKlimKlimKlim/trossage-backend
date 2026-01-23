@@ -28,8 +28,8 @@ func (m *Manager) Repo() IRepository { //nolint:ireturn // It must return interf
 	return m.repo
 }
 
-func (m *Manager) InTx(ctx context.Context, fn func(tx IRepository) error) (err error) {
-	tx, err := m.pool.BeginTx(ctx, pgx.TxOptions{})
+func (m *Manager) InTxWithOptions(ctx context.Context, opts pgx.TxOptions, fn func(tx IRepository) error) (err error) {
+	tx, err := m.pool.BeginTx(ctx, opts)
 	if err != nil {
 		return fmt.Errorf("failed to begin transaction: %w", err)
 	}
@@ -57,4 +57,12 @@ func (m *Manager) InTx(ctx context.Context, fn func(tx IRepository) error) (err 
 	err = fn(repo)
 
 	return err
+}
+
+func (m *Manager) InTx(ctx context.Context, fn func(tx IRepository) error) (err error) {
+	return m.InTxWithOptions(ctx, pgx.TxOptions{}, fn)
+}
+
+func (m *Manager) InReadOnlyTx(ctx context.Context, fn func(tx IRepository) error) (err error) {
+	return m.InTxWithOptions(ctx, pgx.TxOptions{AccessMode: pgx.ReadOnly}, fn)
 }

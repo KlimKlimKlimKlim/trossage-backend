@@ -3,8 +3,8 @@ package service
 import (
 	"context"
 	"fmt"
+	"slices"
 
-	derrors "github.com/KlimKlimKlimKlim/trossage-backend/internal/errors"
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/http/dto"
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/postgres"
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/websocket/hub"
@@ -13,14 +13,10 @@ import (
 func (s *Service) SendTyping(ctx context.Context, senderID, chatID int64, typing dto.TypingUpdateRequest) error {
 	var userIDs []int64
 
-	err := s.RepoManager.InTx(ctx, func(tx postgres.IRepository) error {
-		isMember, err := tx.IsUserMember(ctx, chatID, senderID)
+	err := s.RepoManager.InReadOnlyTx(ctx, func(tx postgres.IRepository) error {
+		err := s.isUserMember(ctx, tx, chatID, senderID)
 		if err != nil {
-			return fmt.Errorf("failed to check is user member: %w", err)
-		}
-
-		if !isMember {
-			return derrors.ErrUserIsNotMember
+			return err
 		}
 
 		userIDs, err = tx.SelectChatMembers(ctx, chatID)
@@ -33,6 +29,10 @@ func (s *Service) SendTyping(ctx context.Context, senderID, chatID int64, typing
 	if err != nil {
 		return err
 	}
+
+	userIDs = slices.DeleteFunc(userIDs, func(id int64) bool {
+		return id == senderID
+	})
 
 	s.WSHub.BroadcastToUsers(userIDs, hub.NewTypingEvent(senderID, chatID, typing.Operations))
 

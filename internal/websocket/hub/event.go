@@ -2,7 +2,7 @@ package hub
 
 import (
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/http/dto"
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/models"
+	"github.com/KlimKlimKlimKlim/trossage-backend/internal/model"
 )
 
 type EventType string
@@ -33,14 +33,14 @@ func NewTypingEvent(senderID, chatID int64, operations []dto.TypingOperation) *E
 	return newEvent(EventTypeTyping, typingDTO)
 }
 
-func NewNewMessageEvent(message models.Message) *Event {
+func NewNewMessageEvent(message model.Message) *Event {
 	var messageDTO dto.MessageResponse
 	messageDTO.Fill(message)
 
 	return newEvent(EventTypeNewMessage, messageDTO)
 }
 
-func NewChatCreatedEvent(chat models.Chat, user models.User) *Event {
+func NewChatCreatedEvent(chat model.Chat, user model.User) *Event {
 	var chatDTO dto.ChatResponse
 	chatDTO.Fill(chat, user)
 

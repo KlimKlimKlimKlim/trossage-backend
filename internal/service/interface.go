@@ -9,4 +9,5 @@ import (
 type IRepoManager interface {
 	Repo() postgres.IRepository
 	InTx(ctx context.Context, fn func(tx postgres.IRepository) error) (err error)
+	InReadOnlyTx(ctx context.Context, fn func(tx postgres.IRepository) error) (err error)
 }

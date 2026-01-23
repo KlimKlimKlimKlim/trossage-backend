@@ -10,7 +10,7 @@ import (
 
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/config"
 	derrors "github.com/KlimKlimKlimKlim/trossage-backend/internal/errors"
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/models"
+	"github.com/KlimKlimKlimKlim/trossage-backend/internal/model"
 )
 
 type Controller struct {
@@ -55,23 +55,23 @@ func (jc *Controller) GenerateSignedToken(userID int64) (string, error) {
 	return jc.signToken(token)
 }
 
-func (jc *Controller) GenerateSignedTokenAndModel(userID int64) (string, models.Token, error) {
+func (jc *Controller) GenerateSignedTokenAndModel(userID int64) (string, model.Token, error) {
 	token := jc.generateToken(userID)
 
 	expiredAt, err := token.Claims.GetExpirationTime()
 	if err != nil {
-		return "", models.Token{}, fmt.Errorf("failed to get expiration time: %w", err)
+		return "", model.Token{}, fmt.Errorf("failed to get expiration time: %w", err)
 	}
 
 	tokenString, err := jc.signToken(token)
 	if err != nil {
-		return "", models.Token{}, fmt.Errorf("failed to sign token: %w", err)
+		return "", model.Token{}, fmt.Errorf("failed to sign token: %w", err)
 	}
 
 	hash := sha256.Sum256([]byte(tokenString))
 	tokenHash := hex.EncodeToString(hash[:])
 
-	modelToken := models.Token{
+	modelToken := model.Token{
 		UserID:    userID,
 		TokenHash: tokenHash,
 		ExpiresAt: expiredAt.Time,

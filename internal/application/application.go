@@ -14,14 +14,14 @@ import (
 	"golang.org/x/sync/errgroup"
 
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/config"
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/http/servers/api"
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/http/servers/system"
+	"github.com/KlimKlimKlimKlim/trossage-backend/internal/http/server/api"
+	"github.com/KlimKlimKlimKlim/trossage-backend/internal/http/server/system"
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/logger"
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/postgres"
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/postgres/repository"
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/service"
 	ws "github.com/KlimKlimKlimKlim/trossage-backend/internal/websocket/hub"
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/workers/tokencleanup"
+	"github.com/KlimKlimKlimKlim/trossage-backend/internal/worker/tokencleanup"
 	"github.com/KlimKlimKlimKlim/trossage-backend/migrations"
 )
 
