@@ -12,9 +12,7 @@ CREATE TABLE users (
     updated_at timestamptz NOT NULL DEFAULT NOW()
 );
 
-CREATE UNIQUE INDEX idx_users_login ON users (user_login)
-WHERE
-    deleted_at IS NULL;
+CREATE UNIQUE INDEX idx_users_login ON users (user_login);
 
 CREATE INDEX idx_users_login_prefix ON users (user_login text_pattern_ops)
 WHERE
