@@ -23,7 +23,7 @@ func Auth(jwtController *jwt.Controller) gin.HandlerFunc {
 			return
 		}
 
-		ctx.Set(contextKeyUserID, userID)
+		SetUserID(ctx, userID)
 		ctx.Next()
 	}
 }

@@ -48,7 +48,7 @@ func RefreshAuth(jwtController *jwt.Controller, rm service.IRepoManager) gin.Han
 			return
 		}
 
-		ctx.Set(contextKeyUserID, userID)
+		SetUserID(ctx, userID)
 		ctx.Set(contextKeyTokenID, token.ID)
 		ctx.Next()
 	}

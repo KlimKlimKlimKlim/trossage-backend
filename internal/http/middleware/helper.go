@@ -33,6 +33,10 @@ func GetUserID(ctx *gin.Context) (int64, bool) {
 	return id, ok
 }
 
+func SetUserID(ctx *gin.Context, userID int64) {
+	ctx.Set(contextKeyUserID, userID)
+}
+
 func GetTokenID(ctx *gin.Context) (int64, bool) {
 	userID, exists := ctx.Get(contextKeyTokenID)
 	if !exists {

@@ -5,6 +5,7 @@ import (
 
 	derrors "github.com/KlimKlimKlimKlim/trossage-backend/internal/errors"
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/http/dto"
+	"github.com/KlimKlimKlimKlim/trossage-backend/internal/http/middleware"
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/http/response"
 )
 
@@ -30,6 +31,8 @@ func (h *handler) loginUser(ctx *gin.Context) {
 		response.HandleError(ctx, err)
 		return
 	}
+
+	middleware.SetUserID(ctx, user.ID)
 
 	var resp dto.UserAndTokenResponse
 	resp.Fill(user, jwtPair.AccessToken, jwtPair.RefreshToken)

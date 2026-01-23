@@ -29,6 +29,10 @@ func Logging(logger *zap.Logger) gin.HandlerFunc {
 			zap.String("user_agent", ctx.Request.UserAgent()),
 		}
 
+		if userID, exists := GetUserID(ctx); exists {
+			fields = append(fields, zap.Int64("user_id", userID))
+		}
+
 		if len(ctx.Errors) > 0 {
 			fields = append(fields, zap.Error(ctx.Errors[0].Err))
 		}
