@@ -86,7 +86,7 @@ func (jc *Controller) ProcessToken(tokenString string) (int64, error) {
 		return jc.secret, nil
 	})
 
-	if err != nil || !token.Valid || c.UserID == 0 || c.Type != jc.tokenType {
+	if err != nil || !token.Valid || c.UserID <= 0 || c.Type != jc.tokenType {
 		return 0, derrors.ErrUnauthorized
 	}
 
