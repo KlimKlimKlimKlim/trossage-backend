@@ -1,4 +1,4 @@
-package postgres
+package repository
 
 import (
 	"context"
@@ -7,7 +7,9 @@ import (
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/model"
 )
 
-type IRepository interface { //nolint:interfacebloat // it's okay for repository interfaces
+type Repository interface { //nolint:interfacebloat // it's okay for repository interfaces
+	WithTx(ctx context.Context, readOnly bool) (Repository, Commiter, error)
+
 	InsertUser(ctx context.Context, user model.AuthUser) (model.AuthUser, error)
 	SelectAuthUserByLogin(ctx context.Context, login string) (model.AuthUser, error)
 	SelectAuthUserByID(ctx context.Context, userID int64) (model.AuthUser, error)
@@ -36,4 +38,9 @@ type IRepository interface { //nolint:interfacebloat // it's okay for repository
 	CreateMessage(ctx context.Context, chatID, senderID int64, text string) (model.Message, error)
 	SelectMessages(ctx context.Context, chatID int64, limit, offset int) ([]model.Message, error)
 	CountChatMessages(ctx context.Context, chatID int64) (int, error)
+}
+
+type Commiter interface {
+	Commit(ctx context.Context) error
+	Rollback(ctx context.Context) error
 }

@@ -17,8 +17,7 @@ import (
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/http/server/api"
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/http/server/system"
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/logger"
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/postgres"
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/postgres/repository"
+	"github.com/KlimKlimKlimKlim/trossage-backend/internal/repository/postgres"
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/service"
 	ws "github.com/KlimKlimKlimKlim/trossage-backend/internal/websocket/hub"
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/worker/tokencleanup"
@@ -73,10 +72,10 @@ func (a *App) Init(ctx context.Context) error {
 	a.log.Info("Migrations run")
 
 	a.wsHub = ws.New(a.log, &a.config.Server.WebSocket)
-	repoManager := postgres.NewManager(pool, repository.NewRepository(pool))
-	a.service = service.New(a.config, repoManager, a.wsHub)
+	repo := postgres.NewRepository(pool)
+	a.service = service.New(a.config, repo, a.wsHub)
 
-	a.tokenCleanupWorker = tokencleanup.New(a.log, repoManager, &a.config.Worker.TokenCleanup)
+	a.tokenCleanupWorker = tokencleanup.New(a.log, repo, &a.config.Worker.TokenCleanup)
 
 	a.systemServer = system.New(&a.config.Server.System)
 	a.apiServer = api.New(a.log, a.config, a.service)

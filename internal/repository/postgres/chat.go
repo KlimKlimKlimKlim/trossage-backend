@@ -1,4 +1,4 @@
-package repository
+package postgres
 
 import (
 	"context"
@@ -8,13 +8,13 @@ import (
 
 	derrors "github.com/KlimKlimKlimKlim/trossage-backend/internal/errors"
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/model"
-	query "github.com/KlimKlimKlimKlim/trossage-backend/internal/postgres/repository/query/chat"
+	query "github.com/KlimKlimKlimKlim/trossage-backend/internal/repository/postgres/query/chat"
 )
 
 func (r *Repository) SelectChatBetweenUsers(ctx context.Context, userID1, userID2 int64) (int64, error) {
 	var chatID int64
 
-	err := r.db.QueryRow(ctx, query.SelectChatBetweenUsersQuery, userID1, userID2).Scan(&chatID)
+	err := r.querier.QueryRow(ctx, query.SelectChatBetweenUsersQuery, userID1, userID2).Scan(&chatID)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return 0, derrors.ErrChatNotFound
@@ -29,7 +29,7 @@ func (r *Repository) SelectChatBetweenUsers(ctx context.Context, userID1, userID
 func (r *Repository) InsertChat(ctx context.Context, chatType model.ChatType) (model.Chat, error) {
 	var chat model.Chat
 
-	err := r.db.QueryRow(ctx, query.InsertChatQuery, chatType).Scan(
+	err := r.querier.QueryRow(ctx, query.InsertChatQuery, chatType).Scan(
 		&chat.ID,
 		&chat.Type,
 		&chat.CreatedAt,
@@ -47,7 +47,7 @@ func (r *Repository) InsertChatParticipants(ctx context.Context, chatID int64, u
 		return derrors.ErrEmptyInput
 	}
 
-	_, err := r.db.Exec(ctx, query.InsertChatParticipantsQuery, chatID, userIDs)
+	_, err := r.querier.Exec(ctx, query.InsertChatParticipantsQuery, chatID, userIDs)
 
 	return err
 }
@@ -57,7 +57,7 @@ func (r *Repository) SelectUserChats(
 	userID int64,
 	limit, offset int,
 ) ([]model.ChatWithDetails, error) {
-	rows, err := r.db.Query(ctx, query.SelectUserChatsQuery, userID, limit, offset)
+	rows, err := r.querier.Query(ctx, query.SelectUserChatsQuery, userID, limit, offset)
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +80,7 @@ func (r *Repository) SelectUserChats(
 func (r *Repository) CountUserChats(ctx context.Context, userID int64) (int, error) {
 	var count int
 
-	err := r.db.QueryRow(ctx, query.CountUserChatsQuery, userID).Scan(&count)
+	err := r.querier.QueryRow(ctx, query.CountUserChatsQuery, userID).Scan(&count)
 	if err != nil {
 		return 0, err
 	}
@@ -91,7 +91,7 @@ func (r *Repository) CountUserChats(ctx context.Context, userID int64) (int, err
 func (r *Repository) IsUserMember(ctx context.Context, chatID, userID int64) (bool, error) {
 	var isMember bool
 
-	err := r.db.QueryRow(ctx, query.IsUserMemberQuery, chatID, userID).Scan(&isMember)
+	err := r.querier.QueryRow(ctx, query.IsUserMemberQuery, chatID, userID).Scan(&isMember)
 	if err != nil {
 		return false, err
 	}
@@ -102,7 +102,7 @@ func (r *Repository) IsUserMember(ctx context.Context, chatID, userID int64) (bo
 func (r *Repository) SelectChatByID(ctx context.Context, chatID int64) (model.Chat, error) {
 	var chat model.Chat
 
-	err := r.db.QueryRow(ctx, query.SelectChatByIDQuery, chatID).Scan(
+	err := r.querier.QueryRow(ctx, query.SelectChatByIDQuery, chatID).Scan(
 		&chat.ID,
 		&chat.Type,
 		&chat.CreatedAt,
@@ -121,7 +121,7 @@ func (r *Repository) SelectChatByID(ctx context.Context, chatID int64) (model.Ch
 }
 
 func (r *Repository) SelectChatMembers(ctx context.Context, chatID int64) ([]int64, error) {
-	rows, err := r.db.Query(ctx, query.SelectChatMembersQuery, chatID)
+	rows, err := r.querier.Query(ctx, query.SelectChatMembersQuery, chatID)
 	if err != nil {
 		return nil, err
 	}

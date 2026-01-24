@@ -1,16 +1,16 @@
-package repository
+package postgres
 
 import (
 	"context"
 
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/model"
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/postgres/repository/query/message"
+	"github.com/KlimKlimKlimKlim/trossage-backend/internal/repository/postgres/query/message"
 )
 
 func (r *Repository) CreateMessage(ctx context.Context, chatID, senderID int64, text string) (model.Message, error) {
 	var msg model.Message
 
-	err := r.db.QueryRow(ctx, message.CreateMessageQuery, chatID, senderID, text).Scan(
+	err := r.querier.QueryRow(ctx, message.CreateMessageQuery, chatID, senderID, text).Scan(
 		&msg.ID,
 		&msg.ChatID,
 		&msg.SenderID,
@@ -25,7 +25,7 @@ func (r *Repository) CreateMessage(ctx context.Context, chatID, senderID int64, 
 }
 
 func (r *Repository) SelectMessages(ctx context.Context, chatID int64, limit, offset int) ([]model.Message, error) {
-	rows, err := r.db.Query(ctx, message.SelectMessagesQuery, chatID, limit, offset)
+	rows, err := r.querier.Query(ctx, message.SelectMessagesQuery, chatID, limit, offset)
 	if err != nil {
 		return nil, err
 	}
@@ -56,7 +56,7 @@ func (r *Repository) SelectMessages(ctx context.Context, chatID int64, limit, of
 func (r *Repository) CountChatMessages(ctx context.Context, chatID int64) (int, error) {
 	var count int
 
-	err := r.db.QueryRow(ctx, message.CountChatMessagesQuery, chatID).Scan(&count)
+	err := r.querier.QueryRow(ctx, message.CountChatMessagesQuery, chatID).Scan(&count)
 	if err != nil {
 		return 0, err
 	}

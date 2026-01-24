@@ -47,9 +47,18 @@ var (
 	ErrUserIDIsEmpty    = errors.New("user_id is empty")
 	ErrTokenIDIsEmpty   = errors.New("token_id is empty")
 	ErrUnknownLoggerEnv = errors.New("unknown logger environment")
-	ErrPanicInTx        = errors.New("panic in transaction")
-	ErrEmptyInput       = errors.New("empty input")
+)
 
+// WebSocket errors.
+var (
 	ErrClientClosed   = errors.New("client is closed")
 	ErrSendBufferFull = errors.New("send buffer is full")
+)
+
+// Storage errors.
+var (
+	ErrPanicInTx      = errors.New("panic in transaction")
+	ErrEmptyInput     = errors.New("empty input")
+	ErrReadWriteTx    = errors.New("cannot begin a read-write transaction inside a read-only transaction")
+	ErrTxNotSupported = errors.New("repository querier does not support transactions")
 )

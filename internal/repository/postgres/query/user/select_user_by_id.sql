@@ -1,7 +1,6 @@
 SELECT
     id,
     user_login,
-    password_hash,
     display_name,
     created_at,
     updated_at,
@@ -9,5 +8,6 @@ SELECT
 FROM
     users
 WHERE
-    id = $1;
+    id = $1
+    AND deleted_at IS NULL;
 

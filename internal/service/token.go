@@ -6,10 +6,9 @@ import (
 	"fmt"
 
 	derrors "github.com/KlimKlimKlimKlim/trossage-backend/internal/errors"
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/postgres"
 )
 
-func (s *Service) createTokens(ctx context.Context, tx postgres.IRepository, userID int64) (string, string, error) {
+func (s *Service) createTokens(ctx context.Context, userID int64) (string, string, error) {
 	accessString, err := s.AccessJWTController.GenerateSignedToken(userID)
 	if err != nil {
 		return "", "", fmt.Errorf("failed to sign access token: %w", err)
@@ -20,7 +19,7 @@ func (s *Service) createTokens(ctx context.Context, tx postgres.IRepository, use
 		return "", "", fmt.Errorf("failed to sign access token: %w", err)
 	}
 
-	if _, err = tx.InsertRefreshToken(ctx, storeToken); err != nil {
+	if _, err = s.Repo.InsertRefreshToken(ctx, storeToken); err != nil {
 		return "", "", fmt.Errorf("failed to insert token: %w", err)
 	}
 
@@ -30,8 +29,8 @@ func (s *Service) createTokens(ctx context.Context, tx postgres.IRepository, use
 func (s *Service) RefreshToken(ctx context.Context, userID, oldTokenID int64) (string, string, error) {
 	var accessString, refreshString string
 
-	err := s.RepoManager.InTx(ctx, func(tx postgres.IRepository) error {
-		user, err := tx.SelectAuthUserByID(ctx, userID)
+	err := s.InTx(ctx, func(txS *Service) error {
+		_, err := txS.Repo.SelectAuthUserByID(ctx, userID)
 		if err != nil {
 			if errors.Is(err, derrors.ErrUserNotFound) {
 				return fmt.Errorf("user not found: %w", derrors.ErrUnauthorized)
@@ -40,11 +39,7 @@ func (s *Service) RefreshToken(ctx context.Context, userID, oldTokenID int64) (s
 			return fmt.Errorf("failed to select user: %w", err)
 		}
 
-		if user.IsDeleted() {
-			return fmt.Errorf("user is deleted: %w", derrors.ErrUnauthorized)
-		}
-
-		if err = tx.RevokeRefreshTokenByID(ctx, oldTokenID); err != nil {
+		if err = txS.Repo.RevokeRefreshTokenByID(ctx, oldTokenID); err != nil {
 			if errors.Is(err, derrors.ErrTokenNotFound) {
 				return fmt.Errorf("token not found: %w", derrors.ErrUnauthorized)
 			}
@@ -52,7 +47,7 @@ func (s *Service) RefreshToken(ctx context.Context, userID, oldTokenID int64) (s
 			return fmt.Errorf("failed to revoke old token: %w", err)
 		}
 
-		accessString, refreshString, err = s.createTokens(ctx, tx, userID)
+		accessString, refreshString, err = txS.createTokens(ctx, userID)
 		if err != nil {
 			return fmt.Errorf("failed to create new tokens: %w", err)
 		}
@@ -67,7 +62,7 @@ func (s *Service) RefreshToken(ctx context.Context, userID, oldTokenID int64) (s
 }
 
 func (s *Service) Logout(ctx context.Context, tokenID int64) error {
-	if err := s.RepoManager.Repo().RevokeRefreshTokenByID(ctx, tokenID); err != nil {
+	if err := s.Repo.RevokeRefreshTokenByID(ctx, tokenID); err != nil {
 		return fmt.Errorf("failed to revoke token: %w", err)
 	}
 
@@ -75,7 +70,7 @@ func (s *Service) Logout(ctx context.Context, tokenID int64) error {
 }
 
 func (s *Service) LogoutAll(ctx context.Context, userID int64) error {
-	if err := s.RepoManager.Repo().RevokeRefreshTokensByUserID(ctx, userID); err != nil {
+	if err := s.Repo.RevokeRefreshTokensByUserID(ctx, userID); err != nil {
 		return fmt.Errorf("failed to revoke tokens: %w", err)
 	}
 

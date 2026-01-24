@@ -1,4 +1,4 @@
-package repository
+package postgres
 
 import (
 	"context"
@@ -9,11 +9,11 @@ import (
 
 	derrors "github.com/KlimKlimKlimKlim/trossage-backend/internal/errors"
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/model"
-	query "github.com/KlimKlimKlimKlim/trossage-backend/internal/postgres/repository/query/token"
+	query "github.com/KlimKlimKlimKlim/trossage-backend/internal/repository/postgres/query/token"
 )
 
 func (r *Repository) InsertRefreshToken(ctx context.Context, token model.Token) (model.Token, error) {
-	err := r.db.QueryRow(ctx, query.InsertTokenQuery, token.UserID, token.TokenHash, token.ExpiresAt).Scan(
+	err := r.querier.QueryRow(ctx, query.InsertTokenQuery, token.UserID, token.TokenHash, token.ExpiresAt).Scan(
 		&token.ID,
 		&token.CreatedAt,
 	)
@@ -27,7 +27,7 @@ func (r *Repository) InsertRefreshToken(ctx context.Context, token model.Token) 
 func (r *Repository) SelectRefreshToken(ctx context.Context, userID int64, tokenHash string) (model.Token, error) {
 	var token model.Token
 
-	err := r.db.QueryRow(ctx, query.SelectTokenQuery, userID, tokenHash).Scan(
+	err := r.querier.QueryRow(ctx, query.SelectTokenQuery, userID, tokenHash).Scan(
 		&token.ID,
 		&token.UserID,
 		&token.TokenHash,
@@ -47,7 +47,7 @@ func (r *Repository) SelectRefreshToken(ctx context.Context, userID int64, token
 }
 
 func (r *Repository) RevokeRefreshTokenByID(ctx context.Context, tokenID int64) error {
-	result, err := r.db.Exec(ctx, query.RevokeTokenByIDQuery, tokenID)
+	result, err := r.querier.Exec(ctx, query.RevokeTokenByIDQuery, tokenID)
 	if err != nil {
 		return err
 	}
@@ -60,7 +60,7 @@ func (r *Repository) RevokeRefreshTokenByID(ctx context.Context, tokenID int64) 
 }
 
 func (r *Repository) RevokeRefreshTokensByUserID(ctx context.Context, userID int64) error {
-	_, err := r.db.Exec(ctx, query.RevokeTokensByUserID, userID)
+	_, err := r.querier.Exec(ctx, query.RevokeTokensByUserID, userID)
 	if err != nil {
 		return err
 	}
@@ -69,7 +69,7 @@ func (r *Repository) RevokeRefreshTokensByUserID(ctx context.Context, userID int
 }
 
 func (r *Repository) DeleteExpiredTokens(ctx context.Context, olderThan time.Time) (int64, error) {
-	result, err := r.db.Exec(ctx, query.DeleteExpiredTokensQuery, olderThan)
+	result, err := r.querier.Exec(ctx, query.DeleteExpiredTokensQuery, olderThan)
 	if err != nil {
 		return 0, err
 	}
@@ -78,7 +78,7 @@ func (r *Repository) DeleteExpiredTokens(ctx context.Context, olderThan time.Tim
 }
 
 func (r *Repository) DeleteRevokedTokens(ctx context.Context, olderThan time.Time) (int64, error) {
-	result, err := r.db.Exec(ctx, query.DeleteRevokedTokensQuery, olderThan)
+	result, err := r.querier.Exec(ctx, query.DeleteRevokedTokensQuery, olderThan)
 	if err != nil {
 		return 0, err
 	}

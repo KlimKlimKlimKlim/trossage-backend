@@ -8,7 +8,6 @@ import (
 
 	derrors "github.com/KlimKlimKlimKlim/trossage-backend/internal/errors"
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/model"
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/postgres"
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/service/validate"
 )
 
@@ -47,13 +46,13 @@ func (s *Service) CreateUser(
 	user.DisplayName = displayName
 	user.PasswordHash = ph
 
-	err = s.RepoManager.InTx(ctx, func(tx postgres.IRepository) error {
-		user, err = tx.InsertUser(ctx, user)
+	err = s.InTx(ctx, func(txS *Service) error {
+		user, err = txS.Repo.InsertUser(ctx, user)
 		if err != nil {
 			return fmt.Errorf("failed to insert user: %w", err)
 		}
 
-		jwtPair.AccessToken, jwtPair.RefreshToken, err = s.createTokens(ctx, tx, user.ID)
+		jwtPair.AccessToken, jwtPair.RefreshToken, err = txS.createTokens(ctx, user.ID)
 		if err != nil {
 			return fmt.Errorf("failed to create tokens: %w", err)
 		}
@@ -68,48 +67,36 @@ func (s *Service) CreateUser(
 }
 
 func (s *Service) LoginUser(ctx context.Context, login, password string) (model.User, model.JWTPair, error) {
-	var (
-		user    model.AuthUser
-		JWTPair model.JWTPair
-	)
-
-	err := s.RepoManager.InTx(ctx, func(tx postgres.IRepository) error {
-		var err error
-
-		user, err = tx.SelectAuthUserByLogin(ctx, login)
-		if err != nil {
-			if errors.Is(err, derrors.ErrUserNotFound) {
-				return fmt.Errorf("user not found: %w", derrors.ErrUnauthorized)
-			}
-
-			return fmt.Errorf("failed to select user: %w", err)
-		}
-
-		ok, err := s.hasher.VerifyPassword(password, user.PasswordHash)
-		if err != nil {
-			return fmt.Errorf("failed to verify password: %w", err)
-		}
-
-		if !ok {
-			return fmt.Errorf("password is wrong: %w", derrors.ErrUnauthorized)
-		}
-
-		JWTPair.AccessToken, JWTPair.RefreshToken, err = s.createTokens(ctx, tx, user.ID)
-		if err != nil {
-			return fmt.Errorf("failed to create tokens: %w", err)
-		}
-
-		return nil
-	})
+	user, err := s.Repo.SelectAuthUserByLogin(ctx, login)
 	if err != nil {
-		return model.User{}, model.JWTPair{}, err
+		if errors.Is(err, derrors.ErrUserNotFound) {
+			return model.User{}, model.JWTPair{}, fmt.Errorf("user not found: %w", derrors.ErrUnauthorized)
+		}
+
+		return model.User{}, model.JWTPair{}, fmt.Errorf("failed to select user: %w", err)
+	}
+
+	ok, err := s.hasher.VerifyPassword(password, user.PasswordHash)
+	if err != nil {
+		return model.User{}, model.JWTPair{}, fmt.Errorf("failed to verify password: %w", err)
+	}
+
+	if !ok {
+		return model.User{}, model.JWTPair{}, fmt.Errorf("password is wrong: %w", derrors.ErrUnauthorized)
+	}
+
+	var JWTPair model.JWTPair
+
+	JWTPair.AccessToken, JWTPair.RefreshToken, err = s.createTokens(ctx, user.ID)
+	if err != nil {
+		return model.User{}, model.JWTPair{}, fmt.Errorf("failed to create tokens: %w", err)
 	}
 
 	return user.User, JWTPair, nil
 }
 
 func (s *Service) GetUserByID(ctx context.Context, userID int64) (model.User, error) {
-	user, err := s.getAndCheckUserByID(ctx, s.RepoManager.Repo(), userID)
+	user, err := s.Repo.SelectUserByID(ctx, userID)
 	if err != nil {
 		return model.User{}, fmt.Errorf("failed to get user: %w", err)
 	}
@@ -127,18 +114,14 @@ func (s *Service) UpdateUser(
 		tokenRevocation model.TokenRevocation
 	)
 
-	err := s.RepoManager.InTx(ctx, func(tx postgres.IRepository) error {
-		user, err := tx.SelectAuthUserByID(ctx, userID)
+	err := s.InTx(ctx, func(txS *Service) error {
+		user, err := txS.Repo.SelectAuthUserByID(ctx, userID)
 		if err != nil {
 			return fmt.Errorf("failed to get user: %w", err)
 		}
 
-		if user.IsDeleted() {
-			return fmt.Errorf("user is deleted: %w", derrors.ErrUserNotFound)
-		}
-
 		if newPassword != "" {
-			if err = s.updateUserPassword(ctx, tx, &user, oldPassword, newPassword); err != nil {
+			if err = txS.updateUserPassword(ctx, &user, oldPassword, newPassword); err != nil {
 				return err
 			}
 
@@ -147,12 +130,12 @@ func (s *Service) UpdateUser(
 		}
 
 		if displayName != "" {
-			if err = s.updateUserDisplayName(&user, displayName); err != nil {
+			if err = txS.updateUserDisplayName(&user, displayName); err != nil {
 				return err
 			}
 		}
 
-		updatedUser, err = tx.UpdateUser(ctx, user)
+		updatedUser, err = txS.Repo.UpdateUser(ctx, user)
 		if err != nil {
 			return fmt.Errorf("failed to update user: %w", err)
 		}
@@ -172,7 +155,6 @@ func (s *Service) UpdateUser(
 
 func (s *Service) updateUserPassword(
 	ctx context.Context,
-	tx postgres.IRepository,
 	user *model.AuthUser,
 	oldPassword, newPassword string,
 ) error {
@@ -205,7 +187,7 @@ func (s *Service) updateUserPassword(
 
 	user.PasswordHash = newHash
 
-	if err = tx.RevokeRefreshTokensByUserID(ctx, user.ID); err != nil {
+	if err = s.Repo.RevokeRefreshTokensByUserID(ctx, user.ID); err != nil {
 		return fmt.Errorf("failed to revoke tokens: %w", err)
 	}
 
@@ -223,13 +205,13 @@ func (s *Service) updateUserDisplayName(user *model.AuthUser, displayName string
 }
 
 func (s *Service) DeleteUser(ctx context.Context, userID int64, password string) error {
-	err := s.RepoManager.InTx(ctx, func(tx postgres.IRepository) error {
-		user, err := tx.SelectAuthUserByID(ctx, userID)
+	err := s.InTx(ctx, func(txS *Service) error {
+		user, err := txS.Repo.SelectAuthUserByID(ctx, userID)
 		if err != nil {
 			return fmt.Errorf("failed to get user: %w", err)
 		}
 
-		ok, err := s.hasher.VerifyPassword(password, user.PasswordHash)
+		ok, err := txS.hasher.VerifyPassword(password, user.PasswordHash)
 		if err != nil {
 			return fmt.Errorf("failed to verify password: %w", err)
 		}
@@ -238,16 +220,12 @@ func (s *Service) DeleteUser(ctx context.Context, userID int64, password string)
 			return derrors.ErrUnauthorized
 		}
 
-		if user.IsDeleted() {
-			return fmt.Errorf("user is deleted: %w", derrors.ErrUserNotFound)
-		}
-
-		if err = tx.DeleteUser(ctx, userID); err != nil {
-			return fmt.Errorf("failed to delete user: %w", err)
-		}
-
-		if err = tx.RevokeRefreshTokensByUserID(ctx, userID); err != nil {
+		if err = txS.Repo.RevokeRefreshTokensByUserID(ctx, userID); err != nil {
 			return fmt.Errorf("failed to revoke tokens: %w", err)
+		}
+
+		if err = txS.Repo.DeleteUser(ctx, userID); err != nil {
+			return fmt.Errorf("failed to delete user: %w", err)
 		}
 
 		return nil
@@ -272,15 +250,15 @@ func (s *Service) SearchUsersByLogin(
 		total int
 	)
 
-	err := s.RepoManager.InReadOnlyTx(ctx, func(tx postgres.IRepository) error {
+	err := s.InReadOnlyTx(ctx, func(txS *Service) error {
 		var err error
 
-		users, err = tx.SelectUsersByLoginPrefix(ctx, userID, prefix, limit, offset)
+		users, err = txS.Repo.SelectUsersByLoginPrefix(ctx, userID, prefix, limit, offset)
 		if err != nil {
 			return fmt.Errorf("failed to search users: %w", err)
 		}
 
-		total, err = tx.CountUsersByLoginPrefix(ctx, userID, prefix)
+		total, err = txS.Repo.CountUsersByLoginPrefix(ctx, userID, prefix)
 		if err != nil {
 			return fmt.Errorf("failed to count users: %w", err)
 		}
@@ -292,17 +270,4 @@ func (s *Service) SearchUsersByLogin(
 	}
 
 	return users, total, nil
-}
-
-func (s *Service) getAndCheckUserByID(ctx context.Context, tx postgres.IRepository, userID int64) (model.User, error) {
-	user, err := tx.SelectUserByID(ctx, userID)
-	if err != nil {
-		return model.User{}, fmt.Errorf("failed to select user: %w", err)
-	}
-
-	if user.IsDeleted() {
-		return model.User{}, fmt.Errorf("user is deleted: %w", derrors.ErrUserNotFound)
-	}
-
-	return user, nil
 }

@@ -39,7 +39,7 @@ func New(log *zap.Logger, cfg *config.Config, svc *service.Service) *http.Server
 			authRouter.POST("/login", rateLimitMiddleware, hdl.loginUser)
 			authRouter.POST("/logout-all", authMiddleware, hdl.logoutUserAll)
 
-			authRouter.Use(middleware.RefreshAuth(svc.RefreshJWTController, svc.RepoManager))
+			authRouter.Use(middleware.RefreshAuth(svc.RefreshJWTController, svc.Repo))
 			authRouter.POST("/refresh", hdl.refreshToken)
 			authRouter.POST("/logout", hdl.logoutUser)
 		}

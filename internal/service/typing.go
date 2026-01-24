@@ -6,20 +6,19 @@ import (
 	"slices"
 
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/http/dto"
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/postgres"
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/websocket/hub"
 )
 
 func (s *Service) SendTyping(ctx context.Context, senderID, chatID int64, typing dto.TypingUpdateRequest) error {
 	var userIDs []int64
 
-	err := s.RepoManager.InReadOnlyTx(ctx, func(tx postgres.IRepository) error {
-		err := s.isUserMember(ctx, tx, chatID, senderID)
+	err := s.InReadOnlyTx(ctx, func(txS *Service) error {
+		err := txS.isUserMember(ctx, chatID, senderID)
 		if err != nil {
 			return err
 		}
 
-		userIDs, err = tx.SelectChatMembers(ctx, chatID)
+		userIDs, err = txS.Repo.SelectChatMembers(ctx, chatID)
 		if err != nil {
 			return fmt.Errorf("failed to select chat members: %w", err)
 		}

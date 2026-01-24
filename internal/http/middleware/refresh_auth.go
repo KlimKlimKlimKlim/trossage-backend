@@ -13,10 +13,10 @@ import (
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/http/response"
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/jwt"
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/model"
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/service"
+	"github.com/KlimKlimKlimKlim/trossage-backend/internal/repository"
 )
 
-func RefreshAuth(jwtController *jwt.Controller, rm service.IRepoManager) gin.HandlerFunc {
+func RefreshAuth(jwtController *jwt.Controller, rm repository.Repository) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		tokenString, err := extractHeaderToken(ctx)
 		if err != nil {
@@ -32,7 +32,7 @@ func RefreshAuth(jwtController *jwt.Controller, rm service.IRepoManager) gin.Han
 
 		tokenHash := hashToken(tokenString)
 
-		token, err := rm.Repo().SelectRefreshToken(ctx, userID, tokenHash)
+		token, err := rm.SelectRefreshToken(ctx, userID, tokenHash)
 		if err != nil {
 			if errors.Is(err, derrors.ErrTokenNotFound) {
 				err = fmt.Errorf("token not found: %w", derrors.ErrUnauthorized)

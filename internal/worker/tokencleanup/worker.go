@@ -9,20 +9,20 @@ import (
 
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/config"
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/logger"
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/service"
+	"github.com/KlimKlimKlimKlim/trossage-backend/internal/repository"
 )
 
 type Worker struct {
-	log        *zap.Logger
-	repository service.IRepoManager
-	cfg        *config.TokenCleanupConfig
+	log  *zap.Logger
+	repo repository.Repository
+	cfg  *config.TokenCleanupConfig
 }
 
-func New(log *zap.Logger, rm service.IRepoManager, cfg *config.TokenCleanupConfig) *Worker {
+func New(log *zap.Logger, repo repository.Repository, cfg *config.TokenCleanupConfig) *Worker {
 	return &Worker{
-		log:        log.With(zap.String(logger.WorkerField, workerName)),
-		repository: rm,
-		cfg:        cfg,
+		log:  log.With(zap.String(logger.WorkerField, workerName)),
+		repo: repo,
+		cfg:  cfg,
 	}
 }
 
@@ -53,12 +53,12 @@ func (w *Worker) cleanup(ctx context.Context) error {
 	expiredThreshold := now.Add(-w.cfg.ExpiredRetention)
 	revokedThreshold := now.Add(-w.cfg.RevokedRetention)
 
-	expiredCount, err := w.repository.Repo().DeleteExpiredTokens(ctx, expiredThreshold)
+	expiredCount, err := w.repo.DeleteExpiredTokens(ctx, expiredThreshold)
 	if err != nil {
 		return fmt.Errorf("failed to delete expired tokens: %w", err)
 	}
 
-	revokedCount, err := w.repository.Repo().DeleteRevokedTokens(ctx, revokedThreshold)
+	revokedCount, err := w.repo.DeleteRevokedTokens(ctx, revokedThreshold)
 	if err != nil {
 		return fmt.Errorf("failed to delete revoked tokens: %w", err)
 	}

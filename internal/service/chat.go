@@ -7,7 +7,6 @@ import (
 
 	derrors "github.com/KlimKlimKlimKlim/trossage-backend/internal/errors"
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/model"
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/postgres"
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/websocket/hub"
 )
 
@@ -22,20 +21,20 @@ func (s *Service) CreateChat(ctx context.Context, userID, otherUserID int64) (mo
 		otherUser   model.User
 	)
 
-	err := s.RepoManager.InTx(ctx, func(tx postgres.IRepository) error {
+	err := s.InTx(ctx, func(txS *Service) error {
 		var err error
 
-		currentUser, err = s.getAndCheckUserByID(ctx, tx, userID)
+		currentUser, err = txS.Repo.SelectUserByID(ctx, userID)
 		if err != nil {
 			return fmt.Errorf("failed to select user: %w", err)
 		}
 
-		otherUser, err = s.getAndCheckUserByID(ctx, tx, otherUserID)
+		otherUser, err = txS.Repo.SelectUserByID(ctx, otherUserID)
 		if err != nil {
 			return fmt.Errorf("failed to select other user: %w", err)
 		}
 
-		existingChatID, err := tx.SelectChatBetweenUsers(ctx, userID, otherUserID)
+		existingChatID, err := txS.Repo.SelectChatBetweenUsers(ctx, userID, otherUserID)
 		if err != nil && !errors.Is(err, derrors.ErrChatNotFound) {
 			return fmt.Errorf("failed to check existing chat: %w", err)
 		}
@@ -48,12 +47,12 @@ func (s *Service) CreateChat(ctx context.Context, userID, otherUserID int64) (mo
 			)
 		}
 
-		chat, err = tx.InsertChat(ctx, model.ChatTypePrivate)
+		chat, err = txS.Repo.InsertChat(ctx, model.ChatTypePrivate)
 		if err != nil {
 			return fmt.Errorf("failed to insert chat: %w", err)
 		}
 
-		err = tx.InsertChatParticipants(ctx, chat.ID, userID, otherUserID)
+		err = txS.Repo.InsertChatParticipants(ctx, chat.ID, userID, otherUserID)
 		if err != nil {
 			return fmt.Errorf("failed to insert participants: %w", err)
 		}
@@ -79,15 +78,15 @@ func (s *Service) GetUserChats(
 		total int
 	)
 
-	err := s.RepoManager.InReadOnlyTx(ctx, func(tx postgres.IRepository) error {
+	err := s.InReadOnlyTx(ctx, func(txS *Service) error {
 		var err error
 
-		chats, err = tx.SelectUserChats(ctx, userID, limit, offset)
+		chats, err = txS.Repo.SelectUserChats(ctx, userID, limit, offset)
 		if err != nil {
 			return fmt.Errorf("failed to get user chats: %w", err)
 		}
 
-		total, err = tx.CountUserChats(ctx, userID)
+		total, err = txS.Repo.CountUserChats(ctx, userID)
 		if err != nil {
 			return fmt.Errorf("failed to count user chats: %w", err)
 		}

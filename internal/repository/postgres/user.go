@@ -1,4 +1,4 @@
-package repository
+package postgres
 
 import (
 	"context"
@@ -10,11 +10,11 @@ import (
 
 	derrors "github.com/KlimKlimKlimKlim/trossage-backend/internal/errors"
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/model"
-	query "github.com/KlimKlimKlimKlim/trossage-backend/internal/postgres/repository/query/user"
+	query "github.com/KlimKlimKlimKlim/trossage-backend/internal/repository/postgres/query/user"
 )
 
 func (r *Repository) InsertUser(ctx context.Context, user model.AuthUser) (model.AuthUser, error) {
-	err := r.db.QueryRow(ctx, query.InsertUserQuery,
+	err := r.querier.QueryRow(ctx, query.InsertUserQuery,
 		user.Login,
 		user.PasswordHash,
 		user.DisplayName,
@@ -38,7 +38,7 @@ func (r *Repository) InsertUser(ctx context.Context, user model.AuthUser) (model
 func (r *Repository) SelectAuthUserByLogin(ctx context.Context, login string) (model.AuthUser, error) {
 	var user model.AuthUser
 
-	err := r.db.QueryRow(ctx, query.SelectAuthUserByLoginQuery,
+	err := r.querier.QueryRow(ctx, query.SelectAuthUserByLoginQuery,
 		login,
 	).Scan(
 		&user.ID,
@@ -62,7 +62,7 @@ func (r *Repository) SelectAuthUserByLogin(ctx context.Context, login string) (m
 func (r *Repository) SelectAuthUserByID(ctx context.Context, userID int64) (model.AuthUser, error) {
 	var user model.AuthUser
 
-	err := r.db.QueryRow(ctx, query.SelectAuthUserByIDQuery, userID).Scan(
+	err := r.querier.QueryRow(ctx, query.SelectAuthUserByIDQuery, userID).Scan(
 		&user.ID,
 		&user.Login,
 		&user.PasswordHash,
@@ -85,7 +85,7 @@ func (r *Repository) SelectAuthUserByID(ctx context.Context, userID int64) (mode
 func (r *Repository) SelectUserByID(ctx context.Context, userID int64) (model.User, error) {
 	var user model.User
 
-	err := r.db.QueryRow(ctx, query.SelectUserByIDQuery, userID).Scan(
+	err := r.querier.QueryRow(ctx, query.SelectUserByIDQuery, userID).Scan(
 		&user.ID,
 		&user.Login,
 		&user.DisplayName,
@@ -105,7 +105,7 @@ func (r *Repository) SelectUserByID(ctx context.Context, userID int64) (model.Us
 }
 
 func (r *Repository) UpdateUser(ctx context.Context, user model.AuthUser) (model.AuthUser, error) {
-	err := r.db.QueryRow(ctx, query.UpdateUserQuery,
+	err := r.querier.QueryRow(ctx, query.UpdateUserQuery,
 		user.ID,
 		user.DisplayName,
 		user.PasswordHash,
@@ -124,7 +124,7 @@ func (r *Repository) UpdateUser(ctx context.Context, user model.AuthUser) (model
 }
 
 func (r *Repository) DeleteUser(ctx context.Context, userID int64) error {
-	result, err := r.db.Exec(ctx, query.DeleteUserQuery, userID)
+	result, err := r.querier.Exec(ctx, query.DeleteUserQuery, userID)
 	if err != nil {
 		return err
 	}
@@ -142,7 +142,7 @@ func (r *Repository) SelectUsersByLoginPrefix(
 	prefix string,
 	limit, offset int,
 ) ([]model.User, error) {
-	rows, err := r.db.Query(ctx, query.SelectUsersByLoginPrefixQuery, userID, prefix, limit, offset)
+	rows, err := r.querier.Query(ctx, query.SelectUsersByLoginPrefixQuery, userID, prefix, limit, offset)
 	if err != nil {
 		return nil, err
 	}
@@ -171,7 +171,7 @@ func (r *Repository) SelectUsersByLoginPrefix(
 
 func (r *Repository) CountUsersByLoginPrefix(ctx context.Context, userID int64, prefix string) (int, error) {
 	var count int
-	if err := r.db.QueryRow(ctx, query.CountUsersByLoginPrefixQuery, userID, prefix).Scan(&count); err != nil {
+	if err := r.querier.QueryRow(ctx, query.CountUsersByLoginPrefixQuery, userID, prefix).Scan(&count); err != nil {
 		return 0, err
 	}
 
