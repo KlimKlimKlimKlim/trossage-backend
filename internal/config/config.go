@@ -120,8 +120,8 @@ type RateLimit struct {
 	Limit  int64         `env:"LIMIT"  envDefault:"10"`
 }
 
-func New() (*Config, error) {
-	_ = godotenv.Load()
+func New(filenames ...string) (*Config, error) {
+	_ = godotenv.Load(filenames...)
 
 	cfg, err := env.ParseAs[Config]()
 	if err != nil {

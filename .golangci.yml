@@ -58,6 +58,13 @@ linters:
   exclusions:
     paths:
       - "docs/docs.go$"
+    rules:
+      - path: _test\.go
+        linters:
+          - funlen
+          - maintidx
+          - gocognit
+          - nestif
   enable:
     - asasalint
     - asciicheck
@@ -284,3 +291,5 @@ linters:
     varnamelen:
       max-distance: 10
       min-name-length: 2
+      ignore-names:
+        - i
