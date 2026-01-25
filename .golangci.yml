@@ -58,6 +58,7 @@ linters:
   exclusions:
     paths:
       - "docs/docs.go$"
+      - "internal/mocks/.*"
     rules:
       - path: _test\.go
         linters:

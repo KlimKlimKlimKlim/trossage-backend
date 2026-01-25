@@ -2,9 +2,9 @@
 packages:
   github.com/KlimKlimKlimKlim/trossage-backend/internal/repository:
     config:
-      dir: "internal/mocks"
-      pkgname: mocks
-      filename: "{{.InterfaceName}}.go"
+      dir: "{{.InterfaceDir}}/../mocks"
+      pkgname: "mocks"
+      filename: "mock_{{.InterfaceName | snakecase}}.go"
       structname: "{{.InterfaceName}}"
     interfaces:
       Repository:
