@@ -4,12 +4,15 @@ package main
 //	@version		1.0
 //	@description	Simple chat backend API
 
-//	@BasePath	/api
+//	@servers	url=http://localhost:8080/api description=Local Development
 
 //	@securityDefinitions.apikey	BearerAuth
 //	@in							header
 //	@name						Authorization
 //	@description				Type "Bearer" followed by a space and JWT token
+
+//go:generate go tool swag init --v3.1 -g main.go -o ../docs
+
 import (
 	"context"
 	"log"

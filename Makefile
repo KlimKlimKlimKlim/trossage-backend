@@ -1,10 +1,6 @@
-.PHONY: mocks
-mocks:
-	@mockery
-
-.PHONY: swagger
-swagger:
-	@swag init --v3.1 -g cmd/main.go -o docs
+.PHONY: gen
+gen:
+	go generate ./...
 
 .PHONY: test
 test:

@@ -7,6 +7,7 @@ import (
 	"github.com/KlimKlimKlimKlim/trossage-backend/internal/model"
 )
 
+//go:generate go tool mockery
 type Repository interface { //nolint:interfacebloat // it's okay for repository interfaces
 	WithTx(ctx context.Context, readOnly bool) (Repository, Commiter, error)
 

@@ -1,0 +1,10 @@
+# .mockery.yaml
+packages:
+  github.com/KlimKlimKlimKlim/trossage-backend/internal/repository:
+    config:
+      dir: "internal/mocks"
+      pkgname: mocks
+      filename: "{{.InterfaceName}}.go"
+      structname: "{{.InterfaceName}}"
+    interfaces:
+      Repository:
