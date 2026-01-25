@@ -1,89 +1,96 @@
 # Trossage Backend
 
-Backend для мессенджера с поддержкой real-time коммуникации через WebSocket.
+Real-time messenger backend with WebSocket support.
 
-## Возможности
+## Features
 
-- Регистрация и аутентификация (JWT access/refresh tokens)
-- Приватные чаты между пользователями
-- Real-time доставка сообщений и событий (WebSocket)
-- Индикатор набора текста (typing indicator)
-- Поиск пользователей
+- Registration and authentication (JWT access/refresh tokens)
+- Private chats between users
+- Real-time message and event delivery (WebSocket)
+- Typing indicator
+- User search
 
-## Технологии
+## Tech Stack
 
 - **Go 1.25**, Gin, pgx
 - **WebSocket** (coder/websocket)
-- **JWT** для аутентификации
-- **Argon2id** для хеширования паролей
+- **JWT** for authentication
+- **Argon2id** for password hashing
 - **PostgreSQL 16**
 
-## Запуск
+## Getting Started
+
+### Install Tools
 
 ```bash
-# Скопировать и настроить переменные окружения
-cp .env.example .env
+# Install Homebrew tools
+brew install golangci-lint  # Go linter
+brew install sqlfluff       # SQL style linter  
+brew install rust           # Rust toolchain (required for squawk)
 
-# Запуск через Docker Compose
-docker-compose up -d
+# Install Rust-based tools
+cargo install squawk-cli    # PostgreSQL migration safety linter
 ```
 
-API будет доступен на `http://localhost:8080`, health-check на `http://localhost:8081/health`.
+Go tools (swag, mockery) are installed automatically via `go tool`.
+
+### Run
+
+```bash
+# Copy and configure environment variables
+cp .env.example .env
+
+# Start with Docker Compose
+make docker-up
+```
+
+API available at `http://localhost:8080`, health-check at `http://localhost:8081/health`.
 
 ## API
 
-Документация в формате Swagger находится в директории [`docs/swagger.json`](docs/swagger.json).
+Swagger documentation: [`docs/swagger.json`](docs/swagger.json).
 
-### Основные эндпоинты
+### Main Endpoints
 
-| Метод | Путь                      | Описание             |
-|-------|---------------------------|----------------------|
-| POST  | `/api/auth/register`      | Регистрация          |
-| POST  | `/api/auth/login`         | Вход                 |
-| POST  | `/api/auth/refresh`       | Обновление токенов   |
-| POST  | `/api/auth/logout`        | Выход                |
-| GET   | `/api/users/me`           | Текущий пользователь |
-| GET   | `/api/users/search`       | Поиск пользователей  |
-| POST  | `/api/chats`              | Создать чат          |
-| GET   | `/api/chats`              | Список чатов         |
-| POST  | `/api/chats/:id/messages` | Отправить сообщение  |
-| GET   | `/api/chats/:id/messages` | История сообщений    |
-| GET   | `/api/ws`                 | WebSocket соединение |
+| Method | Path                      | Description          |
+|--------|---------------------------|----------------------|
+| POST   | `/api/auth/register`      | Register             |
+| POST   | `/api/auth/login`         | Login                |
+| POST   | `/api/auth/refresh`       | Refresh tokens       |
+| POST   | `/api/auth/logout`        | Logout               |
+| GET    | `/api/users/me`           | Current user         |
+| GET    | `/api/users/search`       | Search users         |
+| POST   | `/api/chats`              | Create chat          |
+| GET    | `/api/chats`              | List chats           |
+| POST   | `/api/chats/:id/messages` | Send message         |
+| GET    | `/api/chats/:id/messages` | Message history      |
+| GET    | `/api/ws`                 | WebSocket connection |
 
-## Структура проекта
+## Project Structure
 
 ```
-cmd/                 # Точка входа
+cmd/                 # Entry point
 internal/
-  application/       # Жизненный цикл приложения
-  config/            # Конфигурация
+  application/       # Application lifecycle
+  config/            # Configuration
   http/              # HTTP handlers, middleware, DTO
-  postgres/          # Repository layer
-  service/           # Бизнес-логика
-  websocket/         # WebSocket hub и клиенты
-  worker/            # Фоновые задачи
-migrations/          # SQL миграции
-docs/                # Swagger документация
+  repository/        # Repository layer
+  service/           # Business logic
+  websocket/         # WebSocket hub and clients
+  worker/            # Background tasks
+migrations/          # SQL migrations
+docs/                # Swagger documentation
 ```
 
-## Make-команды
+## Make Commands
 
-| Команда                       | Описание                                   |
+| Command                       | Description                                |
 |-------------------------------|--------------------------------------------|
-| `make mocks`                  | Генерация моков (mockery)                  |
-| `make swagger`                | Генерация Swagger документации             |
-| `make test`                   | Запуск тестов                              |
-| `make lint-all`               | Запуск всех линтеров                       |
-| `make lint-file FILE=path.go` | Линтинг одного файла                       |
-| `make docker-up`              | Пересборка и запуск контейнеров            |
-| `make docker-down`            | Остановка контейнеров и очистка образов    |
-| `make docker-deep-clean`      | Полная очистка Docker (образы, кэш, тома)  |
-
-## Линтеры
-
-| Линтер          | Назначение                                  |
-|-----------------|---------------------------------------------|
-| `golangci-lint` | Статический анализ Go-кода                  |
-| `squawk`        | Проверка SQL-миграций на безопасность       |
-| `sqlfluff`      | Проверка стиля SQL (PostgreSQL)             |
+| `make gen`                    | Generate code (swagger, mocks)             |
+| `make test`                   | Run tests                                  |
+| `make lint-all`               | Run all linters                            |
+| `make lint-file FILE=path.go` | Lint single file                           |
+| `make docker-up`              | Rebuild and start containers               |
+| `make docker-down`            | Stop containers and clean images           |
+| `make docker-deep-clean`      | Full Docker cleanup (images, cache, vols)  |
 
