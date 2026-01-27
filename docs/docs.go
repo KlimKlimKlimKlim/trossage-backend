@@ -7,6 +7,541 @@ import "github.com/swaggo/swag/v2"
 const docTemplate = `{
     "schemes": {{ marshal .Schemes }},
     "components": {
+        "schemas": {
+            "dto.ChatResponse": {
+                "properties": {
+                    "created_at": {
+                        "example": "2025-12-23T00:00:00Z",
+                        "type": "string"
+                    },
+                    "id": {
+                        "example": 123,
+                        "type": "integer"
+                    },
+                    "last_message": {
+                        "$ref": "#/components/schemas/dto.LastMessageInfo"
+                    },
+                    "other_user": {
+                        "$ref": "#/components/schemas/dto.UserResponse"
+                    },
+                    "type": {
+                        "example": "private",
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "dto.ChatsListResponse": {
+                "properties": {
+                    "chats": {
+                        "items": {
+                            "$ref": "#/components/schemas/dto.ChatResponse"
+                        },
+                        "type": "array",
+                        "uniqueItems": false
+                    },
+                    "limit": {
+                        "example": 20,
+                        "type": "integer"
+                    },
+                    "offset": {
+                        "example": 0,
+                        "type": "integer"
+                    },
+                    "total": {
+                        "example": 42,
+                        "type": "integer"
+                    }
+                },
+                "type": "object"
+            },
+            "dto.CreateChatRequest": {
+                "properties": {
+                    "user_id": {
+                        "example": 456,
+                        "minimum": 1,
+                        "type": "integer"
+                    }
+                },
+                "required": [
+                    "user_id"
+                ],
+                "type": "object"
+            },
+            "dto.DeleteUserRequest": {
+                "properties": {
+                    "password": {
+                        "example": "currentPassword123",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "password"
+                ],
+                "type": "object"
+            },
+            "dto.EmptyData": {
+                "type": "object"
+            },
+            "dto.ErrorResponse": {
+                "properties": {
+                    "data": {
+                        "type": "object"
+                    },
+                    "error": {
+                        "example": "some error message",
+                        "type": "string"
+                    },
+                    "is_success": {
+                        "example": false,
+                        "type": "boolean"
+                    }
+                },
+                "type": "object"
+            },
+            "dto.LastMessageInfo": {
+                "properties": {
+                    "created_at": {
+                        "example": "2025-12-23T00:15:30Z",
+                        "type": "string"
+                    },
+                    "sender": {
+                        "$ref": "#/components/schemas/dto.UserResponse"
+                    },
+                    "text": {
+                        "example": "Привет!",
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "dto.LoginUserRequest": {
+                "properties": {
+                    "login": {
+                        "example": "john_doe",
+                        "type": "string"
+                    },
+                    "password": {
+                        "example": "securePass123",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "login",
+                    "password"
+                ],
+                "type": "object"
+            },
+            "dto.MessageResponse": {
+                "properties": {
+                    "chat_id": {
+                        "example": 123,
+                        "type": "integer"
+                    },
+                    "created_at": {
+                        "example": "2025-12-29T13:00:00Z",
+                        "type": "string"
+                    },
+                    "id": {
+                        "example": 456,
+                        "type": "integer"
+                    },
+                    "sender_id": {
+                        "example": 789,
+                        "type": "integer"
+                    },
+                    "text": {
+                        "example": "Привет!",
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "dto.MessagesResponse": {
+                "properties": {
+                    "limit": {
+                        "example": 20,
+                        "type": "integer"
+                    },
+                    "messages": {
+                        "items": {
+                            "$ref": "#/components/schemas/dto.MessageResponse"
+                        },
+                        "type": "array",
+                        "uniqueItems": false
+                    },
+                    "offset": {
+                        "example": 0,
+                        "type": "integer"
+                    },
+                    "total": {
+                        "example": 150,
+                        "type": "integer"
+                    }
+                },
+                "type": "object"
+            },
+            "dto.RegisterUserRequest": {
+                "properties": {
+                    "display_name": {
+                        "example": "John Doe",
+                        "maxLength": 20,
+                        "type": "string"
+                    },
+                    "login": {
+                        "example": "john_doe",
+                        "maxLength": 20,
+                        "minLength": 3,
+                        "type": "string"
+                    },
+                    "password": {
+                        "example": "securePass123",
+                        "maxLength": 63,
+                        "minLength": 8,
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "display_name",
+                    "login",
+                    "password"
+                ],
+                "type": "object"
+            },
+            "dto.SendMessageRequest": {
+                "properties": {
+                    "text": {
+                        "example": "Привет!",
+                        "maxLength": 4096,
+                        "minLength": 1,
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "text"
+                ],
+                "type": "object"
+            },
+            "dto.SuccessChatResponse": {
+                "properties": {
+                    "data": {
+                        "$ref": "#/components/schemas/dto.ChatResponse"
+                    },
+                    "error": {
+                        "example": "",
+                        "type": "string"
+                    },
+                    "is_success": {
+                        "example": true,
+                        "type": "boolean"
+                    }
+                },
+                "type": "object"
+            },
+            "dto.SuccessChatsListResponse": {
+                "properties": {
+                    "data": {
+                        "$ref": "#/components/schemas/dto.ChatsListResponse"
+                    },
+                    "error": {
+                        "example": "",
+                        "type": "string"
+                    },
+                    "is_success": {
+                        "example": true,
+                        "type": "boolean"
+                    }
+                },
+                "type": "object"
+            },
+            "dto.SuccessEmptyResponse": {
+                "properties": {
+                    "data": {
+                        "$ref": "#/components/schemas/dto.EmptyData"
+                    },
+                    "error": {
+                        "example": "",
+                        "type": "string"
+                    },
+                    "is_success": {
+                        "example": true,
+                        "type": "boolean"
+                    }
+                },
+                "type": "object"
+            },
+            "dto.SuccessMessageResponse": {
+                "properties": {
+                    "data": {
+                        "$ref": "#/components/schemas/dto.MessageResponse"
+                    },
+                    "error": {
+                        "example": "",
+                        "type": "string"
+                    },
+                    "is_success": {
+                        "example": true,
+                        "type": "boolean"
+                    }
+                },
+                "type": "object"
+            },
+            "dto.SuccessMessagesResponse": {
+                "properties": {
+                    "data": {
+                        "$ref": "#/components/schemas/dto.MessagesResponse"
+                    },
+                    "error": {
+                        "example": "",
+                        "type": "string"
+                    },
+                    "is_success": {
+                        "example": true,
+                        "type": "boolean"
+                    }
+                },
+                "type": "object"
+            },
+            "dto.SuccessTokenResponse": {
+                "properties": {
+                    "data": {
+                        "$ref": "#/components/schemas/dto.TokenResponse"
+                    },
+                    "error": {
+                        "example": "",
+                        "type": "string"
+                    },
+                    "is_success": {
+                        "example": true,
+                        "type": "boolean"
+                    }
+                },
+                "type": "object"
+            },
+            "dto.SuccessUpdateUserResponse": {
+                "properties": {
+                    "data": {
+                        "$ref": "#/components/schemas/dto.UpdateUserResponse"
+                    },
+                    "error": {
+                        "example": "",
+                        "type": "string"
+                    },
+                    "is_success": {
+                        "example": true,
+                        "type": "boolean"
+                    }
+                },
+                "type": "object"
+            },
+            "dto.SuccessUserAndTokenResponse": {
+                "properties": {
+                    "data": {
+                        "$ref": "#/components/schemas/dto.UserAndTokenResponse"
+                    },
+                    "error": {
+                        "example": "",
+                        "type": "string"
+                    },
+                    "is_success": {
+                        "example": true,
+                        "type": "boolean"
+                    }
+                },
+                "type": "object"
+            },
+            "dto.SuccessUserResponse": {
+                "properties": {
+                    "data": {
+                        "$ref": "#/components/schemas/dto.UserResponse"
+                    },
+                    "error": {
+                        "example": "",
+                        "type": "string"
+                    },
+                    "is_success": {
+                        "example": true,
+                        "type": "boolean"
+                    }
+                },
+                "type": "object"
+            },
+            "dto.SuccessUsersSearchResponse": {
+                "properties": {
+                    "data": {
+                        "$ref": "#/components/schemas/dto.UsersSearchResponse"
+                    },
+                    "error": {
+                        "example": "",
+                        "type": "string"
+                    },
+                    "is_success": {
+                        "example": true,
+                        "type": "boolean"
+                    }
+                },
+                "type": "object"
+            },
+            "dto.TokenResponse": {
+                "properties": {
+                    "access_token": {
+                        "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                        "type": "string"
+                    },
+                    "refresh_token": {
+                        "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "dto.TypingOperation": {
+                "properties": {
+                    "length": {
+                        "example": 3,
+                        "maximum": 4096,
+                        "minimum": 1,
+                        "type": "integer"
+                    },
+                    "position": {
+                        "example": 5,
+                        "maximum": 4096,
+                        "minimum": 0,
+                        "type": "integer"
+                    },
+                    "text": {
+                        "example": "привет",
+                        "maxLength": 4096,
+                        "minLength": 1,
+                        "type": "string"
+                    },
+                    "type": {
+                        "enum": [
+                            "insert",
+                            "delete",
+                            "replace",
+                            "clear"
+                        ],
+                        "example": "insert",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "type"
+                ],
+                "type": "object"
+            },
+            "dto.TypingUpdateRequest": {
+                "properties": {
+                    "operations": {
+                        "items": {
+                            "$ref": "#/components/schemas/dto.TypingOperation"
+                        },
+                        "maxItems": 50,
+                        "minItems": 1,
+                        "type": "array",
+                        "uniqueItems": false
+                    }
+                },
+                "required": [
+                    "operations"
+                ],
+                "type": "object"
+            },
+            "dto.UpdateUserRequest": {
+                "properties": {
+                    "display_name": {
+                        "example": "John Doe Updated",
+                        "maxLength": 20,
+                        "minLength": 1,
+                        "type": "string"
+                    },
+                    "new_password": {
+                        "example": "newSecurePass123",
+                        "maxLength": 63,
+                        "minLength": 8,
+                        "type": "string"
+                    },
+                    "old_password": {
+                        "example": "currentPassword123",
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "dto.UpdateUserResponse": {
+                "properties": {
+                    "tokens_revoked": {
+                        "example": true,
+                        "type": "boolean"
+                    },
+                    "tokens_revoked_reason": {
+                        "example": "password changed",
+                        "type": "string"
+                    },
+                    "user": {
+                        "$ref": "#/components/schemas/dto.UserResponse"
+                    }
+                },
+                "type": "object"
+            },
+            "dto.UserAndTokenResponse": {
+                "properties": {
+                    "token": {
+                        "$ref": "#/components/schemas/dto.TokenResponse"
+                    },
+                    "user": {
+                        "$ref": "#/components/schemas/dto.UserResponse"
+                    }
+                },
+                "type": "object"
+            },
+            "dto.UserResponse": {
+                "properties": {
+                    "created_at": {
+                        "example": "2025-12-15T09:00:00Z",
+                        "type": "string"
+                    },
+                    "display_name": {
+                        "example": "John Doe",
+                        "type": "string"
+                    },
+                    "id": {
+                        "example": 12345,
+                        "type": "integer"
+                    },
+                    "login": {
+                        "example": "john_doe",
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "dto.UsersSearchResponse": {
+                "properties": {
+                    "limit": {
+                        "example": 20,
+                        "type": "integer"
+                    },
+                    "offset": {
+                        "example": 0,
+                        "type": "integer"
+                    },
+                    "total": {
+                        "example": 42,
+                        "type": "integer"
+                    },
+                    "users": {
+                        "items": {
+                            "$ref": "#/components/schemas/dto.UserResponse"
+                        },
+                        "type": "array",
+                        "uniqueItems": false
+                    }
+                },
+                "type": "object"
+            }
+        },
         "securitySchemes": {
             "BearerAuth": {
                 "description": "Type \"Bearer\" followed by a space and JWT token",
@@ -25,7 +560,1035 @@ const docTemplate = `{
         "description": "",
         "url": ""
     },
-    "paths": {},
+    "paths": {
+        "/auth/login": {
+            "post": {
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/dto.LoginUserRequest",
+                                "summary": "request",
+                                "description": "Login credentials"
+                            }
+                        }
+                    },
+                    "description": "Login credentials",
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/dto.SuccessUserAndTokenResponse"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "400": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/dto.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Invalid request data"
+                    },
+                    "401": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/dto.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Invalid credentials"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/dto.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Internal server error"
+                    }
+                },
+                "summary": "Login user",
+                "tags": [
+                    "auth"
+                ]
+            }
+        },
+        "/auth/logout": {
+            "post": {
+                "description": "Revokes current refresh token and ends session on this device",
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/dto.SuccessEmptyResponse"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "401": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/dto.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Invalid or expired refresh token"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/dto.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Internal server error"
+                    }
+                },
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "summary": "Logout",
+                "tags": [
+                    "auth"
+                ]
+            }
+        },
+        "/auth/logout-all": {
+            "post": {
+                "description": "Revokes all refresh tokens and ends all user sessions",
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/dto.SuccessEmptyResponse"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "401": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/dto.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Unauthorized"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/dto.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Internal server error"
+                    }
+                },
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "summary": "Logout from all devices",
+                "tags": [
+                    "auth"
+                ]
+            }
+        },
+        "/auth/refresh": {
+            "post": {
+                "description": "Generates new access and refresh tokens using valid refresh token",
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/dto.SuccessTokenResponse"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "401": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/dto.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Invalid or expired refresh token"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/dto.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Internal server error"
+                    }
+                },
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "summary": "Refresh tokens",
+                "tags": [
+                    "auth"
+                ]
+            }
+        },
+        "/auth/register": {
+            "post": {
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/dto.RegisterUserRequest",
+                                "summary": "request",
+                                "description": "Registration data"
+                            }
+                        }
+                    },
+                    "description": "Registration data",
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/dto.SuccessUserAndTokenResponse"
+                                }
+                            }
+                        },
+                        "description": "Created"
+                    },
+                    "400": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/dto.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Invalid request data"
+                    },
+                    "409": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/dto.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "User already exists"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/dto.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Internal server error"
+                    }
+                },
+                "summary": "Register user",
+                "tags": [
+                    "auth"
+                ]
+            }
+        },
+        "/chats": {
+            "get": {
+                "description": "Get user's chat list with pagination",
+                "parameters": [
+                    {
+                        "description": "Limit",
+                        "in": "query",
+                        "name": "limit",
+                        "schema": {
+                            "default": 20,
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "description": "Offset",
+                        "in": "query",
+                        "name": "offset",
+                        "schema": {
+                            "default": 0,
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/dto.SuccessChatsListResponse"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "401": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/dto.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Unauthorized"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/dto.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Internal server error"
+                    }
+                },
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "summary": "Get chats",
+                "tags": [
+                    "chats"
+                ]
+            },
+            "post": {
+                "description": "Create a new chat",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/dto.CreateChatRequest",
+                                "summary": "request",
+                                "description": "Chat creation request"
+                            }
+                        }
+                    },
+                    "description": "Chat creation request",
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/dto.SuccessChatResponse"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "400": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/dto.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Invalid request"
+                    },
+                    "401": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/dto.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/dto.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "User not found"
+                    },
+                    "409": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/dto.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Chat already exists"
+                    },
+                    "422": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/dto.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Cannot create chat with yourself"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/dto.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Internal server error"
+                    }
+                },
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "summary": "Create chat",
+                "tags": [
+                    "chats"
+                ]
+            }
+        },
+        "/chats/{chat_id}/messages": {
+            "get": {
+                "description": "Get messages from chat",
+                "parameters": [
+                    {
+                        "description": "Chat ID",
+                        "in": "path",
+                        "name": "chat_id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "description": "Limit",
+                        "in": "query",
+                        "name": "limit",
+                        "schema": {
+                            "default": 20,
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "description": "Offset",
+                        "in": "query",
+                        "name": "offset",
+                        "schema": {
+                            "default": 0,
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/dto.SuccessMessagesResponse"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "400": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/dto.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Invalid path params"
+                    },
+                    "401": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/dto.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/dto.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "User is not member"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/dto.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Chat not found"
+                    }
+                },
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "summary": "Get messages",
+                "tags": [
+                    "messages"
+                ]
+            },
+            "post": {
+                "description": "Send a new message",
+                "parameters": [
+                    {
+                        "description": "Chat ID",
+                        "in": "path",
+                        "name": "chat_id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/dto.SendMessageRequest",
+                                "summary": "request",
+                                "description": "Message body"
+                            }
+                        }
+                    },
+                    "description": "Message body",
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/dto.SuccessMessageResponse"
+                                }
+                            }
+                        },
+                        "description": "Created"
+                    },
+                    "400": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/dto.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Invalid body"
+                    },
+                    "401": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/dto.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/dto.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "User is not member"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/dto.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Chat not found"
+                    },
+                    "422": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/dto.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Message is empty"
+                    }
+                },
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "summary": "Send message",
+                "tags": [
+                    "messages"
+                ]
+            }
+        },
+        "/chats/{chat_id}/typing": {
+            "post": {
+                "description": "Sends draft message editing operations in real-time.\nOperations:\n- ` + "`" + `insert` + "`" + `: add text at position (requires position, text)\n- ` + "`" + `delete` + "`" + `: remove characters from position (requires position, length)\n- ` + "`" + `replace` + "`" + `: replace entire text, e.g. autocorrect (requires position, text)\n- ` + "`" + `clear` + "`" + `: complete input field clear on send/cancel",
+                "parameters": [
+                    {
+                        "description": "Chat ID",
+                        "in": "path",
+                        "name": "chat_id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/dto.TypingUpdateRequest",
+                                "summary": "request",
+                                "description": "Typing operations"
+                            }
+                        }
+                    },
+                    "description": "Typing operations",
+                    "required": true
+                },
+                "responses": {
+                    "204": {
+                        "content": {
+                            "application/json": {}
+                        },
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/dto.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Invalid body"
+                    },
+                    "401": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/dto.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/dto.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "User is not member"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/dto.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Chat not found"
+                    }
+                },
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "summary": "Send typing operations",
+                "tags": [
+                    "typing"
+                ]
+            }
+        },
+        "/users/me": {
+            "delete": {
+                "description": "Permanently deletes authenticated user account and all associated data. Requires password confirmation.",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/dto.DeleteUserRequest",
+                                "summary": "request",
+                                "description": "Password confirmation"
+                            }
+                        }
+                    },
+                    "description": "Password confirmation",
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/dto.SuccessEmptyResponse"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "400": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/dto.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Invalid request body"
+                    },
+                    "401": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/dto.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Unauthorized or invalid password"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/dto.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Internal server error"
+                    }
+                },
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "summary": "Delete current user",
+                "tags": [
+                    "users"
+                ]
+            },
+            "get": {
+                "description": "Returns authenticated user profile information",
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/dto.SuccessUserResponse"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "401": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/dto.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Unauthorized"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/dto.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Internal server error"
+                    }
+                },
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "summary": "Get current user",
+                "tags": [
+                    "users"
+                ]
+            },
+            "patch": {
+                "description": "Updates authenticated user display name and/or password. Password change revokes all refresh tokens.",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/dto.UpdateUserRequest",
+                                "summary": "request",
+                                "description": "Fields to update"
+                            }
+                        }
+                    },
+                    "description": "Fields to update",
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/dto.SuccessUpdateUserResponse"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "400": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/dto.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Invalid request data or same password"
+                    },
+                    "401": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/dto.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Unauthorized"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/dto.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Internal server error"
+                    }
+                },
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "summary": "Update current user",
+                "tags": [
+                    "users"
+                ]
+            }
+        },
+        "/users/search": {
+            "get": {
+                "description": "Search users by login prefix with pagination",
+                "parameters": [
+                    {
+                        "description": "Search query (login prefix)",
+                        "in": "query",
+                        "name": "q",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "Limit",
+                        "in": "query",
+                        "name": "limit",
+                        "schema": {
+                            "default": 20,
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "description": "Offset",
+                        "in": "query",
+                        "name": "offset",
+                        "schema": {
+                            "default": 0,
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/dto.SuccessUsersSearchResponse"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "401": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/dto.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Unauthorized"
+                    },
+                    "422": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/dto.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Invalid query"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/dto.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Internal server error"
+                    }
+                },
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "summary": "Search users",
+                "tags": [
+                    "users"
+                ]
+            }
+        },
+        "/ws": {
+            "get": {
+                "description": "Establish WebSocket connection for receiving real-time chat events (server -\u003e client only)",
+                "parameters": [
+                    {
+                        "description": "JWT token (alternative to Authorization header for WebSocket clients)",
+                        "in": "query",
+                        "name": "token",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "101": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "description": "Switching Protocols"
+                    },
+                    "401": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/dto.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Unauthorized"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/dto.ErrorResponse"
+                                }
+                            }
+                        },
+                        "description": "Internal server error"
+                    }
+                },
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "summary": "Connect to WebSocket",
+                "tags": [
+                    "websocket"
+                ]
+            }
+        }
+    },
     "openapi": "3.1.0"
 }`
 

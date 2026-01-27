@@ -11,7 +11,7 @@ package main
 //	@name						Authorization
 //	@description				Type "Bearer" followed by a space and JWT token
 
-//go:generate go tool swag init --v3.1 -g main.go -o ../docs
+//go:generate go tool swag init --v3.1 -g main.go -d ./,.. -o ../docs --parseInternal
 
 import (
 	"context"
