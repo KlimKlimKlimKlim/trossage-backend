@@ -137,7 +137,7 @@ func (s *JWTTestSuite) TestGenerateSignedToken() {
 			parts := strings.Split(tokenString, ".")
 			s.Len(parts, 3)
 
-			parsedToken, err := jwt.ParseWithClaims(tokenString, &claims{}, func(token *jwt.Token) (any, error) {
+			parsedToken, err := jwt.ParseWithClaims(tokenString, &claims{}, func(_ *jwt.Token) (any, error) {
 				return controller.secret, nil
 			})
 			s.Require().NoError(err)
@@ -212,7 +212,7 @@ func (s *JWTTestSuite) TestGenerateSignedTokenAndModel() {
 			expectedExpiry := time.Now().Add(tc.config.Lifetime)
 			s.WithinDuration(expectedExpiry, modelToken.ExpiresAt, 2*time.Second)
 
-			parsedToken, err := jwt.ParseWithClaims(tokenString, &claims{}, func(token *jwt.Token) (any, error) {
+			parsedToken, err := jwt.ParseWithClaims(tokenString, &claims{}, func(_ *jwt.Token) (any, error) {
 				return controller.secret, nil
 			})
 			s.Require().NoError(err)
@@ -263,7 +263,7 @@ func (s *JWTTestSuite) TestTokenLifetime() {
 			afterGeneration := time.Now()
 
 			// Parse and check claims.
-			parsedToken, err := jwt.ParseWithClaims(tokenString, &claims{}, func(token *jwt.Token) (any, error) {
+			parsedToken, err := jwt.ParseWithClaims(tokenString, &claims{}, func(_ *jwt.Token) (any, error) {
 				return controller.secret, nil
 			})
 			s.Require().NoError(err)

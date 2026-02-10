@@ -204,7 +204,7 @@ func TestRun(t *testing.T) {
 
 		repo.EXPECT().
 			DeleteExpiredTokens(mock.Anything, mock.AnythingOfType("time.Time")).
-			RunAndReturn(func(ctx context.Context, t time.Time) (int64, error) {
+			RunAndReturn(func(_ context.Context, _ time.Time) (int64, error) {
 				callCount++
 				return 0, errDatabaseFailure
 			}).
@@ -236,7 +236,7 @@ func TestRun(t *testing.T) {
 
 		repo.EXPECT().
 			DeleteExpiredTokens(mock.Anything, mock.AnythingOfType("time.Time")).
-			RunAndReturn(func(ctx context.Context, t time.Time) (int64, error) {
+			RunAndReturn(func(_ context.Context, _ time.Time) (int64, error) {
 				select {
 				case cleanupCalled <- struct{}{}:
 				default:

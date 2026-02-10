@@ -243,6 +243,12 @@ linters:
         - name: specify-disable-reason
           severity: error
       rules:
+        - name: exported
+          disabled: true
+        - name: package-comments
+          disabled: true
+        - name: blank-imports
+          disabled: true
         - name: error-strings
         - name: error-return
         - name: error-naming

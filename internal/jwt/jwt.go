@@ -82,7 +82,7 @@ func (jc *Controller) GenerateSignedTokenAndModel(userID int64) (string, model.T
 
 func (jc *Controller) ProcessToken(tokenString string) (int64, error) {
 	c := &claims{}
-	token, err := jwt.ParseWithClaims(tokenString, c, func(token *jwt.Token) (any, error) {
+	token, err := jwt.ParseWithClaims(tokenString, c, func(_ *jwt.Token) (any, error) {
 		return jc.secret, nil
 	})
 
