@@ -6,7 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	derrors "github.com/KlimKlimKlimKlim/trossage-backend/internal/errors"
+	derrors "github.com/GlaciemArgentum/trossage-backend/internal/errors"
 )
 
 type Response struct {

@@ -6,9 +6,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/config"
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/http/middleware"
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/service"
+	"github.com/GlaciemArgentum/trossage-backend/internal/config"
+	"github.com/GlaciemArgentum/trossage-backend/internal/http/middleware"
+	"github.com/GlaciemArgentum/trossage-backend/internal/service"
 )
 
 type handler struct {

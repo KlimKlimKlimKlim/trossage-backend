@@ -7,9 +7,9 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/config"
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/logger"
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/repository"
+	"github.com/GlaciemArgentum/trossage-backend/internal/config"
+	"github.com/GlaciemArgentum/trossage-backend/internal/logger"
+	"github.com/GlaciemArgentum/trossage-backend/internal/repository"
 )
 
 type Worker struct {

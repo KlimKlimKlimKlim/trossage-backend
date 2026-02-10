@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"slices"
 
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/http/dto"
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/websocket/hub"
+	"github.com/GlaciemArgentum/trossage-backend/internal/http/dto"
+	"github.com/GlaciemArgentum/trossage-backend/internal/websocket/hub"
 )
 
 func (s *Service) SendTyping(ctx context.Context, senderID, chatID int64, typing dto.TypingUpdateRequest) error {

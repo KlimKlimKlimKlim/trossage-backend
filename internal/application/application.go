@@ -13,15 +13,15 @@ import (
 	"go.uber.org/zap"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/config"
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/http/server/api"
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/http/server/system"
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/logger"
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/repository/postgres"
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/service"
-	ws "github.com/KlimKlimKlimKlim/trossage-backend/internal/websocket/hub"
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/worker/tokencleanup"
-	"github.com/KlimKlimKlimKlim/trossage-backend/migrations"
+	"github.com/GlaciemArgentum/trossage-backend/internal/config"
+	"github.com/GlaciemArgentum/trossage-backend/internal/http/server/api"
+	"github.com/GlaciemArgentum/trossage-backend/internal/http/server/system"
+	"github.com/GlaciemArgentum/trossage-backend/internal/logger"
+	"github.com/GlaciemArgentum/trossage-backend/internal/repository/postgres"
+	"github.com/GlaciemArgentum/trossage-backend/internal/service"
+	ws "github.com/GlaciemArgentum/trossage-backend/internal/websocket/hub"
+	"github.com/GlaciemArgentum/trossage-backend/internal/worker/tokencleanup"
+	"github.com/GlaciemArgentum/trossage-backend/migrations"
 )
 
 type App struct {

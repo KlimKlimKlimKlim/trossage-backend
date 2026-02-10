@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	derrors "github.com/KlimKlimKlimKlim/trossage-backend/internal/errors"
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/repository"
+	derrors "github.com/GlaciemArgentum/trossage-backend/internal/errors"
+	"github.com/GlaciemArgentum/trossage-backend/internal/repository"
 )
 
 func (s *Service) inTxWithOpts(ctx context.Context, readOnly bool, fn func(*Service) error) (err error) {

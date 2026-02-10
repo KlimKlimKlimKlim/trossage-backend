@@ -18,9 +18,9 @@ import (
 	"log"
 	"os"
 
-	_ "github.com/KlimKlimKlimKlim/trossage-backend/docs"
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/application"
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/config"
+	_ "github.com/GlaciemArgentum/trossage-backend/docs"
+	"github.com/GlaciemArgentum/trossage-backend/internal/application"
+	"github.com/GlaciemArgentum/trossage-backend/internal/config"
 )
 
 func main() {

@@ -9,11 +9,11 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	derrors "github.com/KlimKlimKlimKlim/trossage-backend/internal/errors"
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/http/response"
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/jwt"
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/model"
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/repository"
+	derrors "github.com/GlaciemArgentum/trossage-backend/internal/errors"
+	"github.com/GlaciemArgentum/trossage-backend/internal/http/response"
+	"github.com/GlaciemArgentum/trossage-backend/internal/jwt"
+	"github.com/GlaciemArgentum/trossage-backend/internal/model"
+	"github.com/GlaciemArgentum/trossage-backend/internal/repository"
 )
 
 func RefreshAuth(jwtController *jwt.Controller, rm repository.Repository) gin.HandlerFunc {

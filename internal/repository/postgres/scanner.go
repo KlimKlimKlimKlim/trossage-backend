@@ -5,7 +5,7 @@ import (
 
 	"github.com/jackc/pgx/v5"
 
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/model"
+	"github.com/GlaciemArgentum/trossage-backend/internal/model"
 )
 
 type nullableUserFields struct {

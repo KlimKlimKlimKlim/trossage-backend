@@ -1,4 +1,4 @@
-module github.com/KlimKlimKlimKlim/trossage-backend
+module github.com/GlaciemArgentum/trossage-backend
 
 go 1.25.3
 

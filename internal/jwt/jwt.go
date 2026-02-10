@@ -8,9 +8,9 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/config"
-	derrors "github.com/KlimKlimKlimKlim/trossage-backend/internal/errors"
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/model"
+	"github.com/GlaciemArgentum/trossage-backend/internal/config"
+	derrors "github.com/GlaciemArgentum/trossage-backend/internal/errors"
+	"github.com/GlaciemArgentum/trossage-backend/internal/model"
 )
 
 type Controller struct {

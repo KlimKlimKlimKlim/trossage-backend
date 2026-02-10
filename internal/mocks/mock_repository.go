@@ -8,8 +8,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/model"
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/repository"
+	"github.com/GlaciemArgentum/trossage-backend/internal/model"
+	"github.com/GlaciemArgentum/trossage-backend/internal/repository"
 	mock "github.com/stretchr/testify/mock"
 )
 

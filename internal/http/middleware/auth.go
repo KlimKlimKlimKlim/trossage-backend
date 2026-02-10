@@ -5,8 +5,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/http/response"
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/jwt"
+	"github.com/GlaciemArgentum/trossage-backend/internal/http/response"
+	"github.com/GlaciemArgentum/trossage-backend/internal/jwt"
 )
 
 func Auth(jwtController *jwt.Controller) gin.HandlerFunc {

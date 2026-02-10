@@ -10,8 +10,8 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
 
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/config"
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/mocks"
+	"github.com/GlaciemArgentum/trossage-backend/internal/config"
+	"github.com/GlaciemArgentum/trossage-backend/internal/mocks"
 )
 
 var (

@@ -7,8 +7,8 @@ import (
 	wslib "github.com/coder/websocket"
 	"go.uber.org/zap"
 
-	derrors "github.com/KlimKlimKlimKlim/trossage-backend/internal/errors"
-	ws "github.com/KlimKlimKlimKlim/trossage-backend/internal/websocket"
+	derrors "github.com/GlaciemArgentum/trossage-backend/internal/errors"
+	ws "github.com/GlaciemArgentum/trossage-backend/internal/websocket"
 )
 
 func (h *Hub) BroadcastToUser(userID int64, event *Event) {

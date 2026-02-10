@@ -3,7 +3,7 @@ package dto
 import (
 	"time"
 
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/model"
+	"github.com/GlaciemArgentum/trossage-backend/internal/model"
 )
 
 type SendMessageRequest struct {

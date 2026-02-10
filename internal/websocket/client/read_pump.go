@@ -3,7 +3,7 @@ package client
 import (
 	wslib "github.com/coder/websocket"
 
-	ws "github.com/KlimKlimKlimKlim/trossage-backend/internal/websocket"
+	ws "github.com/GlaciemArgentum/trossage-backend/internal/websocket"
 )
 
 // readPump reads messages from the WebSocket connection.

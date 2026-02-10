@@ -8,9 +8,9 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 
-	derrors "github.com/KlimKlimKlimKlim/trossage-backend/internal/errors"
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/model"
-	query "github.com/KlimKlimKlimKlim/trossage-backend/internal/repository/postgres/query/user"
+	derrors "github.com/GlaciemArgentum/trossage-backend/internal/errors"
+	"github.com/GlaciemArgentum/trossage-backend/internal/model"
+	query "github.com/GlaciemArgentum/trossage-backend/internal/repository/postgres/query/user"
 )
 
 func (r *Repository) InsertUser(ctx context.Context, user model.AuthUser) (model.AuthUser, error) {

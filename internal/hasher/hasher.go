@@ -5,7 +5,7 @@ import (
 
 	"github.com/alexedwards/argon2id"
 
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/config"
+	"github.com/GlaciemArgentum/trossage-backend/internal/config"
 )
 
 const (

@@ -6,7 +6,7 @@ import (
 
 	wslib "github.com/coder/websocket"
 
-	ws "github.com/KlimKlimKlimKlim/trossage-backend/internal/websocket"
+	ws "github.com/GlaciemArgentum/trossage-backend/internal/websocket"
 )
 
 func (c *Client) writePump() {

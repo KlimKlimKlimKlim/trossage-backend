@@ -7,7 +7,7 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/config"
+	"github.com/GlaciemArgentum/trossage-backend/internal/config"
 )
 
 type HasherTestSuite struct {

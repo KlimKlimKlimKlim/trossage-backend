@@ -6,8 +6,8 @@ import (
 
 	"github.com/jackc/pgx/v5"
 
-	derrors "github.com/KlimKlimKlimKlim/trossage-backend/internal/errors"
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/repository"
+	derrors "github.com/GlaciemArgentum/trossage-backend/internal/errors"
+	"github.com/GlaciemArgentum/trossage-backend/internal/repository"
 )
 
 //nolint:ireturn // necessary for compatibility with repository.Repository

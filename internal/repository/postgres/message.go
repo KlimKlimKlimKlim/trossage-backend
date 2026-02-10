@@ -3,8 +3,8 @@ package postgres
 import (
 	"context"
 
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/model"
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/repository/postgres/query/message"
+	"github.com/GlaciemArgentum/trossage-backend/internal/model"
+	"github.com/GlaciemArgentum/trossage-backend/internal/repository/postgres/query/message"
 )
 
 func (r *Repository) CreateMessage(ctx context.Context, chatID, senderID int64, text string) (model.Message, error) {

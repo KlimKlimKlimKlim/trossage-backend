@@ -7,7 +7,7 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/config"
+	"github.com/GlaciemArgentum/trossage-backend/internal/config"
 )
 
 const (

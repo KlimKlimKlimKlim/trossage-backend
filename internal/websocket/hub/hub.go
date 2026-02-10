@@ -9,9 +9,9 @@ import (
 	"go.uber.org/zap"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/config"
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/logger"
-	ws "github.com/KlimKlimKlimKlim/trossage-backend/internal/websocket"
+	"github.com/GlaciemArgentum/trossage-backend/internal/config"
+	"github.com/GlaciemArgentum/trossage-backend/internal/logger"
+	ws "github.com/GlaciemArgentum/trossage-backend/internal/websocket"
 )
 
 type Hub struct {

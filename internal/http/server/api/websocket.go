@@ -8,10 +8,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/config"
-	derrors "github.com/KlimKlimKlimKlim/trossage-backend/internal/errors"
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/jwt"
-	ws "github.com/KlimKlimKlimKlim/trossage-backend/internal/websocket/client"
+	"github.com/GlaciemArgentum/trossage-backend/internal/config"
+	derrors "github.com/GlaciemArgentum/trossage-backend/internal/errors"
+	"github.com/GlaciemArgentum/trossage-backend/internal/jwt"
+	ws "github.com/GlaciemArgentum/trossage-backend/internal/websocket/client"
 )
 
 // connectWebSocket establishes a WebSocket connection for real-time chat events.

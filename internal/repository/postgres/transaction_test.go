@@ -5,8 +5,8 @@ import (
 
 	"github.com/jackc/pgerrcode"
 
-	derrors "github.com/KlimKlimKlimKlim/trossage-backend/internal/errors"
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/model"
+	derrors "github.com/GlaciemArgentum/trossage-backend/internal/errors"
+	"github.com/GlaciemArgentum/trossage-backend/internal/model"
 )
 
 func (s *RepositoryTestSuite) TestWithTx() {

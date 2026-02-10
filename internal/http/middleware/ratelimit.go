@@ -6,7 +6,7 @@ import (
 	mgin "github.com/ulule/limiter/v3/drivers/middleware/gin"
 	"github.com/ulule/limiter/v3/drivers/store/memory"
 
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/config"
+	"github.com/GlaciemArgentum/trossage-backend/internal/config"
 )
 
 func RateLimit(cfg *config.RateLimit) gin.HandlerFunc {

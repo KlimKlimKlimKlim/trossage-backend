@@ -5,11 +5,11 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	derrors "github.com/KlimKlimKlimKlim/trossage-backend/internal/errors"
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/http/dto"
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/http/middleware"
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/http/params"
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/http/response"
+	derrors "github.com/GlaciemArgentum/trossage-backend/internal/errors"
+	"github.com/GlaciemArgentum/trossage-backend/internal/http/dto"
+	"github.com/GlaciemArgentum/trossage-backend/internal/http/middleware"
+	"github.com/GlaciemArgentum/trossage-backend/internal/http/params"
+	"github.com/GlaciemArgentum/trossage-backend/internal/http/response"
 )
 
 // getMessages gets messages from chat

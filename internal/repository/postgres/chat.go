@@ -6,9 +6,9 @@ import (
 
 	"github.com/jackc/pgx/v5"
 
-	derrors "github.com/KlimKlimKlimKlim/trossage-backend/internal/errors"
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/model"
-	query "github.com/KlimKlimKlimKlim/trossage-backend/internal/repository/postgres/query/chat"
+	derrors "github.com/GlaciemArgentum/trossage-backend/internal/errors"
+	"github.com/GlaciemArgentum/trossage-backend/internal/model"
+	query "github.com/GlaciemArgentum/trossage-backend/internal/repository/postgres/query/chat"
 )
 
 func (r *Repository) SelectChatBetweenUsers(ctx context.Context, userID1, userID2 int64) (int64, error) {

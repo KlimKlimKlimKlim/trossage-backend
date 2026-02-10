@@ -1,11 +1,11 @@
 package service
 
 import (
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/config"
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/hasher"
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/jwt"
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/repository"
-	ws "github.com/KlimKlimKlimKlim/trossage-backend/internal/websocket/hub"
+	"github.com/GlaciemArgentum/trossage-backend/internal/config"
+	"github.com/GlaciemArgentum/trossage-backend/internal/hasher"
+	"github.com/GlaciemArgentum/trossage-backend/internal/jwt"
+	"github.com/GlaciemArgentum/trossage-backend/internal/repository"
+	ws "github.com/GlaciemArgentum/trossage-backend/internal/websocket/hub"
 )
 
 type Service struct {

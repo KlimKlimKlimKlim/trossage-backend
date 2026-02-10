@@ -1,7 +1,7 @@
 package postgres
 
 import (
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/repository"
+	"github.com/GlaciemArgentum/trossage-backend/internal/repository"
 )
 
 type Repository struct {

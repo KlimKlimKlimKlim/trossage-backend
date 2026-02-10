@@ -1,8 +1,8 @@
 package hub
 
 import (
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/http/dto"
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/model"
+	"github.com/GlaciemArgentum/trossage-backend/internal/http/dto"
+	"github.com/GlaciemArgentum/trossage-backend/internal/model"
 )
 
 type EventType string

@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 
-	derrors "github.com/KlimKlimKlimKlim/trossage-backend/internal/errors"
+	derrors "github.com/GlaciemArgentum/trossage-backend/internal/errors"
 )
 
 func (s *Service) createTokens(ctx context.Context, userID int64) (string, string, error) {

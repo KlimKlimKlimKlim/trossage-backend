@@ -5,7 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/config"
+	"github.com/GlaciemArgentum/trossage-backend/internal/config"
 )
 
 func New(cfg *config.SystemServer) *http.Server {

@@ -6,8 +6,8 @@ import (
 
 	wslib "github.com/coder/websocket"
 
-	derrors "github.com/KlimKlimKlimKlim/trossage-backend/internal/errors"
-	ws "github.com/KlimKlimKlimKlim/trossage-backend/internal/websocket"
+	derrors "github.com/GlaciemArgentum/trossage-backend/internal/errors"
+	ws "github.com/GlaciemArgentum/trossage-backend/internal/websocket"
 )
 
 type Client struct {

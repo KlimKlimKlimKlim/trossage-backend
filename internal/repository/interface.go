@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/model"
+	"github.com/GlaciemArgentum/trossage-backend/internal/model"
 )
 
 //go:generate go tool mockery

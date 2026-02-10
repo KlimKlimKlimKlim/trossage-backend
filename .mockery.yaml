@@ -1,6 +1,6 @@
 # .mockery.yaml
 packages:
-  github.com/KlimKlimKlimKlim/trossage-backend/internal/repository:
+  github.com/GlaciemArgentum/trossage-backend/internal/repository:
     config:
       dir: "{{.InterfaceDir}}/../mocks"
       pkgname: "mocks"

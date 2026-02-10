@@ -8,8 +8,8 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/config"
-	derrors "github.com/KlimKlimKlimKlim/trossage-backend/internal/errors"
+	"github.com/GlaciemArgentum/trossage-backend/internal/config"
+	derrors "github.com/GlaciemArgentum/trossage-backend/internal/errors"
 )
 
 func New(cfg config.Logger) (*zap.Logger, error) {

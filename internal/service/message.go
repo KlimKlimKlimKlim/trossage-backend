@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"strings"
 
-	derrors "github.com/KlimKlimKlimKlim/trossage-backend/internal/errors"
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/model"
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/websocket/hub"
+	derrors "github.com/GlaciemArgentum/trossage-backend/internal/errors"
+	"github.com/GlaciemArgentum/trossage-backend/internal/model"
+	"github.com/GlaciemArgentum/trossage-backend/internal/websocket/hub"
 )
 
 func (s *Service) CreateMessage(

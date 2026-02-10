@@ -41,11 +41,11 @@ formatters:
     - swaggo
   settings:
     gofumpt:
-      module-path: github.com/KlimKlimKlimKlim/trossage-backend
+      module-path: github.com/GlaciemArgentum/trossage-backend
       extra-rules: true
     goimports:
       local-prefixes:
-        - github.com/KlimKlimKlimKlim/trossage-backend
+        - github.com/GlaciemArgentum/trossage-backend
     golines:
       max-len: 120
       tab-len: 4

@@ -7,9 +7,9 @@ import (
 
 	"github.com/jackc/pgx/v5"
 
-	derrors "github.com/KlimKlimKlimKlim/trossage-backend/internal/errors"
-	"github.com/KlimKlimKlimKlim/trossage-backend/internal/model"
-	query "github.com/KlimKlimKlimKlim/trossage-backend/internal/repository/postgres/query/token"
+	derrors "github.com/GlaciemArgentum/trossage-backend/internal/errors"
+	"github.com/GlaciemArgentum/trossage-backend/internal/model"
+	query "github.com/GlaciemArgentum/trossage-backend/internal/repository/postgres/query/token"
 )
 
 func (r *Repository) InsertRefreshToken(ctx context.Context, token model.Token) (model.Token, error) {

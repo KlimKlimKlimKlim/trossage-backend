@@ -3,7 +3,7 @@ package params
 import (
 	"strings"
 
-	derrors "github.com/KlimKlimKlimKlim/trossage-backend/internal/errors"
+	derrors "github.com/GlaciemArgentum/trossage-backend/internal/errors"
 )
 
 const (
